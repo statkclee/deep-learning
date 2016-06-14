@@ -10,6 +10,8 @@ subtitle: 구글 클라우드 비젼
 > * 구글 클라우드 비젼 API를 설치한다.
 > * 구글 비젼 API를 통해 얼굴인식, 명소인식, 물체를 식별한다.
 
+<img src="fig/gcv-process.png" alt="구글 클라우드 비젼 API" width="60%">
+
 
 ### 1. 구글 클라우드 비젼 API 인증 준비
 
