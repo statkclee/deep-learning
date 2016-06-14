@@ -12,6 +12,14 @@ title: xwMOOC 딥러닝
 
 <img src="fig/three-pillars.png" width="57%" />
 
+특히, 데이터 폭증과 병렬컴퓨팅을 통해 강력한 연산 능력을 갖추게 되었지만, 이를 효과적으로 활용할 모형이 마땅치 않았으나 깊은 신경망을 모형을 통해 그동안 홀대 받았던 신경망 모형이 가장 인기있는 모형으로 자리잡게 되었다.
+
+전통 학습 모형은 작은 데이터에서 학습효과가 좋지만, 데이터가 많아져도 이를 반영한 성능은 나오지 않는다. 신경망 모형은 데이터 증가에 맞추어 표현력을 따라서 높이면 성능도 높일 수 있다. 하지만, 그에 따른 어마어마한 컴퓨팅 자원이 소요된다. 최근 클라우드와 더불어 고성능 컴퓨팅 HPC에 GPU를 도입해서 정말 상상도 못한 컴퓨팅 자원을 감당할만한 비용으로 이용가능한 세상이 되었다.
+
+<img src="fig/dl-hpc-evolution.png" width="57%" />
+
+
+
 > ### AI is a Superpower {.callout}
 >
 > "AI is a superpower!!!", 인공지능을 체득하면 슈퍼파워를 손에 쥘 것이다. [Andrew Ng](https://twitter.com/andrewyng/status/728986380638916609)
@@ -25,6 +33,7 @@ title: xwMOOC 딥러닝
 [^jeff-dean-spark-2016]: [Large Scale Deep Learning with TensorFlow](https://www.youtube.com/watch?v=XYwIDn00PAo) 
 [^andrew-ng-spark-2016]: [AI-The New Electricity](https://www.youtube.com/watch?v=4eJhcxfYR4I)
 
+1. [딥러닝이 주목받는 이유](why-dl.html)
 1. 클라우드 API 활용 구축
     - [구글 클라우드 비젼](gc-vision.html)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
