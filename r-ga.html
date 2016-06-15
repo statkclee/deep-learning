@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: xwMOOC 딥러닝</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
+          <h2 class="subtitle">R 구글 애널리틱스(GA)</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>R 구글 애널리틱스(GA)를 이해한다.</li>
+</ul>
+</div>
+</section>
+<h3 id="r-구글-애널리틱스-설치">R 구글 애널리틱스 설치</h3>
+<p><img src="fig/rga-workflow.png" alt="구글 애널리틱스 작업흐름" width="50%"></p>
+<p>구글 클라우드 플랫폼에 담긴 구글 애널리틱스(Google Analytics, GA) 데이터를 뽑아내서 R에서 자유로이 작업을 하고자 한다.</p>
+<section class="prereq panel panel-warning">
+<div class="panel-heading">
+<h3 id="사전-학습"><span class="glyphicon glyphicon-education"></span>사전 학습</h3>
+</div>
+<div class="panel-body">
+<ul>
+<li>클라우드와 API 기초 개념이해</li>
+<li>OAUTH 2.0 작동방식 이해</li>
+<li>GA 서비스 이해</li>
+</ul>
+</div>
+</section>
+<h3 id="ga를-지원하는-r-팩키지">GA를 지원하는 R 팩키지</h3>
+<p>GA를 지원하는 R 팩키지는 다양하다.</p>
+<ul>
+<li><a href="https://cran.r-project.org/web/packages/RGA/index.html">RGA</a> : 1 개발자 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></li>
+<li><a href="https://github.com/skardhamar/rga">rga</a> : 12 개발자</li>
+<li><a href="https://cran.r-project.org/web/packages/googleAnalyticsR/index.html">googleAnalyticsR</a>: 3 개발자</li>
+<li><a href="https://github.com/Tatvic/RGoogleAnalytics">RGoogleAnalytics</a> : 4 개발자 <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></li>
+<li><a href="https://github.com/jdeboer/ganalytics">ganalytics</a> : 2 개발자</li>
+</ul>
+<p>서로 장단점이 있지만, <strong>RGA</strong> 로 간다. 이유는 저자와 같은 학습과정을 정말 잘 정리해서 표현했고, 가장 최근 현재 구글 클라우드 플랫폼을 그대로 적용했기 때문이다. 아무래도 가장 최근 블로그 글이라 그런가 보다.</p>
+<h3 id="r에서-ga-구현-rga-demystified">R에서 GA 구현 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
+<p>구글 클라우드 플랫폼에서 데이터를 땡겨 R에서 마음껏 분석을 한다는 것은 많은 제약이 따른다. 다르게 생각하면 구글에서 사용자에게 GA API를 공개하고 허용된 데이터를 자유로이 전달해줘야 하는데 보안, 성능, 편의성 등을 여러 요소를 고려하여 오랜기간동안 나름 정립된 것인만큼 존중해 주도록 한다.</p>
+<p>R과 RStudio IDE는 설치가 된 것으로 간주하고 생략하고 바로 R과 GA를 연결하는 작업을 수행한다.</p>
+<h4 id="구글-클라우드-플랫폼-프로젝트-생성">구글 클라우드 플랫폼 프로젝트 생성</h4>
+<p>R과 GA를 연결할 때 핵심이 되는 <strong>인증서를 생성</strong> 하는 것이 목적이다. 이를 통해 사람의 개업없이 R 응용프로그램과 GA 클라우드 시스템간에 인증이 되어 데이터를 주고 받을 수 있게 된다.</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://console.developers.google.com/project">구글 개발자 콘솔(Google Develoers Console)</a>로 이동<br />
+</li>
+<li>좌측상단 햄버거 모양을 클릭하면 좌측에 메뉴가 보인다.</li>
+<li>좌측 메뉴에서 <strong>API Manager</strong> 를 클릭한다.</li>
+<li>프로젝트가 꼭 필요하니 처음이면 새로 프로젝트를 생성한다.</li>
+<li>좌측메뉴에서 <strong>Credentials</strong> 를 클릭하여 인증서를 생성한다. <code>Create credentials</code> → <code>OAuth client ID</code>
+<ul>
+<li><code>Application Type</code> → <code>Other</code>를 선택하고 인증서에 명칭을 부여한다.</li>
+</ul></li>
+<li><code>Create</code> 를 클릭하면 <strong>OAuth client</strong> <code>client ID</code> 와 함께 <code>client secret</code> 이 생성되는데 소중히 메모하여 간직한다.</li>
+</ol>
+<p><img src="fig/ga-project-setup.png" alt="구글 클라우드 플랫폼 인증서 생성" width="70%"></p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h4 id="analytics-api-활성화"><span class="glyphicon glyphicon-pushpin"></span>Analytics API 활성화</h4>
+</div>
+<div class="panel-body">
+<p><img src="fig/rga-analytics-api-enable.png" alt="구글 애널리틱스 API 활성화" width="30%"></p>
+</div>
+</aside>
+<h4 id="구글-애널리틱스-ids-확인">구글 애널리틱스 <code>ids</code> 확인</h4>
+<p><a href="https://ga-dev-tools.appspot.com/query-explorer/">Google Analytics Query Explorer</a>에서 <code>ids</code>를 확인한다. R코드에서 사용할 것이기 때문에 잘 보관하여 준비해 둔다.</p>
+<p><img src="fig/ga-ids-query-explorer.png" alt="구글 애널리틱스 쿼리 탐색기" width="30%"></p>
+<p><strong>View ids</strong> 가 확인되면 이것으로 모든 준비가 된 것이다.</p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h4 id="r과-ga-토큰-생성"><span class="glyphicon glyphicon-pushpin"></span>R과 GA 토큰 생성</h4>
+</div>
+<div class="panel-body">
+<p>구글 클라우드 프로젝트 인증 <code>client ID</code>, <code>client secret</code>, 구글 애널리틱스 <code>ids</code>를 확인하고 R 응용프로그램에서 함께 실어 구글로 보내면 다음과 같은 인증 화면이 나오고 나서 토큰이 생성된다. 토큰은 구글에서 정한 수명이 있어 시간이 지나면 재인증하고 새로 생성된다.</p>
+<p><img src="fig/rga-token.png" alt="구글 애널리틱스 쿼리 탐색기" width="30%"></p>
+</div>
+</aside>
+<h4 id="r과-ga-합체">R과 GA 합체</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
+## 1. 환경설정
+##=========================================================================================
+
+if(<span class="st">&quot;RGA&quot;</span> %in%<span class="st"> </span><span class="kw">installed.packages</span>() ==<span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;RGA&quot;</span>)
+<span class="kw">library</span>(RGA)
+
+<span class="co"># GA 계정 인증</span>
+client.id &lt;-<span class="st"> &quot;------------------.apps.googleusercontent.com&quot;</span>
+client.secret &lt;-<span class="st"> &quot;XXXXXXXXXXXXXXX&quot;</span>
+
+ga_token &lt;-<span class="st"> </span><span class="kw">authorize</span>(<span class="dt">client.id =</span> client.id, 
+                      <span class="dt">client.secret =</span> client.secret)
+
+##=========================================================================================
+## 2. 데이터 가져오기 및 인증 후 토큰 생성
+##=========================================================================================
+
+<span class="co"># GA 데이터를 로컬 `ga.df` 데이터프레임으로 가져오기</span>
+ga.df &lt;-<span class="st"> </span><span class="kw">get_ga</span>(<span class="dt">profileId =</span> <span class="st">&quot;ga:XXXXXXXXXXX&quot;</span>, 
+                 <span class="dt">start.date =</span> <span class="st">&quot;7daysAgo&quot;</span>,
+                 <span class="dt">end.date =</span> <span class="st">&quot;yesterday&quot;</span>, 
+                 <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;ga:users&quot;</span>, <span class="st">&quot;ga:sessions&quot;</span>,<span class="st">&quot; ga:pageviews&quot;</span>), 
+                 <span class="dt">dimensions =</span> <span class="st">&quot;ga:date&quot;</span>, <span class="dt">sort =</span> <span class="ot">NULL</span>, <span class="dt">filters =</span> <span class="ot">NULL</span>,
+                 <span class="dt">segment =</span> <span class="ot">NULL</span>, <span class="dt">samplingLevel =</span> <span class="ot">NULL</span>, <span class="dt">start.index =</span> <span class="ot">NULL</span>,
+                 <span class="dt">max.results =</span> <span class="ot">NULL</span>, <span class="dt">include.empty.rows =</span> <span class="ot">NULL</span>, <span class="dt">fetch.by =</span> <span class="ot">NULL</span>, ga_token)
+
+##=========================================================================================
+## 3. 시각화
+##=========================================================================================
+
+<span class="kw">plot</span>(ga.df$date, ga.df$sessions,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="kw">max</span>(ga.df$sessions)))</code></pre></div>
+<p><img src="fig/RGA-session-plot.png" alt="RGA 헬로우 월드" width="50%"></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://www.lunametrics.com/blog/2015/11/23/export-google-analytics-data-with-r/">4 Ways to Export Your Google Analytics Data with R</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://analyticsdemystified.com/analysis/tutorial_pulling_google_analytics_data_with_r/">FROM 0 TO R WITH GOOGLE ANALYTICS</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="http://www.tatvic.com/blog/author/kushan/">How to extract Google Analytics data in R using RGoogleAnalytics</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="http://analyticsdemystified.com/analysis/tutorial_pulling_google_analytics_data_with_r/">FROM 0 TO R WITH GOOGLE ANALYTICS</a><a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </body>
+</html>
