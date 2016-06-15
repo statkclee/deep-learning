@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: xwMOOC 딥러닝</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
+          <h2 class="subtitle">R 구글 url 축약-googleAuthR</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>구글 인증 팩키지를 이해한다.</li>
+<li>url 단축 API를 R에서 호출해서 개발한다.</li>
+</ul>
+</div>
+</section>
+<h3 id="googleauthr-팩키지를-통한-url-축약-googleauthr-vignette">1. <code>googleAuthR</code> 팩키지를 통한 url 축약 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
+## 1. 환경설정
+##=========================================================================================
+<span class="co"># 팩키지 설치 </span>
+if(<span class="st">&quot;googleAuthR&quot;</span> %in%<span class="st"> </span><span class="kw">installed.packages</span>() ==<span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;googleAuthR&quot;</span>)
+<span class="kw">library</span>(googleAuthR)
+
+<span class="co"># GA 계정 인증</span>
+client.id &lt;-<span class="st"> &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com&quot;</span>
+client.secret &lt;-<span class="st"> &quot;xxxxxxxxxxxxxxxxxxxxxx&quot;</span>
+
+
+<span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_id&quot;</span> =<span class="st"> </span>client.id)
+<span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_secret&quot;</span> =<span class="st"> </span>client.secret)
+
+<span class="kw">options</span>(<span class="st">&quot;googleAuthR.scopes.selected&quot;</span> =<span class="st"> </span>
+<span class="st">          </span><span class="kw">c</span>(<span class="st">&quot;https://www.googleapis.com/auth/urlshortener&quot;</span>))
+
+googleAuthR::<span class="kw">gar_auth</span>()
+
+##=========================================================================================
+## 2. url 축약
+##=========================================================================================
+
+<span class="co">#&#39; Shortens a url using goo.gl</span>
+<span class="co">#&#39;</span>
+<span class="co">#&#39; @param url URl to shorten with goo.gl</span>
+<span class="co">#&#39; </span>
+<span class="co">#&#39; @return a string of the short URL</span>
+<span class="co">#&#39;</span>
+<span class="co">#&#39; Documentation: https://developers.google.com/url-shortener/v1/getting_started</span>
+
+## a wrapper for the function that users pass in the URL to shorten
+shorten_url &lt;-<span class="st"> </span>function(url){
+  
+  ## turns into {&#39;longUrl&#39; : &#39;&lt;&lt;example.com&gt;&gt;&#39;} when using jsonlite::toJSON(body)
+  body =<span class="st"> </span><span class="kw">list</span>(
+    <span class="dt">longUrl =</span> url
+  )
+  
+  ## generate the API call function
+  ## POST https://www.googleapis.com/urlshortener/v1/url
+  ## response has 4 objects $kind, $id, $longUrl, and $status, but we only want $id
+  f &lt;-<span class="st"> </span><span class="kw">gar_api_generator</span>(<span class="st">&quot;https://www.googleapis.com/urlshortener/v1/url&quot;</span>,
+                         <span class="st">&quot;POST&quot;</span>,
+                         <span class="dt">data_parse_function =</span> function(x) x$id)
+
+  ## now the function has been generated, pass in the body.
+  ## this function has no need for path_arguments or pars_arguments, but that will differ for other APIs.
+  <span class="kw">f</span>(<span class="dt">the_body =</span> body)
+}
+
+## to use:
+
+<span class="kw">gar_auth</span>()
+<span class="kw">shorten_url</span>(<span class="st">&quot;http://www.google.com&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">[<span class="dv">1</span>] <span class="st">&quot;http://goo.gl/FpCtwi&quot;</span></code></pre></div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://cran.r-project.org/web/packages/googleAuthR/vignettes/googleAuthR.html">googleAuthR - Google API Client Library for R</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </body>
+</html>
