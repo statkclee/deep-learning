@@ -35,10 +35,12 @@
 <div class="panel-body">
 <ul>
 <li>R 구글 애널리틱스(GA)를 이해한다.</li>
+<li>RGA 팩키지를 통해 인증을 마친 다음 데이터를 가져온다.</li>
+<li>RGA 기능을 활용하여 R코드를 고급화한다.</li>
 </ul>
 </div>
 </section>
-<h3 id="r-구글-애널리틱스-설치">R 구글 애널리틱스 설치</h3>
+<h3 id="r-구글-애널리틱스-설치">1. R 구글 애널리틱스 설치</h3>
 <p><img src="fig/rga-workflow.png" alt="구글 애널리틱스 작업흐름" width="50%"></p>
 <p>구글 클라우드 플랫폼에 담긴 구글 애널리틱스(Google Analytics, GA) 데이터를 뽑아내서 R에서 자유로이 작업을 하고자 한다.</p>
 <section class="prereq panel panel-warning">
@@ -53,7 +55,7 @@
 </ul>
 </div>
 </section>
-<h3 id="ga를-지원하는-r-팩키지">GA를 지원하는 R 팩키지</h3>
+<h3 id="ga를-지원하는-r-팩키지">2. GA를 지원하는 R 팩키지</h3>
 <p>GA를 지원하는 R 팩키지는 다양하다.</p>
 <ul>
 <li><a href="https://cran.r-project.org/web/packages/RGA/index.html">RGA</a> : 1 개발자 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></li>
@@ -63,10 +65,10 @@
 <li><a href="https://github.com/jdeboer/ganalytics">ganalytics</a> : 2 개발자</li>
 </ul>
 <p>서로 장단점이 있지만, <strong>RGA</strong> 로 간다. 이유는 저자와 같은 학습과정을 정말 잘 정리해서 표현했고, 가장 최근 현재 구글 클라우드 플랫폼을 그대로 적용했기 때문이다. 아무래도 가장 최근 블로그 글이라 그런가 보다.</p>
-<h3 id="r에서-ga-구현-rga-demystified">R에서 GA 구현 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
+<h3 id="r에서-ga-구현-rga-demystified">3. R에서 GA 구현 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
 <p>구글 클라우드 플랫폼에서 데이터를 땡겨 R에서 마음껏 분석을 한다는 것은 많은 제약이 따른다. 다르게 생각하면 구글에서 사용자에게 GA API를 공개하고 허용된 데이터를 자유로이 전달해줘야 하는데 보안, 성능, 편의성 등을 여러 요소를 고려하여 오랜기간동안 나름 정립된 것인만큼 존중해 주도록 한다.</p>
 <p>R과 RStudio IDE는 설치가 된 것으로 간주하고 생략하고 바로 R과 GA를 연결하는 작업을 수행한다.</p>
-<h4 id="구글-클라우드-플랫폼-프로젝트-생성">구글 클라우드 플랫폼 프로젝트 생성</h4>
+<h4 id="구글-클라우드-플랫폼-프로젝트-생성">3.1. 구글 클라우드 플랫폼 프로젝트 생성</h4>
 <p>R과 GA를 연결할 때 핵심이 되는 <strong>인증서를 생성</strong> 하는 것이 목적이다. 이를 통해 사람의 개업없이 R 응용프로그램과 GA 클라우드 시스템간에 인증이 되어 데이터를 주고 받을 수 있게 된다.</p>
 <ol style="list-style-type: decimal">
 <li><a href="https://console.developers.google.com/project">구글 개발자 콘솔(Google Develoers Console)</a>로 이동<br />
@@ -89,7 +91,7 @@
 <p><img src="fig/rga-analytics-api-enable.png" alt="구글 애널리틱스 API 활성화" width="30%"></p>
 </div>
 </aside>
-<h4 id="구글-애널리틱스-ids-확인">구글 애널리틱스 <code>ids</code> 확인</h4>
+<h4 id="구글-애널리틱스-ids-확인">3.2. 구글 애널리틱스 <code>ids</code> 확인</h4>
 <p><a href="https://ga-dev-tools.appspot.com/query-explorer/">Google Analytics Query Explorer</a>에서 <code>ids</code>를 확인한다. R코드에서 사용할 것이기 때문에 잘 보관하여 준비해 둔다.</p>
 <p><img src="fig/ga-ids-query-explorer.png" alt="구글 애널리틱스 쿼리 탐색기" width="30%"></p>
 <p><strong>View ids</strong> 가 확인되면 이것으로 모든 준비가 된 것이다.</p>
@@ -102,7 +104,8 @@
 <p><img src="fig/rga-token.png" alt="구글 애널리틱스 쿼리 탐색기" width="30%"></p>
 </div>
 </aside>
-<h4 id="r과-ga-합체">R과 GA 합체</h4>
+<h4 id="r과-ga-합체">3.3. R과 GA 합체</h4>
+<p><code>client.id</code>, <code>client.secret</code>를 R코드에 넣고, <code>get_ga</code>에 <code>ids</code>도 확인하여 넣는다. <code>ids</code>는 <code>ga:XXXXXXXXXXX</code> 형식으로 구현된다. 마지막으로 불러온 데이터를 간단히 도식화한다.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
 ## 1. 환경설정
 ##=========================================================================================
@@ -116,6 +119,9 @@ client.secret &lt;-<span class="st"> &quot;XXXXXXXXXXXXXXX&quot;</span>
 
 ga_token &lt;-<span class="st"> </span><span class="kw">authorize</span>(<span class="dt">client.id =</span> client.id, 
                       <span class="dt">client.secret =</span> client.secret)
+
+<span class="co"># 토큰 정보를 저장</span>
+<span class="kw">save</span>(ga_token, <span class="dt">file=</span><span class="st">&quot;./ga_token&quot;</span>)
 
 ##=========================================================================================
 ## 2. 데이터 가져오기 및 인증 후 토큰 생성
@@ -136,6 +142,102 @@ ga.df &lt;-<span class="st"> </span><span class="kw">get_ga</span>(<span class="
 
 <span class="kw">plot</span>(ga.df$date, ga.df$sessions,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="kw">max</span>(ga.df$sessions)))</code></pre></div>
 <p><img src="fig/RGA-session-plot.png" alt="RGA 헬로우 월드" width="50%"></p>
+<h3 id="rga-r-프로그램-고도화">4. RGA R 프로그램 고도화</h3>
+<h4 id="비밀-환경설정-정보-비노출">4.1. 비밀 환경설정 정보 비노출</h4>
+<p><code>client.id</code>, <code>client.secret</code>와 더불어, <code>get_ga</code>에 <code>ids</code>를 모두 R코드에 한곳에 넣었다. 이렇게 하면 향후 유지보수에도 문제가 있고, 보안문제를 야기할 수도 있다.</p>
+<p><code>client.id</code>, <code>client.secret</code> 정보를 앞선 프로그램에서 <code>ga_token</code> 파일에 저장했다. 이를 <code>load</code> 명령어를 통해 불러오고, 유효한 토큰인지 <code>ValidateToken</code> 명령어로 확인한다.</p>
+<p>또한, <code>get_ga</code>에 <code>ids</code>를 로컬 파일에 환경설정 변수로 넣어 저장해서 프로그램에 함께 포함되지 않게 만들었다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
+## 1. 환경설정
+##=========================================================================================
+<span class="co"># 팩키지 설치 </span>
+if(<span class="st">&quot;RGA&quot;</span> %in%<span class="st"> </span><span class="kw">installed.packages</span>() ==<span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;RGA&quot;</span>)
+<span class="kw">library</span>(RGA)
+
+<span class="co"># GA 계정 인증</span>
+ga_profile &lt;-<span class="st"> </span><span class="kw">list_profiles</span>(<span class="dt">token =</span> ga_token)
+
+<span class="kw">load</span>(<span class="st">&quot;ga_token&quot;</span>)
+<span class="kw">ValidateToken</span>(token)
+
+##=========================================================================================
+## 2. 데이터 가져오기 및 인증 후 토큰 생성
+##=========================================================================================
+<span class="co"># GA ID 파일 환경설정으로 처리</span>
+<span class="kw">source</span>(<span class="st">&quot;ga_conf.R&quot;</span>) <span class="co"># id &lt;- &quot;ga:1xxxxxxxxxx&quot;</span>
+
+<span class="co"># GA 데이터를 로컬 `ga.df` 데이터프레임으로 가져오기</span>
+ga.df &lt;-<span class="st"> </span><span class="kw">get_ga</span>(<span class="dt">profileId =</span> id, 
+                 <span class="dt">start.date =</span> <span class="st">&quot;2015-09-01&quot;</span>,
+                 <span class="dt">end.date =</span> <span class="st">&quot;yesterday&quot;</span>, 
+                 <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;ga:users&quot;</span>, <span class="st">&quot;ga:sessions&quot;</span>,<span class="st">&quot; ga:pageviews&quot;</span>), 
+                 <span class="dt">dimensions =</span> <span class="st">&quot;ga:date&quot;</span>, <span class="dt">sort =</span> <span class="ot">NULL</span>, <span class="dt">filters =</span> <span class="ot">NULL</span>,
+                 <span class="dt">segment =</span> <span class="ot">NULL</span>, <span class="dt">samplingLevel =</span> <span class="ot">NULL</span>, <span class="dt">start.index =</span> <span class="ot">NULL</span>,
+                 <span class="dt">max.results =</span> <span class="dv">10000</span>, <span class="dt">include.empty.rows =</span> <span class="ot">NULL</span>, <span class="dt">fetch.by =</span> <span class="ot">NULL</span>, ga_token)
+
+##=========================================================================================
+## 3. 시각화
+##=========================================================================================
+
+<span class="kw">plot</span>(ga.df$date, ga.df$sessions,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="kw">max</span>(ga.df$sessions)))</code></pre></div>
+<h4 id="rga-고급-분석-rga-ggplot">4.2. RGA 고급 분석 <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></h4>
+<p><code>ggplot</code>을 활용하여 GA에서 수집한 정보를 시각화 했다. <strong><a href="https://developers.google.com/analytics/devguides/reporting/core/dimsmets">구글 애널리틱스 Dimensions &amp; Metrics Explorer</a></strong> 에서 다양한 데이터를 찾아보고 영감을 받기 바란다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
+## 1. 환경설정
+##=========================================================================================
+<span class="co"># 팩키지 설치 </span>
+if(<span class="st">&quot;RGA&quot;</span> %in%<span class="st"> </span><span class="kw">installed.packages</span>() ==<span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;RGA&quot;</span>)
+<span class="kw">library</span>(RGA)
+
+<span class="co"># GA 계정 인증</span>
+ga_profile &lt;-<span class="st"> </span><span class="kw">list_profiles</span>(<span class="dt">token =</span> ga_token)
+
+<span class="kw">load</span>(<span class="st">&quot;ga_token&quot;</span>)
+<span class="kw">ValidateToken</span>(token)
+
+##=========================================================================================
+## 2. 데이터 가져오기 및 인증 후 토큰 생성
+##=========================================================================================
+<span class="co"># GA ID 파일 환경설정으로 처리</span>
+<span class="kw">source</span>(<span class="st">&quot;ga_conf.R&quot;</span>) <span class="co"># id &lt;- &quot;ga:1xxxxxxxxxx&quot;</span>
+
+<span class="co"># GA 데이터를 로컬 `ga.df` 데이터프레임으로 가져오기</span>
+ga.df &lt;-<span class="st"> </span><span class="kw">get_ga</span>(<span class="dt">profileId =</span> id, 
+                 <span class="dt">start.date =</span> <span class="st">&quot;2015-09-01&quot;</span>,
+                 <span class="dt">end.date =</span> <span class="st">&quot;yesterday&quot;</span>, 
+                 <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&quot;ga:users&quot;</span>, <span class="st">&quot;ga:sessions&quot;</span>,<span class="st">&quot; ga:pageviews&quot;</span>), 
+                 <span class="dt">dimensions =</span> <span class="kw">c</span>(<span class="st">&quot;ga:date&quot;</span>,<span class="st">&quot;ga:devicecategory&quot;</span>), <span class="dt">sort =</span> <span class="ot">NULL</span>, <span class="dt">filters =</span> <span class="ot">NULL</span>,
+                 <span class="dt">segment =</span> <span class="ot">NULL</span>, <span class="dt">samplingLevel =</span> <span class="ot">NULL</span>, <span class="dt">start.index =</span> <span class="ot">NULL</span>,
+                 <span class="dt">max.results =</span> <span class="dv">10000</span>, <span class="dt">include.empty.rows =</span> <span class="ot">NULL</span>, <span class="dt">fetch.by =</span> <span class="ot">NULL</span>, ga_token)
+
+##=========================================================================================
+## 3. 시각화
+##=========================================================================================
+<span class="kw">library</span>(ggplot2)
+<span class="co"># plot(ga.df$date, ga.df$sessions,type=&quot;l&quot;,ylim=c(0,max(ga.df$sessions)))</span>
+
+<span class="co"># 3.1. 시각화</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> ga.df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> sessions)) +<span class="st"> </span><span class="kw">geom_line</span>() +
+<span class="st">  </span><span class="kw">theme_bw</span>() +<span class="st">   </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="ot">NA</span>)
+
+<span class="co"># 3.2. 시각화</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> ga.df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> sessions)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) +
+<span class="st">  </span><span class="kw">theme_bw</span>() +<span class="st">  </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="ot">NA</span>)
+
+<span class="co"># 3.3. 시각화 사용자와 페이지뷰</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> ga.df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> users, <span class="dt">y =</span> pageviews)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">theme_bw</span>() +<span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="ot">NA</span>)
+
+<span class="co"># 3.4. 시각화 디바이스 별</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> ga.df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> sessions, <span class="dt">color =</span> deviceCategory) ) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st">  </span><span class="kw">theme_bw</span>() +<span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="ot">NA</span>)
+
+<span class="co"># 3.5. 시각화 디바이스 별</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> ga.df, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x =</span> date, <span class="dt">y =</span> sessions) ) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">facet_grid</span>(deviceCategory ~<span class="st"> </span>.) +<span class="st"> </span><span class="kw">theme_bw</span>() +<span class="st"> </span><span class="kw">ylim</span>(<span class="dv">0</span>,<span class="ot">NA</span>)</code></pre></div>
+<p><img src="fig/rga-session-by-device.png" alt="RGA 디바이스별 세션 시각화" width="50%"></p>
 <div class="footnotes">
 <hr />
 <ol>
@@ -143,6 +245,7 @@ ga.df &lt;-<span class="st"> </span><span class="kw">get_ga</span>(<span class="
 <li id="fn2"><p><a href="http://analyticsdemystified.com/analysis/tutorial_pulling_google_analytics_data_with_r/">FROM 0 TO R WITH GOOGLE ANALYTICS</a><a href="#fnref2">↩</a></p></li>
 <li id="fn3"><p><a href="http://www.tatvic.com/blog/author/kushan/">How to extract Google Analytics data in R using RGoogleAnalytics</a><a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p><a href="http://analyticsdemystified.com/analysis/tutorial_pulling_google_analytics_data_with_r/">FROM 0 TO R WITH GOOGLE ANALYTICS</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><a href="http://www.tmllr.com/from-level1-to-level2-with-r-and-google-analytics-ggplot2/">FROM LEVEL 1 TO LEVEL 2 WITH R AND GOOGLE ANALYTICS: GGPLOT2</a><a href="#fnref5">↩</a></p></li>
 </ol>
 </div>
         </div>
