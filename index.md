@@ -34,17 +34,17 @@ title: xwMOOC 딥러닝
 [^andrew-ng-spark-2016]: [AI-The New Electricity](https://www.youtube.com/watch?v=4eJhcxfYR4I)
 
 1. [딥러닝이 주목받는 이유](why-dl.html)
-1. 클라우드 API 활용 구축
+1. 클라우드 API 활용 딥러닝 구현
+    - [R 구글 url 축약-googleAuthR](r-short-url.html)
+    - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
     - [구글 클라우드 비젼](gc-vision.html)
-    - [구글 번역 API](https://cloud.google.com/translate/)
-    - [구글 음성 API](https://cloud.google.com/speech/)
-    - [구글 예측 API](https://cloud.google.com/prediction/)
+        * [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-api.html)
+    - [*구글 번역 API*](https://cloud.google.com/translate/)
+    - [*구글 음성 API*](https://cloud.google.com/speech/)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
 1. 기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정
 1. 완전 새로운 문제에 자체 기계학습 모형 개발 
-1. [R 구글 애널리틱스(GA)-RGA](r-ga.html)
-1. [R 구글 url 축약-googleAuthR](r-short-url.html)
-1. [R 구글 클라우드 비젼 API-googleAuthR](r-google-vision-api.html)
+
 
 
 ### xwMOOC 오픈 교재

@@ -4,24 +4,24 @@
     <meta charset="utf-8">
     <meta name="generator" content="pandoc">
     <title>Software Carpentry: xwMOOC 딥러닝</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
-    <link rel="stylesheet" type="text/css" href="css/swc.css" />
-    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
-    <meta charset="UTF-8" />
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
   </head>
   <body class="lesson">
     <div class="container card">
-      <div class="banner">
-        <a href="http://software-carpentry.org" title="Software Carpentry">
-          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
-        </a>
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
       </div>
       <article>
       <div class="row">
@@ -46,19 +46,20 @@
 <h2 id="학습목차-jeff-dean-spark-2016-andrew-ng-spark-2016">학습목차 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h2>
 <ol style="list-style-type: decimal">
 <li><a href="why-dl.html">딥러닝이 주목받는 이유</a></li>
-<li>클라우드 API 활용 구축
+<li>클라우드 API 활용 딥러닝 구현
 <ul>
-<li><a href="gc-vision.html">구글 클라우드 비젼</a></li>
-<li><a href="https://cloud.google.com/translate/">구글 번역 API</a></li>
-<li><a href="https://cloud.google.com/speech/">구글 음성 API</a></li>
-<li><a href="https://cloud.google.com/prediction/">구글 예측 API</a></li>
+<li><a href="r-short-url.html">R 구글 url 축약-googleAuthR</a></li>
+<li><a href="r-ga.html">R 구글 애널리틱스(GA)-RGA</a></li>
+<li><a href="gc-vision.html">구글 클라우드 비젼</a>
+<ul>
+<li><a href="r-google-vision-api.html">R 구글 클라우드 비젼 API-RoogleVision</a></li>
+</ul></li>
+<li><a href="https://cloud.google.com/translate/"><em>구글 번역 API</em></a></li>
+<li><a href="https://cloud.google.com/speech/"><em>구글 음성 API</em></a></li>
 </ul></li>
 <li>자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용</li>
 <li>기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정</li>
 <li>완전 새로운 문제에 자체 기계학습 모형 개발</li>
-<li><a href="r-ga.html">R 구글 애널리틱스(GA)-RGA</a></li>
-<li><a href="r-short-url.html">R 구글 url 축약-googleAuthR</a></li>
-<li><a href="r-google-vision-api.html">R 구글 클라우드 비젼 API-googleAuthR</a></li>
 </ol>
 <h3 id="xwmooc-오픈-교재">xwMOOC 오픈 교재</h3>
 <ul>
@@ -108,26 +109,26 @@
         </div>
       </div>
       </article>
-      <div class="footer">
-        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
-        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
-        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
-        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
       </div>
     </div>
-    <!-- Javascript placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
-    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-37305346-2', 'auto');
-      ga('send', 'pageview');
-    
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
     </script>
   </body>
 </html>
