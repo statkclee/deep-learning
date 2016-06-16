@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: xwMOOC 딥러닝</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
+          <h2 class="subtitle">옥스포드 - 감정 API</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>마이크로소프트 옥스포드 API를 이해한다.</li>
+<li>유력 대선 후보들 사진에 나타난 감정을 분석한다.</li>
+</ul>
+</div>
+</section>
+<h3 id="얼굴에-나타난-감정을-분석face-motion-with-r">1. 얼굴에 나타난 감정을 분석<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<p>얼굴에 나타난 감정을 분석하는데 최근에 공개된 마이크로소프트 옥스포드 프로젝트 API를 R에서 활용한다.</p>
+<p><code>httr</code> 팩키지 덕분에 사용법은 무척이나 간결한다.</p>
+<ol style="list-style-type: decimal">
+<li>마이크로소프트 <a href="https://www.microsoft.com/cognitive-services/">Congnitive Services</a>에 무료로 가입한다.</li>
+<li>마이크로소프트에서 제공하는 서비스마다 인증키를 잘 관리한다.
+<ul>
+<li>Linguistic Analysis - Preview</li>
+<li>Face - Preview</li>
+<li>Computer Vision - Preview</li>
+<li>Emotion - Preview</li>
+<li>… <img src="fig/ms-cognitive-service-keys.png" width="70%"></li>
+</ul></li>
+<li>R에서 응용프로그램을 개발하고 마이크로소프트 제공 API를 호출하고 결과를 분석한다.</li>
+</ol>
+<h3 id="감정을-분석할-유력-대선-후보들-사진">2. 감정을 분석할 유력 대선 후보들 사진</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">손학규</th>
+<th align="left">반기문</th>
+<th align="left">문재인</th>
+<th align="left">안철수</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><img src="fig/candidate-son.jpg" width="100%"></td>
+<td align="left"><img src="fig/candidate-ban.jpg" width="100%"></td>
+<td align="left"><img src="fig/candidate-moon.jpg" width="70%"></td>
+<td align="left"><img src="fig/candidate-ahn.jpg" width="60%"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="이미지에-나타난-감정-분석-r-코드">3. 이미지에 나타난 감정 분석 R 코드</h3>
+<p>이미지에 나타난 감정을 분석 R 코드하는 코드를 다음 순서로 작성한다.</p>
+<ol style="list-style-type: decimal">
+<li>작업 디렉토리와 더불어 라이브러리를 불러온다.</li>
+<li>마이크로소프트 <code>Emotion - Preview</code> 감정분석 API 서비스 접속 환경설정을 한다.</li>
+<li><code>emotion_fn</code> 함수를 만들어 이미지가 담긴 사진 URL을 넣으면 마이크로소프트 감정분석 API에 접속하여 감정분석결과를 받아오게 한다.</li>
+<li>사진에 나온 이미지 분석결과를 대선후별로 정리하여 시각화하여 분석을 마무리한다.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##==========================================================================================
+## 00. 환경설정  
+##==========================================================================================
+<span class="kw">library</span>(<span class="st">&quot;httr&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;XML&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)
+<span class="kw">setwd</span>(<span class="st">&quot;~/10-microsoft-oxford&quot;</span>)
+
+##==========================================================================================
+## 01. 마이크로소프트 API 설정  
+##==========================================================================================
+
+<span class="co"># 적용할 마이크로소프트 API 지정</span>
+URL.emoface =<span class="st"> &#39;https://api.projectoxford.ai/emotion/v1.0/recognize&#39;</span>
+
+<span class="co"># 접속 인증키 설정</span>
+<span class="co"># emotionKEY = &#39;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX&#39;</span>
+<span class="kw">source</span>(<span class="st">&quot;private-keys.R&quot;</span>) 
+
+##==========================================================================================
+## 02. 감정분석할 이미지 지정 및 호출
+##==========================================================================================
+
+emotion_fn &lt;-<span class="st"> </span>function(img.url){
+    mybody =<span class="st"> </span><span class="kw">list</span>(<span class="dt">url =</span> img.url)
+    
+    <span class="co"># 마이크로소프트에 API 호출 및 데이터 요청</span>
+    faceEMO  &lt;-<span class="st">  </span><span class="kw">POST</span>(
+      <span class="dt">url =</span> URL.emoface,
+      <span class="kw">content_type</span>(<span class="st">&#39;application/json&#39;</span>), <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>emotionKEY)),
+      <span class="dt">body =</span> mybody,
+      <span class="dt">encode =</span> <span class="st">&#39;json&#39;</span>
+    )
+    
+    <span class="co"># 결과값 출력, Status=200 이면 모든 것이 OK!!!</span>
+    <span class="kw">return</span>(faceEMO)
+}
+
+<span class="co"># 이미지 지정</span>
+son.url &lt;-<span class="st"> &#39;http://www.jungang.co/news/photo/201509/1051_603_841.jpg&#39;</span>
+ban.url &lt;-<span class="st"> &#39;http://img.etoday.co.kr/pto_db/2012/04/20120424082942_194639_500_333.jpg&#39;</span>
+moon.url &lt;-<span class="st"> &#39;http://www.hyundaenews.com/imgdata/hyundaenews_com/201601/2016011932479902.jpg&#39;</span>
+ahn.url &lt;-<span class="st"> &#39;https://t1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/5ns/image/TtrYI3uNOJCsI-UmswcmJgRm5QQ.jpg&#39;</span>
+
+son &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(son.url)
+ban &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ban.url)
+moon &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(moon.url)
+ahn &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ahn.url)
+
+##==========================================================================================
+## 03. 감정분석결과 추가분석
+##==========================================================================================
+<span class="co"># 얼굴 분석결과</span>
+Son &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(son)[[<span class="dv">1</span>]]
+Ban &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(ban)[[<span class="dv">1</span>]]
+Moon &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(moon)[[<span class="dv">1</span>]]
+Ahn &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(ahn)[[<span class="dv">1</span>]]
+
+
+<span class="co"># 분석을 위해 결과값을 데이터프레임으로 변환</span>
+Son.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Son$scores))
+Ban.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ban$scores))
+Moon.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Moon$scores))
+Ahn.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ahn$scores))
+
+<span class="co"># Make some transformation</span>
+Son.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Son.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
+Ban.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ban.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
+Moon.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Moon.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
+Ahn.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ahn.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
+
+Son.o$V1 &lt;-<span class="kw">as.numeric</span>(Son.o$V1)
+Son.o$V1 &lt;-<span class="kw">as.numeric</span>(Son.o$V1)
+<span class="kw">colnames</span>(Son.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Son&quot;</span>
+
+Ban.o$V1 &lt;-<span class="kw">as.numeric</span>(Ban.o$V1)
+Ban.o$V1 &lt;-<span class="kw">as.numeric</span>(Ban.o$V1)
+<span class="kw">colnames</span>(Ban.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ban&quot;</span>
+
+Moon.o$V1 &lt;-<span class="kw">as.numeric</span>(Moon.o$V1)
+Moon.o$V1 &lt;-<span class="kw">as.numeric</span>(Moon.o$V1)
+<span class="kw">colnames</span>(Moon.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Moon&quot;</span>
+
+Ahn.o$V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o$V1)
+Ahn.o$V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o$V1)
+<span class="kw">colnames</span>(Ahn.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ahn&quot;</span>
+
+
+<span class="co"># 행명칭으로부터 감정 변수 생성</span>
+Son.o$Emotion&lt;-<span class="st"> </span><span class="kw">rownames</span>(Son.o)
+
+<span class="co"># 후보데이터 취합</span>
+candidate.df &lt;-<span class="st"> </span><span class="kw">cbind</span>(Ban.o, Moon.o, Ahn.o, Son.o)
+
+<span class="kw">library</span>(reshape2)
+
+candidate.df.m &lt;-<span class="st"> </span><span class="kw">melt</span>(candidate.df, <span class="dt">id.vars=</span><span class="st">&#39;Emotion&#39;</span>)
+
+candidate.df
+
+<span class="kw">ggplot</span>(candidate.df.m, <span class="kw">aes</span>(Emotion, value)) +<span class="st">   </span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> variable), <span class="dt">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>)</code></pre></div>
+<pre class="output"><code>&gt; candidate.df
+                Son          Ban      Moon          Ahn   Emotion
+anger     7.3542325 1.9190960000 1.1539198 0.0003854623     anger
+contempt  1.6380774 9.0302870000 5.4720675 0.0047321445  contempt
+disgust   1.7400689 1.0879935000 1.5798295 0.0011993845   disgust
+fear      4.8542913 3.9310765800 6.1883204 3.9110790000      fear
+happiness 0.9999851 0.9997778000 0.9999778 0.9383517000 happiness
+neutral   1.4403704 0.0002112589 1.7898545 0.0547735900   neutral
+sadness   1.9024080 1.8409718900 1.8538832 0.0005460684   sadness
+surprise  1.0656165 6.0466163600 1.5935927 1.1286004300  surprise</code></pre>
+<p><img src="fig/candidate-emotion.png" width="100%"></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://thinktostart.com/analyze-face-emotions-r/">Analyze Face Emotions with R</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </body>
+</html>
