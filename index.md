@@ -41,7 +41,8 @@ title: xwMOOC 딥러닝
         - [구글 클라우드 비젼](gc-vision.html)
             * [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-api.html)
     - **마이크로소프트**
-        - [옥스포드 - 감정 API](ms-oxford-emotion.html)            
+        - [옥스포드 - 감정 API](ms-oxford-emotion.html)
+        - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
     - [*구글 번역 API*](https://cloud.google.com/translate/)
     - [*구글 음성 API*](https://cloud.google.com/speech/)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
