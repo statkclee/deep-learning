@@ -38,7 +38,7 @@ title: xwMOOC 딥러닝
     - [R 구글 url 축약-googleAuthR](r-short-url.html)
     - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
     - **이미지**
-        **구글**
+        - **구글**
             - [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
             - [R 구글 클라우드 비젼 API](r-google-vision-api.html)
             - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
