@@ -55,6 +55,117 @@
 </ul></li>
 </ul>
 <p><img src="fig/speech-api-web-interface.png" alt="구글 웹 말하기 API 웹 인터페이스" width ="50%"></p>
+<h3 id="음성을-텍스트로-자동변환">2. 음성을 텍스트로 자동변환</h3>
+<h3 id="자동변역">3. 자동변역</h3>
+<p><code>RYandexTranslate</code>, <code>translateR</code> 등 다양한 자동변역 팩키지가 존재한다.</p>
+<p>기본적으로 R 팩키지를 설치하고 나서, API키를 받아 번역서비스 사이트에 던지게 되면 구글이나 얀덱스, 마이크로소프트에서 이를 인증하고 번역결과를 던져주는 방식이다.</p>
+<p><img src="fig/translation-eng2kor.png" alt="자동 기계번역" width ="50%"></p>
+<h4 id="구글-translate-api">3.1. 구글 Translate API</h4>
+<p><a href="https://cloud.google.com/translate/">GOOGLE TRANSLATE API</a>를 활용하여 영문에서 국문으로 번역을 R 환경에서 실행한다.</p>
+<ol style="list-style-type: decimal">
+<li><code>Google Cloud Platform</code>에서 <code>Translation API</code>를 활성화시킨다.</li>
+<li>구글 API 인증키를 잘 준비한다.</li>
+<li><code>translateR</code> 팩키지를 설치한다.</li>
+<li>번역할 영문 데이터를 데이터프레임 혹은 벡터로 준비하고 <code>translate</code> 함수에 넘겨 번역결과를 받는다.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##======================================================================
+## 01. 환경설정
+##======================================================================
+
+<span class="kw">library</span>(translateR)
+TRANSLATION_KEY=<span class="st">&quot;구글에서 받은 API 인증키&quot;</span>
+
+##======================================================================
+## 02. 번역데이터 준비
+##======================================================================
+
+<span class="kw">data</span>(enron)
+<span class="kw">head</span>(enron)
+
+##======================================================================
+## 03. 구글 번역 API 활용 영문을 국문으로 번역
+##======================================================================
+
+google.dataset.out &lt;-<span class="st"> </span><span class="kw">translate</span>(<span class="dt">dataset =</span> enron,
+                                <span class="dt">content.field =</span> <span class="st">&#39;email&#39;</span>,
+                                <span class="dt">google.api.key =</span> TRANSLATION_KEY,
+                                <span class="dt">source.lang =</span> <span class="st">&#39;en&#39;</span>,
+                                <span class="dt">target.lang =</span> <span class="st">&#39;ko&#39;</span>)
+
+##======================================================================
+## 04. 번역결과 검토
+##======================================================================
+
+google.dataset.out$translatedContent[<span class="dv">1</span>]</code></pre></div>
+<p><code>enron</code> 데이터프레임 <code>email</code> 필드전체(10개 행)를 구글 Translate API에 영문(<code>en</code>)에서 한글(<code>ko</code>)로 넘겨 번역을 실행하고 결과를 출력한다.</p>
+<pre class="output"><code>&gt; enron$email[1]
+[1] &quot;Debra,  I have reviewed Markwest&#39;s proposed changes to the Master, and given  the fact that we have since amended the ISDA with Markwest I would like to  maintain consistency between the two agreements with respect to the credit  terms.  This being said, I have attached an amended credit worksheet that  highlights in Red the changes I would like inserted in the Master.  Please  make these changes.  You will notice that I have increased Markwest&#39;s  collateral threshold to $1MM and have agreed to both of their proposals to  amend the Third Party Debt and the Collateral Multiple amount.  Also, with  respect to their request to amend Section 4.2, section (ix), I would like to  know how they define &#39;borrowed money&#39; and if this change is going to be  representative of Markwest, then why is it not bi-lateral.  Thanks Russell&quot;
+
+&gt; google.dataset.out$translatedContent[1]
+[1] &quot;데브라, 내가 주인에 Markwest의 제안 된 변경 사항을 검토, 우리는 이후이 신용 조건에 대한 두 협정 사이의 일관성을 유지하고 싶은 Markwest과 ISDA을 개정 한 사실을 주었다. 이것은 내가 레드에서 나는 마스터에 삽입하고자하는 변화를 강조 수정 된 신용 워크 시트를 첨부 말했다된다. 이러한 변경 사항을 확인하시기 바랍니다. 당신은 내가 $ 1MM에 Markwest의 담보 임계 값을 증가 및 타사 채무와 담보 다중 금액을 수정하는 그들의 제안에 모두 동의 한 것을 알 수 있습니다. 또한, 4.2 절을 개정하는 그들의 요청에 대해, 섹션 (IX), 나는 그들이 &amp;#39;돈을 빌려&amp;#39;정의하고이 변경 Markwest의 대표가 될 것입니다 있다면, 왜 양방향 측면없는 방법을 알고 싶습니다. 감사합니다 러셀&quot;</code></pre>
+<h4 id="얀덱스-번역-api">3.2. 얀덱스 번역 API</h4>
+<p><a href="https://github.com/mukul13/RYandexTranslate">RYandexTranslate</a> 팩키지를 사용해서도 다양한 언어로 번역을 할 수 있다.</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://tech.yandex.com/translate/doc/dg/concepts/api-overview-docpage/">Yandex Translate API</a>에 대한 API키를 발급받는다.</li>
+<li><a href="https://cran.r-project.org/web/packages/RYandexTranslate/index.html">RYandexTranslate</a> 팩키지를 설치한다.</li>
+<li><code>get_translation_direction</code> 방향을 확인하고 번역을 수행한다.</li>
+<li><code>translate</code> 함수에 <code>lang=&quot;en-de&quot;</code> 인자를 넣어 번역 방향을 잘 설정한다.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##======================================================================
+## 01. 환경설정
+##======================================================================
+<span class="kw">library</span>(RYandexTranslate)
+YANDEX_KEY =<span class="st">&quot;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&quot;</span>
+
+##======================================================================
+## 02. 번역데이터 준비
+##======================================================================
+<span class="kw">data</span>(enron)
+<span class="kw">head</span>(enron)
+
+##======================================================================
+## 03. 얀덱스 번역 API 활용 영문을 독일어로 번역
+##======================================================================
+directions &lt;-<span class="st"> </span><span class="kw">get_translation_direction</span>(YANDEX_KEY)
+directions</code></pre></div>
+<pre class="output"><code>$dirs
+  [1] &quot;az-ru&quot; &quot;be-bg&quot; &quot;be-cs&quot; &quot;be-de&quot; &quot;be-en&quot; &quot;be-es&quot; &quot;be-fr&quot; &quot;be-it&quot; &quot;be-pl&quot; &quot;be-ro&quot; &quot;be-ru&quot;
+ [12] &quot;be-sr&quot; &quot;be-tr&quot; &quot;bg-be&quot; &quot;bg-ru&quot; &quot;bg-uk&quot; &quot;ca-en&quot; &quot;ca-ru&quot; &quot;cs-be&quot; &quot;cs-en&quot; &quot;cs-ru&quot; &quot;cs-uk&quot;
+ [23] &quot;da-en&quot; &quot;da-ru&quot; &quot;de-be&quot; &quot;de-en&quot; &quot;de-es&quot; &quot;de-fr&quot; &quot;de-it&quot; &quot;de-ru&quot; &quot;de-tr&quot; &quot;de-uk&quot; &quot;el-en&quot;
+ [34] &quot;el-ru&quot; &quot;en-be&quot; &quot;en-ca&quot; &quot;en-cs&quot; &quot;en-da&quot; &quot;en-de&quot; &quot;en-el&quot; &quot;en-es&quot; &quot;en-et&quot; &quot;en-fi&quot; &quot;en-fr&quot;
+ [45] &quot;en-hu&quot; &quot;en-it&quot; &quot;en-lt&quot; &quot;en-lv&quot; &quot;en-mk&quot; &quot;en-nl&quot; &quot;en-no&quot; &quot;en-pt&quot; &quot;en-ru&quot; &quot;en-sk&quot; &quot;en-sl&quot;
+ [56] &quot;en-sq&quot; &quot;en-sv&quot; &quot;en-tr&quot; &quot;en-uk&quot; &quot;es-be&quot; &quot;es-de&quot; &quot;es-en&quot; &quot;es-ru&quot; &quot;es-uk&quot; &quot;et-en&quot; &quot;et-ru&quot;
+ [67] &quot;fi-en&quot; &quot;fi-ru&quot; &quot;fr-be&quot; &quot;fr-de&quot; &quot;fr-en&quot; &quot;fr-ru&quot; &quot;fr-uk&quot; &quot;hr-ru&quot; &quot;hu-en&quot; &quot;hu-ru&quot; &quot;hy-ru&quot;
+ [78] &quot;it-be&quot; &quot;it-de&quot; &quot;it-en&quot; &quot;it-ru&quot; &quot;it-uk&quot; &quot;lt-en&quot; &quot;lt-ru&quot; &quot;lv-en&quot; &quot;lv-ru&quot; &quot;mk-en&quot; &quot;mk-ru&quot;
+ [89] &quot;nl-en&quot; &quot;nl-ru&quot; &quot;no-en&quot; &quot;no-ru&quot; &quot;pl-be&quot; &quot;pl-ru&quot; &quot;pl-uk&quot; &quot;pt-en&quot; &quot;pt-ru&quot; &quot;ro-be&quot; &quot;ro-ru&quot;
+[100] &quot;ro-uk&quot; &quot;ru-az&quot; &quot;ru-be&quot; &quot;ru-bg&quot; &quot;ru-ca&quot; &quot;ru-cs&quot; &quot;ru-da&quot; &quot;ru-de&quot; &quot;ru-el&quot; &quot;ru-en&quot; &quot;ru-es&quot;
+[111] &quot;ru-et&quot; &quot;ru-fi&quot; &quot;ru-fr&quot; &quot;ru-hr&quot; &quot;ru-hu&quot; &quot;ru-hy&quot; &quot;ru-it&quot; &quot;ru-lt&quot; &quot;ru-lv&quot; &quot;ru-mk&quot; &quot;ru-nl&quot;
+[122] &quot;ru-no&quot; &quot;ru-pl&quot; &quot;ru-pt&quot; &quot;ru-ro&quot; &quot;ru-sk&quot; &quot;ru-sl&quot; &quot;ru-sq&quot; &quot;ru-sr&quot; &quot;ru-sv&quot; &quot;ru-tr&quot; &quot;ru-uk&quot;
+[133] &quot;sk-en&quot; &quot;sk-ru&quot; &quot;sl-en&quot; &quot;sl-ru&quot; &quot;sq-en&quot; &quot;sq-ru&quot; &quot;sr-be&quot; &quot;sr-ru&quot; &quot;sr-uk&quot; &quot;sv-en&quot; &quot;sv-ru&quot;
+[144] &quot;tr-be&quot; &quot;tr-de&quot; &quot;tr-en&quot; &quot;tr-ru&quot; &quot;tr-uk&quot; &quot;uk-bg&quot; &quot;uk-cs&quot; &quot;uk-de&quot; &quot;uk-en&quot; &quot;uk-es&quot; &quot;uk-fr&quot;
+[155] &quot;uk-it&quot; &quot;uk-pl&quot; &quot;uk-ro&quot; &quot;uk-ru&quot; &quot;uk-sr&quot; &quot;uk-tr&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">detect_language</span>(YANDEX_KEY, <span class="dt">text=</span>enron$email[<span class="dv">1</span>])</code></pre></div>
+<pre class="output"><code>[1] &quot;en&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##======================================================================
+## 04. 번역결과 검토
+##======================================================================
+
+enron$translated &lt;-<span class="st"> &quot;&quot;</span>
+
+for(i in <span class="dv">1</span>:<span class="kw">length</span>(enron$email)) {
+  if(i==<span class="dv">4</span>){
+    next <span class="co"># 4번째 전자우편 특수문자 때문에 건너뜀</span>
+  }else{
+    enron$translated[i] &lt;-<span class="st"> </span><span class="kw">translate</span>(YANDEX_KEY, enron$email[i], <span class="dt">lang=</span><span class="st">&quot;en-de&quot;</span>)$text
+  }
+}
+enron$email[<span class="dv">5</span>]
+enron$translated[<span class="dv">5</span>]</code></pre></div>
+<pre class="output"><code>&gt; enron$email[5]
+[1] &quot;Sevil and others,  I have attached a detailed map of the ERCOT system, 69, 138 and 345 KV line  and buses (*.pwd).   The map is based on the 2001 Summer peak load flow case.  (Enron paid about $12,000 for this map so we do not need to disclose it to  outside personnel.)  I also have a detailed map of the eastern interconnect, I believe it is down  to the 138 KV level.  I have also attached a 2001 contingency file (*.ctg) for ease of importing a  standard list of line contingencies that I obtained from the ISO.  I have also attached an ERCOT injection group (*.aux) , which is valuable for  the years after 2001 because of one constrol group.      &quot;
+
+&gt; enron$translated[5]
+[1] &quot;Sevil und andere habe ich in der Anlage eine detaillierte Karte der ERCOT system, 69, 138 und 345-KV-Leitung und Busse (*.pwd). Die Karte basiert auf der 2001 Summer peak-load-flow Fall. (Enron bezahlt ungefähr $12,000 für diese Karte, so dass wir nicht brauchen, um es zu veröffentlichen, um außerhalb Personal.) Ich habe auch eine detaillierte Karte der Ost-interconnect, ich glaube es liegt an den 138-KV-Ebene. Ich habe auch schonmal ein 2001 Kontingenz-Datei (*.ctg) für einfachen Import eine Liste der standard-Linie Risiken, die ich erhielt von der ISO. Ich habe auch mit einem ERCOT Injektion group (*.aux) , die wertvoll für die Jahre ab 2001 aufgrund einer constrol Gruppe. &quot;</code></pre>
         </div>
       </div>
       </article>
