@@ -39,7 +39,8 @@ title: xwMOOC 딥러닝
     - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
     - **구글**
         - [구글 클라우드 비젼](gc-vision.html)
-            * [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-api.html)
+            * [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
+            * [R 구글 클라우드 비젼 API](r-google-vision-api.html)
     - **마이크로소프트**
         - [옥스포드 - 감정 API](ms-oxford-emotion.html)
         - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
