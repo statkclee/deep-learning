@@ -37,15 +37,16 @@ title: xwMOOC 딥러닝
 1. 클라우드 API 활용 딥러닝 구현
     - [R 구글 url 축약-googleAuthR](r-short-url.html)
     - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
-    - **구글**
-        - [구글 클라우드 비젼](gc-vision.html)
-            * [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
-            * [R 구글 클라우드 비젼 API](r-google-vision-api.html)
-    - **마이크로소프트**
-        - [옥스포드 - 감정 API](ms-oxford-emotion.html)
-        - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
-    - [*구글 번역 API*](https://cloud.google.com/translate/)
-    - [*구글 음성 API*](https://cloud.google.com/speech/)
+    - **이미지**
+        **구글**
+            - [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
+            - [R 구글 클라우드 비젼 API](r-google-vision-api.html)
+            - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
+        - **마이크로소프트**
+            - [옥스포드 - 감정 API](ms-oxford-emotion.html)
+            - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
+    - **음성**
+        - [음성 API](speech-api.html)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
 1. 기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정
 1. 완전 새로운 문제에 자체 기계학습 모형 개발 

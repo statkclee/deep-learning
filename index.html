@@ -14,7 +14,13 @@
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <![endif]-->
+    
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
   </head>
   <body class="lesson">
     <div class="container card">
@@ -50,21 +56,18 @@
 <ul>
 <li><a href="r-short-url.html">R 구글 url 축약-googleAuthR</a></li>
 <li><a href="r-ga.html">R 구글 애널리틱스(GA)-RGA</a></li>
-<li><strong>구글</strong>
+<li><strong>이미지</strong> <strong>구글</strong> - <a href="r-google-vision-rooglevision.html">R 구글 클라우드 비젼 API-RoogleVision</a> - <a href="r-google-vision-api.html">R 구글 클라우드 비젼 API</a> - <a href="gc-vision.html">구글 클라우드 비젼 - 파이썬</a>
 <ul>
-<li><a href="gc-vision.html">구글 클라우드 비젼</a>
-<ul>
-<li><a href="r-google-vision-rooglevision.html">R 구글 클라우드 비젼 API-RoogleVision</a></li>
-<li><a href="r-google-vision-api.html">R 구글 클라우드 비젼 API</a></li>
-</ul></li>
-</ul></li>
 <li><strong>마이크로소프트</strong>
 <ul>
 <li><a href="ms-oxford-emotion.html">옥스포드 - 감정 API</a></li>
 <li><a href="ms-cognitive-text-sentiment.html">인지서비스(Cognitive Service) - 텍스트 감성분석</a></li>
 </ul></li>
-<li><a href="https://cloud.google.com/translate/"><em>구글 번역 API</em></a></li>
-<li><a href="https://cloud.google.com/speech/"><em>구글 음성 API</em></a></li>
+</ul></li>
+<li><strong>음성</strong>
+<ul>
+<li><a href="speech-api.html">음성 API</a></li>
+</ul></li>
 </ul></li>
 <li>자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용</li>
 <li>기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정</li>
