@@ -24,6 +24,10 @@ subtitle: 딥러닝이 주목받는 이유
 
 음성인식의 경우도 HMM 이후 딥신경망을 적용하여 20%대를 돌파하고, Ng 박사가 스파크 컨퍼런스에서 발표한 자료에 의하면 바이두가 2012년 17%로 내려온 이후 2016년 3.5%대로 오분류율을 뚝 떨어뜨렸다.
 
-<img src="fig/baidu-speech-errors.png" alt="imageNet 정확도" width="57%"/>
+<img src="fig/baidu-speech-errors.png" alt="바이두 음성인식 오류율" width="57%"/>
+
+NVidia CEO 젠센의 2016 CES 발표회에서 [이미지넷](http://image-net.org/challenges/LSVRC/2015/) 정확도가 2012년부터 2015년까지 80%대에서 90%대로 획기적으로 향상된 것이 확인된다. 전통적인 컴퓨터 비젼으로 정확도를 80%대로 끌어올렸고, 디러닝으로 90%대로 끌어올려 상업화에 한걸음 다가섰다.
+
+<img src="fig/imagenet-accuracy-nvidia-ceo-2016.png" alt="Nvidia CEO imageNet 정확도" width="57%"/>
 
 
