@@ -52,5 +52,12 @@ $H_2 O$ 클러스터가 구성되면 HDFS에서 데이터를 **한번** 읽어 �
 
 <img src="fig/h2o_sparkling_arch.png" alt="소다수 클러스터" width="70%">
 
+## $H_2 O$ 일반화 선형모형
 
+R 스크립트에서 `glm` 일반화 선형모형을 실행시키면 REST API/JSON 응답을 위해 HTTP, TCP/IP 통신계층을 거쳐 $H_2 O$ 클러스터에 작업이 실행되고 결과가 역으로 HTTP, TCP/IP 통신계층을 통해 REST API/JSON 응답으로 돌아온다.
 
+<img src="fig/h2o_glm.png" alt="H2O R 일반화 선형모형" width="70%">
+
+일반화 선형모형은 일반적으로 길고 얇은 데이터 구조에 적합한 모형이다. 이를 분산처리하기 위해서 벡터를 JVM 다수에 쪼개 분산처리하는데, 행은 동일한 JVM 위치시켜 분산처리한다. 
+
+<img src="fig/h2o_dist_dataframe.png" alt="소다수 클러스터" width="70%">
