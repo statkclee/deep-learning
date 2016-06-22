@@ -32,7 +32,7 @@ REST API 클라이언트는 R, 파이썬, 자바스크립트 등으로 구성되
 > 1. REST/JSON/R/파이썬/엑셀/REPL: REST API 호출과 JSON 응답을 통해 파이썬/R, 심지어 엑셀까지도 클라이언트로 작업이 가능하고, 웹 인터페이스도 지원해서 가벼운 작업은 가볍게 처리가 가능하다.
 
 
-<img src="fig/h2o_arch.png" alt="H2O 아키텍처" width="70%">
+<img src="fig/h2o_arch.png" alt="H2O 아키텍처" width="50%">
 
 ## 하둡 클러스터에서 $H_2 O$ 클러스터로...
 
@@ -50,14 +50,14 @@ $H_2 O$ 클러스터가 구성되면 HDFS에서 데이터를 **한번** 읽어 �
 
 스파크와 $H_2 O$를 결합한 소다수(Sparkling water) 클러스터는 HDFS에서 데이터를 불러 읽어오면 스파크가 돌고 있는 각 JVM을 묶어 스파크 RDD를 구성하게 되고, $H_2 O$ RDD와 통신을 통해 작업을 수행하게 된다. 이를 통해 마치 하나의 데이터프레임처럼 보이게 되고, R에서 이용가능한 다양한 기계학습 모형을 인메모리에서 빠르게 대용량 데이터에도 문제 없이 작업을 진행하게 된다.
 
-<img src="fig/h2o_sparkling_arch.png" alt="소다수 클러스터" width="70%">
+<img src="fig/h2o_sparkling_arch.png" alt="소다수 클러스터" width="50%">
 
 ## $H_2 O$ 일반화 선형모형
 
 R 스크립트에서 `glm` 일반화 선형모형을 실행시키면 REST API/JSON 응답을 위해 HTTP, TCP/IP 통신계층을 거쳐 $H_2 O$ 클러스터에 작업이 실행되고 결과가 역으로 HTTP, TCP/IP 통신계층을 통해 REST API/JSON 응답으로 돌아온다.
 
-<img src="fig/h2o_glm.png" alt="H2O R 일반화 선형모형" width="70%">
+<img src="fig/h2o_glm.png" alt="H2O R 일반화 선형모형" width="60%">
 
 일반화 선형모형은 일반적으로 길고 얇은 데이터 구조에 적합한 모형이다. 이를 분산처리하기 위해서 벡터를 JVM 다수에 쪼개 분산처리하는데, 행은 동일한 JVM 위치시켜 분산처리한다. 
 
-<img src="fig/h2o_dist_dataframe.png" alt="소다수 클러스터" width="70%">
+<img src="fig/h2o_dist_dataframe.png" alt="소다수 클러스터" width="50%">
