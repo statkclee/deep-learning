@@ -23,9 +23,9 @@ REST API 클라이언트는 R, 파이썬, 자바스크립트 등으로 구성되
 
 
 > ### $H_2 O$ 핵심 계층 {.callout}
-
+>
 > $H_2 O$ 아키텍쳐는 계층 아키넥쳐를 충실히 따르고 있으며, 각 계층은 최고의 기술적 구성요소를 채택하고 있다.
-
+>
 > 1. 인메모리 분산 K/V 계층 (In-memory Distributed K/V Store Layer): 지연연산을 하지 않는 인메모리 키-값 저장(K/V Store) 모형을 따르고 있고, 메모리 모형은 정확히 자바 메모리 모형이지만, 분산된 자바 메모리 모형이다. `NonBlockingHashMap`으로 약 150ns 속도가 나온다. 
 > 1. 경량 맵리듀스 계층(Light-weight Map/Reduce Layer): 맵리듀스가 병렬 코드를 작성하는 멋진 방법으로 맵리듀스 작업을 통해 작은 데이터는 POJO(Plain Old Java Object)와 빅데이터 $H_2 O$ 분산 배열의 조합으로 표현된다.
 > 1. 초벌 알고리즘 계층 (Pre-Baked Algorithms Layer): $H_2 O$ 에는 최적화되고, 전체 기능이 충분히 갖춘 알고리즘이 다수 포함되어 있다. 일반화 선형모형, 딥러닝, 확률숲, Gradient Boosted machine, PCA, K-Means 등을 들 수 있고, 오차 행렬이 포함되어 알고리즘 성능을 바로 평가할 수 있다.

@@ -59,20 +59,15 @@
 <h3 id="h_2-o-핵심-계층"><span class="glyphicon glyphicon-pushpin"></span><span class="math inline">\(H_2 O\)</span> 핵심 계층</h3>
 </div>
 <div class="panel-body">
-
-</div>
-</aside>
-<blockquote>
 <p><span class="math inline">\(H_2 O\)</span> 아키텍쳐는 계층 아키넥쳐를 충실히 따르고 있으며, 각 계층은 최고의 기술적 구성요소를 채택하고 있다.</p>
-</blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>인메모리 분산 K/V 계층 (In-memory Distributed K/V Store Layer): 지연연산을 하지 않는 인메모리 키-값 저장(K/V Store) 모형을 따르고 있고, 메모리 모형은 정확히 자바 메모리 모형이지만, 분산된 자바 메모리 모형이다. <code>NonBlockingHashMap</code>으로 약 150ns 속도가 나온다.</li>
 <li>경량 맵리듀스 계층(Light-weight Map/Reduce Layer): 맵리듀스가 병렬 코드를 작성하는 멋진 방법으로 맵리듀스 작업을 통해 작은 데이터는 POJO(Plain Old Java Object)와 빅데이터 <span class="math inline">\(H_2 O\)</span> 분산 배열의 조합으로 표현된다.</li>
 <li>초벌 알고리즘 계층 (Pre-Baked Algorithms Layer): <span class="math inline">\(H_2 O\)</span> 에는 최적화되고, 전체 기능이 충분히 갖춘 알고리즘이 다수 포함되어 있다. 일반화 선형모형, 딥러닝, 확률숲, Gradient Boosted machine, PCA, K-Means 등을 들 수 있고, 오차 행렬이 포함되어 알고리즘 성능을 바로 평가할 수 있다.</li>
 <li>REST/JSON/R/파이썬/엑셀/REPL: REST API 호출과 JSON 응답을 통해 파이썬/R, 심지어 엑셀까지도 클라이언트로 작업이 가능하고, 웹 인터페이스도 지원해서 가벼운 작업은 가볍게 처리가 가능하다.</li>
 </ol>
-</blockquote>
+</div>
+</aside>
 <p><img src="fig/h2o_arch.png" alt="H2O 아키텍처" width="50%"></p>
 <h2 id="하둡-클러스터에서-h_2-o-클러스터로">하둡 클러스터에서 <span class="math inline">\(H_2 O\)</span> 클러스터로…</h2>
 <p><code>hadoop -jar h2odriver.jar</code> 명령어로 하둡 게이트웨어 노드로 진입을 하게 되면 Yarn 관리자를 통해 노드 관리자 중 일부가 <span class="math inline">\(H_2 O\)</span> 노드를 할당하게 된다. 이것이 <span class="math inline">\(H_2 O\)</span> 클러스터를 구성하게 된다.</p>
