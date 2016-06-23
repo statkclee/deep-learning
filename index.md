@@ -52,6 +52,7 @@ title: xwMOOC 딥러닝
 1. 완전 새로운 문제에 자체 기계학습 모형 개발 
 1. [$H_2 O$ 기계학습](h20-arch.html)
     - [R 신경망](r-nnet.html)
+    - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
 
 ### xwMOOC 오픈 교재
 
