@@ -49,7 +49,7 @@
 </ul>
 </div>
 </section>
-<h2 id="h_2-o-아키텍쳐"><a href="http://h2o-release.s3.amazonaws.com/h2o/rel-noether/4/docs-website/developuser/h2o_stack.html"><span class="math inline">\(H_2 O\)</span> 아키텍쳐</a></h2>
+<h2 id="h_2-o-아키텍쳐">1. <a href="http://h2o-release.s3.amazonaws.com/h2o/rel-noether/4/docs-website/developuser/h2o_stack.html"><span class="math inline">\(H_2 O\)</span> 아키텍쳐</a></h2>
 <p><span class="math inline">\(H_2 O\)</span>는 REST API 클라이언트를 통해 네트워크를 통해 자바로 구성된 <span class="math inline">\(H_2 O\)</span> JVM과 통신한다.</p>
 <p>REST API 클라이언트는 R, 파이썬, 자바스크립트 등으로 구성되고 <span class="math inline">\(H_2 O\)</span> JVM에 기계학습, 데이터 전처리, 데이터 분석, 모형개발에 관련된 명령어를 실어 나른다.</p>
 <p>쥬리터와 유사한 웹인터페이스를 플로우(flow)를 통해 제공하고, 그 내부에 병렬분산 프로세싱을 위한 인메모리 맵리듀스 데이터 처리 기능과 데이터 인메모리 관리 기능을 키-값(key-value)을 통해 제공한다.</p>
@@ -69,20 +69,74 @@
 </div>
 </aside>
 <p><img src="fig/h2o_arch.png" alt="H2O 아키텍처" width="50%"></p>
-<h2 id="하둡-클러스터에서-h_2-o-클러스터로">하둡 클러스터에서 <span class="math inline">\(H_2 O\)</span> 클러스터로…</h2>
+<h3 id="하둡-클러스터에서-h_2-o-클러스터로">1.1. 하둡 클러스터에서 <span class="math inline">\(H_2 O\)</span> 클러스터로…</h3>
 <p><code>hadoop -jar h2odriver.jar</code> 명령어로 하둡 게이트웨어 노드로 진입을 하게 되면 Yarn 관리자를 통해 노드 관리자 중 일부가 <span class="math inline">\(H_2 O\)</span> 노드를 할당하게 된다. 이것이 <span class="math inline">\(H_2 O\)</span> 클러스터를 구성하게 된다.</p>
 <p><img src="fig/h2o-hadoop-cluster.png" alt="H2O 하둡 클러스" width="100%"></p>
-<h2 id="하둡-데이터와-인메모리-모형">하둡 데이터와 인메모리 모형</h2>
+<h3 id="하둡-데이터와-인메모리-모형">1.2. 하둡 데이터와 인메모리 모형</h3>
 <p><span class="math inline">\(H_2 O\)</span> 클러스터가 구성되면 HDFS에서 데이터를 <strong>한번</strong> 읽어 오게 된다. 그리고 나서 인메모리 내부에서 모형을 개발하게 된다.</p>
 <p><img src="fig/h2o_read_once_model_in_memory.png" alt="HDFS 한번 읽고, 인메모리 모형개발" width="100%"></p>
-<h2 id="소다수sparkling-water-클러스터">소다수(Sparkling water) 클러스터</h2>
+<h2 id="소다수sparkling-water-클러스터">1.3. 소다수(Sparkling water) 클러스터</h2>
 <p>스파크와 <span class="math inline">\(H_2 O\)</span>를 결합한 소다수(Sparkling water) 클러스터는 HDFS에서 데이터를 불러 읽어오면 스파크가 돌고 있는 각 JVM을 묶어 스파크 RDD를 구성하게 되고, <span class="math inline">\(H_2 O\)</span> RDD와 통신을 통해 작업을 수행하게 된다. 이를 통해 마치 하나의 데이터프레임처럼 보이게 되고, R에서 이용가능한 다양한 기계학습 모형을 인메모리에서 빠르게 대용량 데이터에도 문제 없이 작업을 진행하게 된다.</p>
 <p><img src="fig/h2o_sparkling_arch.png" alt="소다수 클러스터" width="50%"></p>
-<h2 id="h_2-o-일반화-선형모형"><span class="math inline">\(H_2 O\)</span> 일반화 선형모형</h2>
+<h2 id="h_2-o-일반화-선형모형">2. <span class="math inline">\(H_2 O\)</span> 일반화 선형모형</h2>
 <p>R 스크립트에서 <code>glm</code> 일반화 선형모형을 실행시키면 REST API/JSON 응답을 위해 HTTP, TCP/IP 통신계층을 거쳐 <span class="math inline">\(H_2 O\)</span> 클러스터에 작업이 실행되고 결과가 역으로 HTTP, TCP/IP 통신계층을 통해 REST API/JSON 응답으로 돌아온다.</p>
 <p><img src="fig/h2o_glm.png" alt="H2O R 일반화 선형모형" width="60%"></p>
 <p>일반화 선형모형은 일반적으로 길고 얇은 데이터 구조에 적합한 모형이다. 이를 분산처리하기 위해서 벡터를 JVM 다수에 쪼개 분산처리하는데, 행은 동일한 JVM 위치시켜 분산처리한다.</p>
 <p><img src="fig/h2o_dist_dataframe.png" alt="소다수 클러스터" width="50%"></p>
+<h3 id="표준-r과-h_2-o-클러스터-비교-h2o-r-scaling">2.1. 표준 R과 <span class="math inline">\(H_2 O\)</span> 클러스터 비교 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<p>표준 R 주요 기능과 <span class="math inline">\(H_2 O\)</span> 자바 클러스터를 표로 정리하면 다음과 같다.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">구분</th>
+<th align="left">표준 R</th>
+<th align="left"><span class="math inline">\(H_2 O\)</span> R</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">데이터 불러오기</td>
+<td align="left"><code>read.csv</code>, <code>read_csv</code> 등</td>
+<td align="left"><code>h2o.importFile</code></td>
+</tr>
+<tr class="even">
+<td align="left">데이터 요약</td>
+<td align="left"><code>summary</code></td>
+<td align="left"><code>summary</code>, <code>h2o.summary</code></td>
+</tr>
+<tr class="odd">
+<td align="left">행과 열 결합</td>
+<td align="left"><code>cbind</code>, <code>rbind</code></td>
+<td align="left"><code>h2o.cbind</code>, <code>h2o.rbind</code></td>
+</tr>
+<tr class="even">
+<td align="left">단항, 이진 연산</td>
+<td align="left"><code>+</code>,<code>-</code>,<code>*</code>,<code>/</code>,<code>^</code>,<code>%%</code>,<code>%/%</code> 등</td>
+<td align="left"><code>+</code>,<code>-</code>,<code>*</code>,<code>/</code>,<code>^</code>,<code>%%</code>,<code>%/%</code> 등</td>
+</tr>
+<tr class="odd">
+<td align="left">일반화 선형모형</td>
+<td align="left"><code>glm</code>, <code>glmnet</code></td>
+<td align="left">h2o.glm</td>
+</tr>
+<tr class="even">
+<td align="left">모형으로 예측</td>
+<td align="left"><code>predict</code></td>
+<td align="left"><code>h2o.predict</code></td>
+</tr>
+<tr class="odd">
+<td align="left">주요 측정치</td>
+<td align="left"><code>auc</code>, <code>mse</code>, <code>logLoss</code> 등</td>
+<td align="left"><code>h2o.auc</code>, <code>h2o.mse</code>, <code>h2o.logloss</code></td>
+</tr>
+</tbody>
+</table>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://blog.h2o.ai/2015/06/h2o-r-functions/">Scaling R with H2O</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
         </div>
       </div>
       </article>

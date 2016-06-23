@@ -11,7 +11,7 @@ subtitle: $H_2 O$ 기계학습
 > * 스파크와 $H_2 O$가 결합된 소다수(Sparkling Water) 클러스터를 이해한다.
 
 
-## [$H_2 O$ 아키텍쳐](http://h2o-release.s3.amazonaws.com/h2o/rel-noether/4/docs-website/developuser/h2o_stack.html)
+## 1. [$H_2 O$ 아키텍쳐](http://h2o-release.s3.amazonaws.com/h2o/rel-noether/4/docs-website/developuser/h2o_stack.html)
 
 $H_2 O$는 REST API 클라이언트를 통해 네트워크를 통해 자바로 구성된 $H_2 O$ JVM과 통신한다.
 
@@ -34,25 +34,25 @@ REST API 클라이언트는 R, 파이썬, 자바스크립트 등으로 구성되
 
 <img src="fig/h2o_arch.png" alt="H2O 아키텍처" width="50%">
 
-## 하둡 클러스터에서 $H_2 O$ 클러스터로...
+### 1.1. 하둡 클러스터에서 $H_2 O$ 클러스터로...
 
 `hadoop -jar h2odriver.jar` 명령어로 하둡 게이트웨어 노드로 진입을 하게 되면 Yarn 관리자를 통해 노드 관리자 중 일부가 $H_2 O$ 노드를 할당하게 된다. 이것이 $H_2 O$ 클러스터를 구성하게 된다.
 
 <img src="fig/h2o-hadoop-cluster.png" alt="H2O 하둡 클러스" width="100%">
 
-## 하둡 데이터와 인메모리 모형 
+### 1.2. 하둡 데이터와 인메모리 모형 
 
 $H_2 O$ 클러스터가 구성되면 HDFS에서 데이터를 **한번** 읽어 오게 된다. 그리고 나서 인메모리 내부에서 모형을 개발하게 된다. 
 
 <img src="fig/h2o_read_once_model_in_memory.png" alt="HDFS 한번 읽고, 인메모리 모형개발" width="100%">
 
-## 소다수(Sparkling water) 클러스터 
+## 1.3. 소다수(Sparkling water) 클러스터 
 
 스파크와 $H_2 O$를 결합한 소다수(Sparkling water) 클러스터는 HDFS에서 데이터를 불러 읽어오면 스파크가 돌고 있는 각 JVM을 묶어 스파크 RDD를 구성하게 되고, $H_2 O$ RDD와 통신을 통해 작업을 수행하게 된다. 이를 통해 마치 하나의 데이터프레임처럼 보이게 되고, R에서 이용가능한 다양한 기계학습 모형을 인메모리에서 빠르게 대용량 데이터에도 문제 없이 작업을 진행하게 된다.
 
 <img src="fig/h2o_sparkling_arch.png" alt="소다수 클러스터" width="50%">
 
-## $H_2 O$ 일반화 선형모형
+## 2. $H_2 O$ 일반화 선형모형
 
 R 스크립트에서 `glm` 일반화 선형모형을 실행시키면 REST API/JSON 응답을 위해 HTTP, TCP/IP 통신계층을 거쳐 $H_2 O$ 클러스터에 작업이 실행되고 결과가 역으로 HTTP, TCP/IP 통신계층을 통해 REST API/JSON 응답으로 돌아온다.
 
@@ -61,3 +61,19 @@ R 스크립트에서 `glm` 일반화 선형모형을 실행시키면 REST API/JS
 일반화 선형모형은 일반적으로 길고 얇은 데이터 구조에 적합한 모형이다. 이를 분산처리하기 위해서 벡터를 JVM 다수에 쪼개 분산처리하는데, 행은 동일한 JVM 위치시켜 분산처리한다. 
 
 <img src="fig/h2o_dist_dataframe.png" alt="소다수 클러스터" width="50%">
+
+### 2.1. 표준 R과 $H_2 O$ 클러스터 비교 [^h2o-r-scaling]
+
+[^h2o-r-scaling]: [Scaling R with H2O](http://blog.h2o.ai/2015/06/h2o-r-functions/)
+
+표준 R 주요 기능과 $H_2 O$ 자바 클러스터를 표로 정리하면 다음과 같다.
+
+|      구분       |            표준 R           |          $H_2 O$ R          |
+|-----------------|-----------------------------|-----------------------------|
+| 데이터 불러오기 | `read.csv`, `read_csv` 등   | `h2o.importFile`            |
+| 데이터 요약     | `summary`                   | `summary`, `h2o.summary`    |
+| 행과 열 결합    | `cbind`, `rbind`            | `h2o.cbind`, `h2o.rbind`    |
+| 단항, 이진 연산 | `+`,`-`,`*`,`/`,`^`,`%%`,`%/%` 등 | `+`,`-`,`*`,`/`,`^`,`%%`,`%/%` 등 |
+| 일반화 선형모형 | `glm`, `glmnet`             | h2o.glm                     |
+| 모형으로 예측   | `predict`                   | `h2o.predict`               |
+| 주요 측정치     | `auc`, `mse`, `logLoss` 등  | `h2o.auc`, `h2o.mse`, `h2o.logloss` |
