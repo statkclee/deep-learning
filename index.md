@@ -54,6 +54,7 @@ title: xwMOOC 딥러닝
     - [R 신경망](r-nnet.html)
     - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
     - [$H_2 O$ 최적 모형 개발](h2o-gbm-titanic.html)
+    - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
 
 ### xwMOOC 오픈 교재
 
