@@ -35,6 +35,16 @@ if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o") }
 install.packages("h2o", repos=(c("http://s3.amazonaws.com/h2o-release/h2o/master/1497/R", getOption("repos"))))
 ~~~
 
+만약 자바가 설치되지 않는 경우 다음 명령어를 통해 자바를 설치한다. 64비트 버젼이 필요하다. 32비트 자바가 설치되어 있다면 64비트 버젼으로 새로 설치해야만 된다.
+
+~~~ {.shell}
+$ sudo add-apt-repository -y ppa:webupd8team/java
+$ sudo apt-get update
+$ sudo apt-get -y install oracle-java8-installer
+$ sudo apt-get -y install oracle-java8-set-default
+$ java -version
+~~~
+
 #### 1.2. $H_2 O$ 클러스터 생성
 
 **로컬 컴퓨터**, **아마존 EC2**, **하둡 서버** 위 어디든 다음 명령어로 $H_2 O$ 인스턴스를 띄울 수 있다.
