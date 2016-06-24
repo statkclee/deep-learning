@@ -4,33 +4,33 @@
     <meta charset="utf-8">
     <meta name="generator" content="pandoc">
     <title>Software Carpentry: xwMOOC 딥러닝</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
-    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
-    <link rel="stylesheet" type="text/css" href="css/swc.css" />
-    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
-    <meta charset="UTF-8" />
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    
-    
-    <!--
-    <div id="google_translate_element"></div><script type="text/javascript">
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
-    }
-    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     -->
   </head>
   <body class="lesson">
     <div class="container card">
-      <div class="banner">
-        <a href="http://software-carpentry.org" title="Software Carpentry">
-          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
-        </a>
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
       </div>
       <article>
       <div class="row">
@@ -48,6 +48,7 @@
 </div>
 </section>
 <h3 id="앙상블-모형">1. 앙상블 모형</h3>
+<p>앙상블 모형은 배깅, 부스팅, 스택쌓기 등 다양한 모형조합 알고리즘이 존재한다.</p>
 <table>
 <colgroup>
 <col width="32%" />
@@ -102,29 +103,37 @@
 </tr>
 </tbody>
 </table>
+<p><strong>슈퍼학습기(Super learner)</strong> 는 버클리 통계학과 교수 Mark van der Laan가 2007년 발표한 논문에 뿌리를 두고 있다. 물론 그 이전에 관련된 연구를 지속적으로 진행하였으며, 슈퍼학습기가 점근적으로 최적 조합이라는 것을 증명한 이론적 토대를 제공했으며 2010년 첫 R 코드로 구현되었고, <a href="https://cran.r-project.org/web/packages/SuperLearner/index.html">SuperLearner - Super Learner Prediction</a>, <a href="https://cran.r-project.org/web/packages/tmle/index.html">tlme</a>로 CRAN에서 설치가능하다.</p>
+<p>슈퍼학습기 이전에 David H. Wolpert가 1992년 <strong>Stacked Generalization</strong> 으로 메타학습기를 통한 스택쌓기를 처음 공식화했고, Leo Breiman 교수가 1996년 <strong>Stacked Regressions</strong> 을 제안했고, 이 연구결과가 슈퍼학습기로 이어졌다.</p>
+<h3 id="슈퍼학습기-알고리즘">2. 슈퍼학습기 알고리즘</h3>
+<p><strong>“수준 0(Level-zero)”</strong> 데이터는 전통적인 통계모형에 사용된 데이터 형태로 이해하면 쉽다. 즉, 설계행렬 <span class="math inline">\(X\)</span>와 종속변수 <span class="math inline">\(y\)</span>로 모형 모수와 함께 기본 학습기를 지정한다. 필요하면 다른 알고리즘을 지정해서 메타 학습기를 지정하기도 한다. 그리고 나서 k-집단 교차타당도를 기본학습기에 적용하여 성능을 평가한다.</p>
+<p><img src="fig/h2o_level_zero.png" alt="수준 0 데이터" width="25%"></p>
+<p><strong>“수준 1(Level-One)”</strong> 데이터는 k-집단 교차타당도를 적용한 기본학습기에서 나온 예측값을 수집한다. 이를 칼럼마다 모아 새로운 설계 행렬 <span class="math inline">\(Z\)</span>를 생성한다. <span class="math inline">\(Z\)</span>, <span class="math inline">\(y\)</span>를 사용해서 메타학습기를 훈련시켜 최적 모형을 개발한다.</p>
+<p><img src="fig/h2o_level_one.png" alt="수준 1 데이터" width="60%"></p>
+<p>슈퍼학습기는 교차타당도를 통해 다른 모수를 갖는 다양한 모형을 명세하여 모형선택과정을 거친다는 점에서 격자탐색(Grid Search)과 임의탐색(Random Search) 과정을 거치는 모수 미세조정, 모수 탐색 방법론과 맥을 함께 한다. 하지만, 메타러닝 단계로 알려진 슈퍼학습기 알고리즘 후반부는 또다른 모형을 하나 생성한다는 점에서 차별점이 있다.</p>
         </div>
       </div>
       </article>
-      <div class="footer">
-        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
-        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
-        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
-        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
       </div>
     </div>
-    <!-- Javascript placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
-    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-37305346-2', 'auto');
-      ga('send', 'pageview');
-    
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
     </script>
   </body>
 </html>
