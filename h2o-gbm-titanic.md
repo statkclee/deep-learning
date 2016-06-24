@@ -10,6 +10,12 @@ subtitle: $H_2 O$ GBM 모형 세부조정
 > * 타이타닉 생존 데이터로 동일한 방법론을 갈음한다.
 > * GBM 기본 모형을 바탕으로 모수 세부조정을 통해 성능을 높인다.
 
+이제부터 타이타닉 생존 정확하게 예측할 수 있는 정말 정확도 높은 예측모형 개발을 위한 눈물겨운 여정을 떠나본다.
+GBM을 가지고 AUC 0.94가 나오는데 다양한 초모수 세부조정을 통해 0.97까지 높일 수 있다. 물론 상위 10개 앙상블을 사용한다면 0.975까지도 가능하다.
+
+<img src="fig/h2o-hyper-parameter-tuning.png" alt="H2O 초모수 세부조정 최적화" width="70%">
+
+
 ### 1. 타이타닉 생존 데이터 GBM 기본 모형구축 [^h2o-gbm-tuning]
 
 [^h2o-gbm-tuning]: [H2O GBM Tuning Tutorial for R](http://blog.h2o.ai/2016/06/h2o-gbm-tuning-tutorial-for-r/)
