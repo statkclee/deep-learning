@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: xwMOOC 딥러닝</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    -->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
+          <h2 class="subtitle">IBM 왓슨</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>인공지능이 바꿔 놓을 세상에 대해 살펴본다.</li>
+<li>IBM 왓슨 API를 활용하여 간단한 응용프로그램을 생성한다.</li>
+</ul>
+</div>
+</section>
+<h3 id="ibm-왓슨-서비스">1. IBM 왓슨 서비스</h3>
+<p>IBM 왓슨은 너무나도 유명한 인공지능의 대명사다. 특히 제퍼디 쇼에 나와서 퀴즈게임에서 승리하여 사람들에게 강한 인상을 남겼다. 그 왓슨이 더 진화된 인공지능을 탑재하고 돌아왔고, 그 당시 퀴즈쇼에 참가했던 켄 제닝스는 미국의 제퍼디 퀴즈쇼에서 최장 기간 우승을 거두었던 잡학의 천재다. 하지만 2011년 왓슨과의 대결에서 패배하면서 느낀 소회를 2013년 <a href="https://www.ted.com/talks/ken_jennings_watson_jeopardy_and_me_the_obsolete_know_it_all?language=ko">켄 제닝스(Ken Jennings): 왓슨, 제퍼디와 나 - 쓸모없어져 버린 똑똑이</a></p>
+<section class="prereq panel panel-warning">
+<div class="panel-heading">
+<h3 id="ibm-왓슨-동영상"><span class="glyphicon glyphicon-education"></span>IBM 왓슨 동영상</h3>
+</div>
+<div class="panel-body">
+<table>
+<thead>
+<tr class="header">
+<th align="center">퀴즈쇼에 나온 IBM 왓슨</th>
+<th align="center">퀴즈 참가자(Ken Jennings)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><iframe width="350" height="260" src="https://www.youtube.com/embed/P18EdAKuC1U" frameborder="0" allowfullscreen></iframe></td>
+<td align="center"><iframe width="350" height="260" src="https://www.youtube.com/embed/b2M-SeKey4o" frameborder="0" allowfullscreen></iframe></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<h3 id="ibm-왓슨-api-활용-tts-서비스-개발">2. IBM 왓슨 API 활용 TTS 서비스 개발</h3>
+<p>미국 대부분의 회사에서 제공하는 API와 마찬가지로 IBM 왓슨 API를 사용할 때 RESTful API로 자격증명을 하기 때문에 JSON 파일 형식으로 떨어지는 <code>credentials</code> 사용자 계정과 비밀번호를 소중히 관리한다.</p>
+<p>먼저 텍스트를 음성으로 들려주는 응용프로그램을 개발할 것이기에 먼저 작업결과에 대한 사전체험을 할 수 있는 <a href="https://text-to-speech-demo.mybluemix.net/">IBM 왓슨 텍스트를 음성전환 데모</a> 웹사이트를 방문하여 개발되면 어떤 느낌일지 사전 체험한다.</p>
+<p><img src="fig/ibm-watson-api-overview.png" alt="IBM 왓슨 API 설정" width="77%" /></p>
+<p>텍스트를 음성으로 들려주는 기능외에도 다양한 API를 제공하고 있다. 이를 타사 API와 조합하여 다양하고 강력한 기능을 갖는 서비스 개발이 가능하다.</p>
+<ul>
+<li>Language Translation</li>
+<li>Natural Language Classifer</li>
+<li>Personality Insights</li>
+<li>Speech To Text</li>
+<li><strong>Text To Speech</strong></li>
+<li>Tone Analyser</li>
+<li>Tradeoff Analytics</li>
+<li>Visual Recognition</li>
+<li>Retrieve and Rank</li>
+<li>AlchemyAPI</li>
+<li>Conversation</li>
+<li>Document Conversion</li>
+</ul>
+<h4 id="ibm-왓슨-서버-설정">2.1. IBM 왓슨 서버 설정</h4>
+<p>가장 먼저 IBM 왓슨 서버쪽 설정을 해주어야 된다. IBM 왓슨 API를 사용하려면 먼저 IBM에서 제공하는 클라우드 PaaS 서비스인 IBM 블루믹스 서비스에 가입해야 한다. 그리고 나서, IBM에서 제공하는 다양한 클라우드 서비스가 모두 망라된 상단 카탈로그(Catalog)를 클릭하여, 서비스(Watson)을 선택한다.</p>
+<ol style="list-style-type: decimal">
+<li><a href="https://console.ng.bluemix.net/">IBM Bluemix Console</a>에 접속하여 가입정보를 입력하고 회원가입한다.</li>
+<li>카탈로그 → 서비스(Watson) → Text-To-Speech 선택하여 관련 정보를 채워넣는다.
+<ul>
+<li>영역</li>
+<li>앱</li>
+<li>서비스 이름</li>
+<li>신임 정보 이름</li>
+</ul></li>
+</ol>
+<p>신임정보에 다음과 같은 <code>credentials</code> 가 생성되는데 이 정보를 활용하여 R 에서 TTS기능을 활용하게 된다.</p>
+<div class="sourceCode"><pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span>
+  <span class="dt">&quot;credentials&quot;</span><span class="fu">:</span> <span class="fu">{</span>
+    <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;https://stream.watsonplatform.net/text-to-speech/api&quot;</span><span class="fu">,</span>
+    <span class="dt">&quot;password&quot;</span><span class="fu">:</span> <span class="st">&quot;7xxxxxxxxxxxxx&quot;</span><span class="fu">,</span>
+    <span class="dt">&quot;username&quot;</span><span class="fu">:</span> <span class="st">&quot;6z077bf3-xxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span>
+  <span class="fu">}</span>
+<span class="fu">}</span></code></pre></div>
+<h4 id="r-클라이언트-설정-ryan-tts">2.2. R 클라이언트 설정 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h4>
+<p><a href="https://dreamtolearn.com/ryan/r_journey_to_watson/13">IBM Watson - Starter Kits</a>에는 R과 IBM 왓슨을 연결하여 체험할 수 있는 유용한 정보가 다수 정리되어 있다. 본 서비스도 <a href="https://github.com/rustyoldrake/R_Scripts_for_Watson/blob/master/Watson-TEXT-TO-SPEECH-Expressive.R">Ryan</a> 이 작성한 R 코드를 기반으로 일부 수정을 한 것이다.</p>
+<p>역사에 길이 남을 명언이 개그 콘서트에서 방영이 되어 있고, 이에 영감을 받아 통계학과 관련된 명언 2개를 음성으로 들어본다.</p>
+<blockquote>
+<p><strong>Donald Rumsfeld</strong></p>
+<p>“Reports that say that something hasn’t happened are always interesting to me, because as we know, there are known knowns; there are things we know we know. We also know there are known unknowns; that is to say we know there are some things we do not know. But there are also unknown unknowns- the ones we don’t know we don’t know.”</p>
+</blockquote>
+<blockquote>
+<p><strong>George Box</strong></p>
+<p>“Since all models are wrong the scientist cannot obtain a correct one by excessive elaboration. On the contrary following William of Occam he should seek an economical description of natural phenomena. Just as the ability to devise simple but evocative models is the signature of the great scientist so overelaboration and overparameterization is often the mark of mediocrity.”</p>
+</blockquote>
+<p><code>watson.TTS.execute</code> 함수를 만들어 IBM 왓슨 TTS 서비스를 호출하고 그 결과를 <code>donald-rumsfeld.wav</code>, <code>george_box.wav</code> 파일로 저장하여 음성으로 듣는 응용프로그램이다.</p>
+<p>불행히도 아직 IBM 왓슨이 한국어를 아직 학습중이라… 기다려 보자!!!</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(RCurl) 
+<span class="kw">library</span>(httr)
+<span class="kw">library</span>(audio)
+<span class="kw">library</span>(seewave)
+<span class="kw">library</span>(Rtts)
+<span class="kw">library</span>(splitstackshape)
+
+<span class="kw">source</span>(<span class="st">&quot;02.code/IBM_WATSON.R&quot;</span>)
+<span class="co"># username_TTS &lt;-&quot;...&quot;</span>
+<span class="co"># password_TTS &lt;- &quot;...&quot;</span>
+url &lt;-<span class="st"> &quot;https://stream.watsonplatform.net/text-to-speech/api&quot;</span>
+username_password_TTS =<span class="st"> </span><span class="kw">paste</span>(username_TTS,<span class="st">&quot;:&quot;</span>,password_TTS,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)
+
+
+########  FUNCTION --- TEXT TO SPEECH
+watson.TTS.execute &lt;-<span class="st"> </span>function(url1,text1,voice1,filename1)
+{
+  the_audio =<span class="st"> </span><span class="kw">CFILE</span>(filename1, <span class="dt">mode=</span><span class="st">&quot;wb&quot;</span>) 
+  <span class="kw">curlPerform</span>(<span class="dt">url =</span> <span class="kw">paste</span>(url1,<span class="st">&quot;?text=&quot;</span>,text1,<span class="st">&quot;&amp;voice=&quot;</span>,voice1,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>),
+              <span class="dt">userpwd =</span> username_password_TTS,
+              <span class="dt">httpheader=</span><span class="kw">c</span>(<span class="dt">accept=</span><span class="st">&quot;audio/wav&quot;</span>),
+              <span class="dt">writedata =</span> the_audio@ref)
+  <span class="kw">close</span>(the_audio)
+  <span class="co"># system(paste(&quot;open&quot;,filename1,&quot;-a vlc&quot;))</span>
+}
+
+###########
+
+<span class="co"># Donald Rumsfeld</span>
+url &lt;-<span class="st"> &quot;https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize&quot;</span>
+text &lt;-<span class="st"> </span><span class="kw">URLencode</span>(<span class="st">&quot;Reports that say that something hasn&#39;t happened are always interesting to me, because as we know, there are known knowns; there are things we know we know. We also know there are known unknowns; that is to say we know there are some things we do not know. But there are also unknown unknowns- the ones we don&#39;t know we don&#39;t know.&quot;</span>)
+voice &lt;-<span class="st"> </span>voices[<span class="dv">10</span>,] <span class="co"># us lisa</span>
+filename &lt;-<span class="st"> &quot;04.output/donald-rumsfeld.wav&quot;</span>
+<span class="kw">watson.TTS.execute</span>(url,text,voice,filename)
+
+
+<span class="co"># George Box</span>
+url &lt;-<span class="st"> &quot;https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize&quot;</span>
+text &lt;-<span class="st"> </span><span class="kw">URLencode</span>(<span class="st">&quot;Since all models are wrong the scientist cannot obtain a correct one by excessive elaboration. On the contrary following William of Occam he should seek an economical description of natural phenomena. Just as the ability to devise simple but evocative models is the signature of the great scientist so overelaboration and overparameterization is often the mark of mediocrity.&quot;</span>)
+voice &lt;-<span class="st"> </span>voices[<span class="dv">11</span>,] <span class="co"># us michael</span>
+filename &lt;-<span class="st"> &quot;04.output/george_box.wav&quot;</span>
+<span class="kw">watson.TTS.execute</span>(url,text,voice,filename)</code></pre></div>
+<section class="prereq panel panel-warning">
+<div class="panel-heading">
+<h3 id="ibm-왓슨-tts-api-실행-결과"><span class="glyphicon glyphicon-education"></span>IBM 왓슨 TTS API 실행 결과</h3>
+</div>
+<div class="panel-body">
+<table>
+<thead>
+<tr class="header">
+<th align="center">Donald Rumsfeld</th>
+<th align="center">George Box</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><iframe width="100%" height="100" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/283441956&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe></td>
+<td align="center"><iframe width="100%" height="100" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/283441955&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://dreamtolearn.com/ryan/r_journey_to_watson/13">Watson-TEXT-TO-SPEECH-Code-Snippet.R</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </body>
+</html>

@@ -47,6 +47,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
     - **음성**
         - [음성 API](speech-api.html)
+    - [IBM 왓슨](r-watson.html)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
 1. 기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정
 1. 완전 새로운 문제에 자체 기계학습 모형 개발 
