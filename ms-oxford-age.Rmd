@@ -13,8 +13,11 @@ mainfont: NanumGothic
 [^visit-south-america]: [박근혜 대통령 중남미 4개국 순방 세부일정](http://www.huffingtonpost.kr/2015/04/15/story_n_7071958.html)
 
 ```{r, include=FALSE}
-source("tools/chunk-options.R")
-img_buckets <- read_csv(data/img_buckets, col_names = TRUE)
+source("tools/chunk-options.R") 
+library(readr)
+library(dygraphs)
+library(xts)
+img_buckets <- read_csv("data/img_buckets.csv", col_names = TRUE)
 ```
 > ## 학습 목표 {.objectives}
 >
@@ -330,8 +333,8 @@ ggsave("04.result/static_img.png")
 특히, 중남미 순방 직후 7년 정도 사진속 나이가 감소했지만 곧 다시 원래 사진속 나이로 회복된 것이 눈에 띈다.
 
 ``` {r}
-library(dygraphs)
-library(xts)
+# library(dygraphs)
+# library(xts)
 
 viz_df <- img_buckets %>% dplyr::select(idate, age, actual_age)
 viz_df <- xts(viz_df, order.by=viz_df$idate)[, c("age", "actual_age")]
