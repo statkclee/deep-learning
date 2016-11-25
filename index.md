@@ -42,9 +42,10 @@ title: xwMOOC 딥러닝과 $H_2 O$
             - [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
             - [R 구글 클라우드 비젼 API](r-google-vision-api.html)
             - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
-        - **마이크로소프트**
+        - **마이크로소프트**            
             - [옥스포드 - 감정 API](ms-oxford-emotion.html)
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
+            - [사진속 나이 추정](ms-oxford-age.html)
     - **음성**
         - [음성 API](speech-api.html)
     - [IBM 왓슨](r-watson.html)
