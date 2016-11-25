@@ -12,9 +12,7 @@ mainfont: NanumGothic
 
 [^visit-south-america]: [박근혜 대통령 중남미 4개국 순방 세부일정](http://www.huffingtonpost.kr/2015/04/15/story_n_7071958.html)
 
-```{r, include=FALSE}
-source("tools/chunk-options.R")
-```
+
 > ## 학습 목표 {.objectives}
 >
 > * 실제 나이와 사진 속 나이 차이를 수치화한다. 
@@ -60,7 +58,8 @@ R에서 이미지 분석에 필요한 팩키지를 설치하고 나서 작업환
 다행히 이미지 파일 형식(**JPEG**)과 넓이와 높이가 모두 동일하고 파일크기만 일부 차이가 
 나는 것이 확인된다. 따라서, 별도 전처리 작업은 필요하지 않게 되었다. 기사의 사진 자료를 준비해주신 분께 깊은 감사의 말씀을 전한다.
 
-```{r eval=FALSE}
+
+~~~{.r}
 # 0. 환경설정--------------------------------------------------
 library(httr)
 library(XML)
@@ -119,7 +118,7 @@ summary(img_info_df)
 ##                                       Mean   :540   Mean   :720                      Mean   :242380  
 ##                                       3rd Qu.:540   3rd Qu.:720                      3rd Qu.:263808  
 ##                                       Max.   :540   Max.   :720                      Max.   :277783  
-```
+~~~
 
 ### 1.2. 사진 가로로 붙이기
 
@@ -127,7 +126,8 @@ summary(img_info_df)
 `image_append` 함수 기능을 사용해서 데이터를 확인한다. 기본설정은 가로방향으로 쭉 붙게 되고, `stack = TRUE` 인자를 넘기면
 수직으로 쭉 쌓는 것도 가능하다.
 
-```{r eval=FALSE}
+
+~~~{.r}
 # 3. 이미지 쫙 붙이기 ------------------------------------------------
 # 전체 이미지 불러오기
 for(lst in seq_along(img_list)){
@@ -146,7 +146,7 @@ img_left2right <- image_append(image_scale(img_vec, "x77"))
 image_write(img_left2right, "04.result/left2right.png", format = "png")
 
 img_top2bottom <- image_append(image_scale(img_vec, "x77"), stack = TRUE)
-```
+~~~
 
 <img src="fig/left2right.png" alt="이미지 사진 가로로 쭉 붙이기" width="100%" />
 
@@ -157,7 +157,8 @@ img_top2bottom <- image_append(image_scale(img_vec, "x77"), stack = TRUE)
 `image_morph()` 기능을 통해 10년이 넘는 동안 얼굴변화과정을 `.gif` 파일로 변환하여 
 동적인 시간정보를 담아 낸다.
 
-```{r eval=FALSE}
+
+~~~{.r}
 # 이미지 좌우 반전
 img_20161104 <- image_flop(img_20161104)
 
@@ -165,7 +166,7 @@ img_transition <- image_morph(c(img_20161104, img_20161104), frames = 10)
 img_animation <- image_animate(img_transition, fps=5)
 
 image_write(img_animation, "04.result/img_transition.gif")
-```
+~~~
 
 <img src="fig/img_transition.gif" alt="얼굴 변화 애니메이션" width="57%" />
 
