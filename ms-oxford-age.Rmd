@@ -31,7 +31,7 @@ img_buckets <- read_csv(data/img_buckets, col_names = TRUE)
 정제된 이미지 데이터가 준비되면 이를 API에 던져 이미지속 성별과 나이결과값을 받아 온다. 그리고 나면 기존 이미지 데이터와 더불어 
 애니메이션 제작, 인터랙티브 데이터 분석을 포함한 심도깊은 작업을 수행한다.
 
-<img src="fig/ms-cognitive-age.png" alt="연령 추정 데이터분석 아키텍쳐" width="77%" />
+<img src="fig/ms-cognitive-age.png" alt="연령 추정 데이터분석 아키텍쳐" width="57%" />
 
 
 [^pictures-with-age-info]: [2004년부터 2016년까지 촬영된 박 대통령 사진 비교](http://news.naver.com/main/read.nhn?mode=LSD&mid=sec&sid1=100&oid=028&aid=0002342652)
@@ -162,7 +162,7 @@ img_animation <- image_animate(img_transition, fps=5)
 image_write(img_animation, "04.result/img_transition.gif")
 ```
 
-<img src="fig/img_transition.gif" alt="얼굴 변화 애니메이션" width="100%" />
+<img src="fig/img_transition.gif" alt="얼굴 변화 애니메이션" width="57%" />
 
 
 ## 3. 인공지능 API 활용 사진속 성별과 나이 추정
