@@ -165,7 +165,7 @@ img_animation <- image_animate(img_transition, fps=5)
 image_write(img_animation, "04.result/img_transition.gif")
 ```
 
-<img src="fig/img_transition.gif" alt="얼굴 변화 애니메이션" width="57%" />
+<img src="fig/img_transition.gif" alt="얼굴 변화 애니메이션" width="37%" />
 
 
 ## 3. 인공지능 API 활용 사진속 성별과 나이 추정
