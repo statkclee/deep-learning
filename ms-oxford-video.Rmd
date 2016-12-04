@@ -75,8 +75,49 @@ url을 복사(이번 경우, [https://www.youtube.com/watch?v=KiJhWHYZkow](https
 
 동영상 감정분석을 위해 미국대선에서 11월에 분석된 파이썬과 R코드를 기반으로 대국민담화 동영상 데이터속 감정변화를 분석한다.
 
+### 4.1. 기본 동영상 분석 
+
+R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, [GitHub](http://github.com)을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다.
+
+``` {r eval=FALSE}
+devtools::install_github("swarm-lab/ROpenCVLite")
+devtools::install_github("swarm-lab/Rvision")
+```
+
+
 ### 4.1. 감정분석 API 사용 권한 획득
 
 <img src="fig/ms-cogitivie-api-key.png" alt="동영상 감정분석 API 키" width="57%" />
 
 
+``` {r emo-api-ggplot}
+# 0. 환경설정------------------------------------------------------------------
+library(stringr)
+
+# 1. 데이터 가져오기-----------------------------------------------------------
+
+emo_01_df <- read_csv("data/park_emo_01.csv")
+emo_02_df <- read_csv("data/park_emo_02_part1.csv")
+emo_03_df <- read_csv("data/park_emo_03.csv")
+
+# 2. 데이터 정제-----------------------------------------------------------
+
+emo_01_df <- emo_01_df %>% mutate(speech='10-25', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+emo_02_df <- emo_02_df %>% mutate(speech='11-04', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+emo_03_df <- emo_03_df %>% mutate(speech='11-29', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+
+emo_df <- bind_rows(emo_01_df, emo_02_df, emo_03_df)
+
+emo_long_df <- emo_df %>% gather(key, value, starts_with("scores")) %>%
+  mutate(key = str_replace(key, "scores.", "")) %>%
+  dplyr::filter(key != 'neutral')
+
+# 3. 데이터 시각화-----------------------------------------------------------
+
+ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
+  # geom_line() +  # would display all the non-smoothed lines
+  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1, aes(linetype=key)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
+```
