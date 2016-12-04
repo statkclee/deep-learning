@@ -77,6 +77,6 @@ url을 복사(이번 경우, [https://www.youtube.com/watch?v=KiJhWHYZkow](https
 
 ### 4.1. 감정분석 API 사용 권한 획득
 
-<img src="fig/ms-cogitivie-api-key.png" alt="동영상 감정분석 API 키" width="57%" />
+<img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" />
 
 
