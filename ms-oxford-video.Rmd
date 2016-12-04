@@ -16,6 +16,8 @@ source("tools/chunk-options.R")
 library(tidyverse)
 library(dygraphs)
 library(xts)
+library(stringr)
+library(ggplot2)
 ```
 > ## 학습 목표 {.objectives}
 >
@@ -92,12 +94,13 @@ devtools::install_github("swarm-lab/Rvision")
 
 ``` {r emo-api-ggplot}
 # 0. 환경설정------------------------------------------------------------------
-library(stringr)
+# library(stringr)
+# library(dplyr)
 
 # 1. 데이터 가져오기-----------------------------------------------------------
 
 emo_01_df <- read_csv("data/park_emo_01.csv")
-emo_02_df <- read_csv("data/park_emo_02_part1.csv")
+emo_02_df <- read_csv("data/park_emo_02.csv")
 emo_03_df <- read_csv("data/park_emo_03.csv")
 
 # 2. 데이터 정제-----------------------------------------------------------
@@ -113,7 +116,7 @@ emo_long_df <- emo_df %>% gather(key, value, starts_with("scores")) %>%
   dplyr::filter(key != 'neutral')
 
 # 3. 데이터 시각화-----------------------------------------------------------
-
+library(ggplot2)
 ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
   # geom_line() +  # would display all the non-smoothed lines
   geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1, aes(linetype=key)) +

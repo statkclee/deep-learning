@@ -70,8 +70,131 @@ url을 복사(이번 경우, [https://www.youtube.com/watch?v=KiJhWHYZkow](https
 
 동영상 감정분석을 위해 미국대선에서 11월에 분석된 파이썬과 R코드를 기반으로 대국민담화 동영상 데이터속 감정변화를 분석한다.
 
+### 4.1. 기본 동영상 분석 
+
+R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, [GitHub](http://github.com)을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다.
+
+
+~~~{.r}
+devtools::install_github("swarm-lab/ROpenCVLite")
+devtools::install_github("swarm-lab/Rvision")
+~~~
+
+
 ### 4.1. 감정분석 API 사용 권한 획득
 
 <img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" />
 
 
+
+~~~{.r}
+# 0. 환경설정------------------------------------------------------------------
+# library(stringr)
+# library(dplyr)
+
+# 1. 데이터 가져오기-----------------------------------------------------------
+
+emo_01_df <- read_csv("data/park_emo_01.csv")
+~~~
+
+
+
+~~~{.output}
+Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+
+~~~
+
+
+
+~~~{.r}
+emo_02_df <- read_csv("data/park_emo_02.csv")
+~~~
+
+
+
+~~~{.output}
+Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+
+~~~
+
+
+
+~~~{.r}
+emo_03_df <- read_csv("data/park_emo_03.csv")
+~~~
+
+
+
+~~~{.output}
+Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+
+~~~
+
+
+
+~~~{.r}
+# 2. 데이터 정제-----------------------------------------------------------
+
+emo_01_df <- emo_01_df %>% mutate(speech='10-25', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+emo_02_df <- emo_02_df %>% mutate(speech='11-04', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+emo_03_df <- emo_03_df %>% mutate(speech='11-29', frame=1:length(speech)) %>% unite(speech_frame, speech, frame)
+
+emo_df <- bind_rows(emo_01_df, emo_02_df, emo_03_df)
+
+emo_long_df <- emo_df %>% gather(key, value, starts_with("scores")) %>%
+  mutate(key = str_replace(key, "scores.", "")) %>%
+  dplyr::filter(key != 'neutral')
+
+# 3. 데이터 시각화-----------------------------------------------------------
+library(ggplot2)
+ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
+  # geom_line() +  # would display all the non-smoothed lines
+  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1, aes(linetype=key)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
+~~~
+
+<img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" />

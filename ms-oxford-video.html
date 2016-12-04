@@ -93,8 +93,90 @@
 </ul>
 <h2 id="동영상-감정-분석-microfot-ai-and-r-microfot-ai-and-python">4. 동영상 감정 분석 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h2>
 <p>동영상 감정분석을 위해 미국대선에서 11월에 분석된 파이썬과 R코드를 기반으로 대국민담화 동영상 데이터속 감정변화를 분석한다.</p>
+<h3 id="기본-동영상-분석">4.1. 기본 동영상 분석</h3>
+<p>R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, <a href="http://github.com">GitHub</a>을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;swarm-lab/ROpenCVLite&quot;</span>)
+devtools::<span class="kw">install_github</span>(<span class="st">&quot;swarm-lab/Rvision&quot;</span>)</code></pre></div>
 <h3 id="감정분석-api-사용-권한-획득">4.1. 감정분석 API 사용 권한 획득</h3>
 <p><img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
+<span class="co"># library(stringr)</span>
+<span class="co"># library(dplyr)</span>
+
+<span class="co"># 1. 데이터 가져오기-----------------------------------------------------------</span>
+
+emo_01_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/park_emo_01.csv&quot;</span>)</code></pre></div>
+<pre class="output"><code>Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emo_02_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/park_emo_02.csv&quot;</span>)</code></pre></div>
+<pre class="output"><code>Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emo_03_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/park_emo_03.csv&quot;</span>)</code></pre></div>
+<pre class="output"><code>Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 2. 데이터 정제-----------------------------------------------------------</span>
+
+emo_01_df &lt;-<span class="st"> </span>emo_01_df %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">speech=</span><span class="st">&#39;10-25&#39;</span>, <span class="dt">frame=</span><span class="dv">1</span>:<span class="kw">length</span>(speech)) %&gt;%<span class="st"> </span><span class="kw">unite</span>(speech_frame, speech, frame)
+emo_02_df &lt;-<span class="st"> </span>emo_02_df %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">speech=</span><span class="st">&#39;11-04&#39;</span>, <span class="dt">frame=</span><span class="dv">1</span>:<span class="kw">length</span>(speech)) %&gt;%<span class="st"> </span><span class="kw">unite</span>(speech_frame, speech, frame)
+emo_03_df &lt;-<span class="st"> </span>emo_03_df %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">speech=</span><span class="st">&#39;11-29&#39;</span>, <span class="dt">frame=</span><span class="dv">1</span>:<span class="kw">length</span>(speech)) %&gt;%<span class="st"> </span><span class="kw">unite</span>(speech_frame, speech, frame)
+
+emo_df &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(emo_01_df, emo_02_df, emo_03_df)
+
+emo_long_df &lt;-<span class="st"> </span>emo_df %&gt;%<span class="st"> </span><span class="kw">gather</span>(key, value, <span class="kw">starts_with</span>(<span class="st">&quot;scores&quot;</span>)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">key =</span> <span class="kw">str_replace</span>(key, <span class="st">&quot;scores.&quot;</span>, <span class="st">&quot;&quot;</span>)) %&gt;%
+<span class="st">  </span>dplyr::<span class="kw">filter</span>(key !=<span class="st"> &#39;neutral&#39;</span>)
+
+<span class="co"># 3. 데이터 시각화-----------------------------------------------------------</span>
+<span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(emo_long_df, <span class="kw">aes</span>(speech_frame, value, <span class="dt">group =</span> key, <span class="dt">col =</span> key)) +
+<span class="st">  </span><span class="co"># geom_line() +  # would display all the non-smoothed lines</span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">n =</span> <span class="dv">100000</span>, <span class="dt">se =</span> F,  <span class="dt">span =</span> <span class="fl">0.1</span>, <span class="kw">aes</span>(<span class="dt">linetype=</span>key)) +
+<span class="st">  </span><span class="kw">theme_minimal</span>() +
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) +
+<span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&#39;10-25_1&#39;</span>, <span class="st">&#39;11-04_1&#39;</span>, <span class="st">&#39;11-29_1&#39;</span>))</code></pre></div>
+<p><img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" /></p>
 <div class="footnotes">
 <hr />
 <ol>
