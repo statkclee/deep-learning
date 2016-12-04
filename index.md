@@ -46,6 +46,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
             - [옥스포드 - 감정 API](ms-oxford-emotion.html)
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
             - [사진속 나이 추정](ms-oxford-age.html)
+            - [동영상 감정 분석](ms-oxford-video.html)
     - **음성**
         - [음성 API](speech-api.html)
     - [IBM 왓슨](r-watson.html)

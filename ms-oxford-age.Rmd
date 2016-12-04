@@ -10,7 +10,7 @@ output:
 mainfont: NanumGothic
 ---
 
-[^visit-south-america]: [박근혜 대통령 중남미 4개국 순방 세부일정](http://www.huffingtonpost.kr/2015/04/15/story_n_7071958.html)
+
 
 ```{r, include=FALSE}
 source("tools/chunk-options.R") 
@@ -324,13 +324,15 @@ ggsave("04.result/static_img.png")
 <img src="fig/static_img.png" alt="시간에 따른 사진 이미지 나이 변화 추이" width="87%" />
 
 
-### 3.4. 동적 이미지 시각화
+### 3.4. 동적 이미지 시각화 [^visit-south-america]
 
 이미지의 나이 변화를 사건의 변화와 함께 살펴보는 것도 전체적인 흐름을 파악하는데 도움이 많이 된다.
 특정 사건 전후를 통해 그 특정 사건이 얼굴 나이에 얼마나 영향을 미쳤는지 정량화하는 것도 가능해졌다.
 
 `dygraphs` 팩키지를 통해 동적 사건 변화를 시각적으로 표현할 뿐만 아니라 `dyAnnotation` 기능을 통해 해당 사건도 즉시 파악할 수 있다.
 특히, 중남미 순방 직후 7년 정도 사진속 나이가 감소했지만 곧 다시 원래 사진속 나이로 회복된 것이 눈에 띈다.
+
+[^visit-south-america]: [박근혜 대통령 중남미 4개국 순방 세부일정](http://www.huffingtonpost.kr/2015/04/15/story_n_7071958.html)
 
 ``` {r}
 # library(dygraphs)
