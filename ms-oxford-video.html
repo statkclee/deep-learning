@@ -94,10 +94,141 @@
 <h2 id="동영상-감정-분석-microfot-ai-and-r-microfot-ai-and-python">4. 동영상 감정 분석 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h2>
 <p>동영상 감정분석을 위해 미국대선에서 11월에 분석된 파이썬과 R코드를 기반으로 대국민담화 동영상 데이터속 감정변화를 분석한다.</p>
 <h3 id="기본-동영상-분석">4.1. 기본 동영상 분석</h3>
-<p>R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, <a href="http://github.com">GitHub</a>을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;swarm-lab/ROpenCVLite&quot;</span>)
-devtools::<span class="kw">install_github</span>(<span class="st">&quot;swarm-lab/Rvision&quot;</span>)</code></pre></div>
-<h3 id="감정분석-api-사용-권한-획득">4.1. 감정분석 API 사용 권한 획득</h3>
+<p>R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, <a href="http://github.com">GitHub</a>을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다. <code>Rvision</code> 팩키지의 <code>video()</code> 함수를 사용해서 <a href="http://opencv.org/">OpenCV</a> <code>Rcpp_Image</code> 객체로 만들고 나서 차원정보를 보게 되면 동영상 화면 정보와 더불어 프레임(frame) 정보를 확인한게 된다. 제3차 담화문 총 8540 프레임중 5000 번째 프레임을 추출해 보자.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
+
+<span class="co"># devtools::install_github(&quot;swarm-lab/videoplayR&quot;)</span>
+<span class="co"># devtools::install_github(&quot;swarm-lab/ROpenCVLite&quot;)</span>
+<span class="co"># devtools::install_github(&quot;swarm-lab/Rvision&quot;)</span>
+<span class="kw">library</span>(Rvision)
+
+<span class="co"># 1. 데이터 가져오기-----------------------------------------------------------</span>
+
+speech_video &lt;-<span class="st"> </span><span class="kw">video</span>(<span class="st">&quot;03.data/park_speech_03_320.mp4&quot;</span>)
+<span class="kw">dim</span>(speech_video)
+## [1]  180.0000  319.3333 8540.0000
+
+<span class="co"># 2. 동영상 이미지 불러오기-----------------------------------------------------------</span>
+
+img_5000 &lt;-<span class="st"> </span><span class="kw">readFrame</span>(speech_video, <span class="dv">5000</span>)
+<span class="kw">plot</span>(img_5000)</code></pre></div>
+<p><img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="77%" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
+
+<span class="co"># devtools::install_github(&quot;swarm-lab/videoplayR&quot;)</span>
+<span class="co"># devtools::install_github(&quot;swarm-lab/ROpenCVLite&quot;)</span>
+<span class="co"># devtools::install_github(&quot;swarm-lab/Rvision&quot;)</span>
+<span class="kw">library</span>(Rvision)
+<span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(stringr)
+<span class="co"># 1. 데이터 가져오기-----------------------------------------------------------</span>
+
+speech_video &lt;-<span class="st"> </span><span class="kw">video</span>(<span class="st">&quot;03.data/park_speech_03_320.mp4&quot;</span>)
+emo_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;03.data/park_emo_03.csv&quot;</span>)
+<span class="co"># scores. 변수명 제거</span>
+<span class="kw">names</span>(emo_df) &lt;-<span class="st"> </span><span class="kw">str_replace</span>(<span class="kw">names</span>(emo_df), <span class="st">&quot;scores.&quot;</span>, <span class="st">&quot;&quot;</span>)
+
+<span class="co"># 2. 동영상 이미지 불러오기-----------------------------------------------------------</span>
+iframe &lt;-<span class="st"> </span><span class="dv">200</span>
+img_iframe &lt;-<span class="st"> </span><span class="kw">readFrame</span>(speech_video, iframe)
+<span class="kw">plot</span>(img_iframe)
+
+x_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">2</span>]
+y_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">1</span>]
+
+<span class="co"># 얼굴 위치 사각형 표시</span>
+<span class="kw">with</span>(emo_df[iframe,], 
+  <span class="kw">rect</span>(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim -<span class="st"> </span>(height)*y_dim), <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>))
+
+<span class="co"># 다양한 감정 수치화</span>
+<span class="kw">with</span>(emo_df[iframe,], 
+    <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim), <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;neutral:&quot;</span>, .(neutral))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+    <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">10</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;happiness:&quot;</span>, .(happiness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">20</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;surprise:&quot;</span>, .(surprise))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">30</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;sadness:&quot;</span>, .(sadness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">40</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;anger:&quot;</span>, .(anger))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">50</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;disgust:&quot;</span>, .(disgust))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">60</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;fear:&quot;</span>, .(fear))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+<span class="kw">with</span>(emo_df[iframe,], 
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">70</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;contempt:&quot;</span>, .(contempt))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+
+<span class="co"># 3. 동영상 + 감정 이미지-----------------------------------------------------------</span>
+<span class="co"># 10 개 프레임만 선택</span>
+idx &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="kw">dim</span>(speech_video)[<span class="dv">3</span>], <span class="dt">length.out=</span><span class="dv">10</span>)
+
+for(iframe in <span class="kw">seq_along</span>(idx)){
+  img_iframe &lt;-<span class="st"> </span><span class="kw">readFrame</span>(speech_video, iframe)
+  <span class="kw">plot</span>(img_iframe)
+  
+  x_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">2</span>]
+  y_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">1</span>]
+  
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">rect</span>(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim -<span class="st"> </span>(height)*y_dim), <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>))
+
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim), <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;neutral:&quot;</span>, .(neutral))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">10</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;happiness:&quot;</span>, .(happiness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">20</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;surprise:&quot;</span>, .(surprise))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">30</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;sadness:&quot;</span>, .(sadness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">40</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;anger:&quot;</span>, .(anger))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">50</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;disgust:&quot;</span>, .(disgust))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">60</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;fear:&quot;</span>, .(fear))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">70</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;contempt:&quot;</span>, .(contempt))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+}
+
+
+<span class="co"># 4. GIF 만들기-------------------------</span>
+idx &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="kw">dim</span>(speech_video)[<span class="dv">3</span>], <span class="dt">length.out=</span><span class="dv">10</span>)
+
+for(iframe in <span class="kw">seq_along</span>(idx)){
+  <span class="kw">png</span>(<span class="dt">filename=</span><span class="kw">paste0</span>(<span class="st">&quot;06.images/img_&quot;</span>,iframe,<span class="st">&quot;.png&quot;</span>))
+  img_iframe &lt;-<span class="st"> </span><span class="kw">readFrame</span>(speech_video, iframe)
+  <span class="kw">plot</span>(img_iframe)
+  
+  x_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">2</span>]
+  y_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<span class="dv">1</span>]
+  
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">rect</span>(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim -<span class="st"> </span>(height)*y_dim), <span class="dt">border =</span> <span class="st">&quot;red&quot;</span>))
+  
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim), <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;neutral:&quot;</span>, .(neutral))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">10</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;happiness:&quot;</span>, .(happiness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">20</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;surprise:&quot;</span>, .(surprise))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">30</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;sadness:&quot;</span>, .(sadness))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">40</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;anger:&quot;</span>, .(anger))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">50</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;disgust:&quot;</span>, .(disgust))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">60</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;fear:&quot;</span>, .(fear))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  <span class="kw">with</span>(emo_df[iframe,], 
+       <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">70</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;contempt:&quot;</span>, .(contempt))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
+  
+  <span class="kw">dev.off</span>()
+}
+<span class="co"># GIF 만들기</span>
+<span class="kw">library</span>(animation)
+<span class="kw">im.convert</span>(<span class="st">&quot;06.images/*.png&quot;</span>, <span class="dt">output =</span> <span class="st">&quot;img_animation.gif&quot;</span>)</code></pre></div>
+<p><img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="100%" /></p>
+<h3 id="감정분석-api-사용-권한-획득">4.2. 감정분석 API 사용 권한 획득</h3>
 <p><img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
 <span class="co"># library(stringr)</span>
@@ -172,7 +303,7 @@ emo_long_df &lt;-<span class="st"> </span>emo_df %&gt;%<span class="st"> </span>
 <span class="kw">library</span>(ggplot2)
 <span class="kw">ggplot</span>(emo_long_df, <span class="kw">aes</span>(speech_frame, value, <span class="dt">group =</span> key, <span class="dt">col =</span> key)) +
 <span class="st">  </span><span class="co"># geom_line() +  # would display all the non-smoothed lines</span>
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">n =</span> <span class="dv">100000</span>, <span class="dt">se =</span> F,  <span class="dt">span =</span> <span class="fl">0.1</span>, <span class="kw">aes</span>(<span class="dt">linetype=</span>key)) +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">n =</span> <span class="dv">100000</span>, <span class="dt">se =</span> F,  <span class="dt">span =</span> <span class="fl">0.1</span>) +
 <span class="st">  </span><span class="kw">theme_minimal</span>() +
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) +
 <span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&#39;10-25_1&#39;</span>, <span class="st">&#39;11-04_1&#39;</span>, <span class="st">&#39;11-29_1&#39;</span>))</code></pre></div>

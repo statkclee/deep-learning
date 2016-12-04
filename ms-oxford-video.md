@@ -73,15 +73,154 @@ url을 복사(이번 경우, [https://www.youtube.com/watch?v=KiJhWHYZkow](https
 ### 4.1. 기본 동영상 분석 
 
 R에서 동영상분석을 위한 팩키지는 공식적으로 배포되는 것은 없고, [GitHub](http://github.com)을 통해 일부 개발중에 있으며 실험목적으로 활용은 가능하다.
+`Rvision` 팩키지의 `video()` 함수를 사용해서 [OpenCV](http://opencv.org/) `Rcpp_Image` 객체로 만들고 나서 차원정보를 보게 되면
+동영상 화면 정보와 더불어 프레임(frame) 정보를 확인한게 된다.
+제3차 담화문 총 8540 프레임중 5000 번째 프레임을 추출해 보자.
 
 
 ~~~{.r}
-devtools::install_github("swarm-lab/ROpenCVLite")
-devtools::install_github("swarm-lab/Rvision")
+# 0. 환경설정------------------------------------------------------------------
+
+# devtools::install_github("swarm-lab/videoplayR")
+# devtools::install_github("swarm-lab/ROpenCVLite")
+# devtools::install_github("swarm-lab/Rvision")
+library(Rvision)
+
+# 1. 데이터 가져오기-----------------------------------------------------------
+
+speech_video <- video("03.data/park_speech_03_320.mp4")
+dim(speech_video)
+## [1]  180.0000  319.3333 8540.0000
+
+# 2. 동영상 이미지 불러오기-----------------------------------------------------------
+
+img_5000 <- readFrame(speech_video, 5000)
+plot(img_5000)
 ~~~
 
+<img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="77%" />
 
-### 4.1. 감정분석 API 사용 권한 획득
+
+~~~{.r}
+# 0. 환경설정------------------------------------------------------------------
+
+# devtools::install_github("swarm-lab/videoplayR")
+# devtools::install_github("swarm-lab/ROpenCVLite")
+# devtools::install_github("swarm-lab/Rvision")
+library(Rvision)
+library(tidyverse)
+library(stringr)
+# 1. 데이터 가져오기-----------------------------------------------------------
+
+speech_video <- video("03.data/park_speech_03_320.mp4")
+emo_df <- read_csv("03.data/park_emo_03.csv")
+# scores. 변수명 제거
+names(emo_df) <- str_replace(names(emo_df), "scores.", "")
+
+# 2. 동영상 이미지 불러오기-----------------------------------------------------------
+iframe <- 200
+img_iframe <- readFrame(speech_video, iframe)
+plot(img_iframe)
+
+x_dim <- dim(img_iframe)[2]
+y_dim <- dim(img_iframe)[1]
+
+# 얼굴 위치 사각형 표시
+with(emo_df[iframe,], 
+  rect(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim - (height)*y_dim), border = "red"))
+
+# 다양한 감정 수치화
+with(emo_df[iframe,], 
+    text(x*x_dim+75, (y_dim-(y)*y_dim), bquote(paste("neutral:", .(neutral))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+    text(x*x_dim+75, (y_dim-(y)*y_dim)-10, bquote(paste("happiness:", .(happiness))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-20, bquote(paste("surprise:", .(surprise))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-30, bquote(paste("sadness:", .(sadness))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-40, bquote(paste("anger:", .(anger))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-50, bquote(paste("disgust:", .(disgust))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-60, bquote(paste("fear:", .(fear))), cex = .75, col="red"))
+with(emo_df[iframe,], 
+     text(x*x_dim+75, (y_dim-(y)*y_dim)-70, bquote(paste("contempt:", .(contempt))), cex = .75, col="red"))
+
+# 3. 동영상 + 감정 이미지-----------------------------------------------------------
+# 10 개 프레임만 선택
+idx <- seq(1, dim(speech_video)[3], length.out=10)
+
+for(iframe in seq_along(idx)){
+  img_iframe <- readFrame(speech_video, iframe)
+  plot(img_iframe)
+  
+  x_dim <- dim(img_iframe)[2]
+  y_dim <- dim(img_iframe)[1]
+  
+  with(emo_df[iframe,], 
+       rect(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim - (height)*y_dim), border = "red"))
+
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim), bquote(paste("neutral:", .(neutral))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-10, bquote(paste("happiness:", .(happiness))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-20, bquote(paste("surprise:", .(surprise))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-30, bquote(paste("sadness:", .(sadness))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-40, bquote(paste("anger:", .(anger))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-50, bquote(paste("disgust:", .(disgust))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-60, bquote(paste("fear:", .(fear))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-70, bquote(paste("contempt:", .(contempt))), cex = .75, col="red"))
+}
+
+
+# 4. GIF 만들기-------------------------
+idx <- seq(1, dim(speech_video)[3], length.out=10)
+
+for(iframe in seq_along(idx)){
+  png(filename=paste0("06.images/img_",iframe,".png"))
+  img_iframe <- readFrame(speech_video, iframe)
+  plot(img_iframe)
+  
+  x_dim <- dim(img_iframe)[2]
+  y_dim <- dim(img_iframe)[1]
+  
+  with(emo_df[iframe,], 
+       rect(x*x_dim, (y_dim-(y)*y_dim), (x+width)*x_dim, (y_dim-(y)*y_dim - (height)*y_dim), border = "red"))
+  
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim), bquote(paste("neutral:", .(neutral))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-10, bquote(paste("happiness:", .(happiness))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-20, bquote(paste("surprise:", .(surprise))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-30, bquote(paste("sadness:", .(sadness))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-40, bquote(paste("anger:", .(anger))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-50, bquote(paste("disgust:", .(disgust))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-60, bquote(paste("fear:", .(fear))), cex = .75, col="red"))
+  with(emo_df[iframe,], 
+       text(x*x_dim+75, (y_dim-(y)*y_dim)-70, bquote(paste("contempt:", .(contempt))), cex = .75, col="red"))
+  
+  dev.off()
+}
+# GIF 만들기
+library(animation)
+im.convert("06.images/*.png", output = "img_animation.gif")
+~~~
+
+<img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="100%" />
+
+### 4.2. 감정분석 API 사용 권한 획득
 
 <img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" />
 
@@ -191,7 +330,7 @@ emo_long_df <- emo_df %>% gather(key, value, starts_with("scores")) %>%
 library(ggplot2)
 ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
   # geom_line() +  # would display all the non-smoothed lines
-  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1, aes(linetype=key)) +
+  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
