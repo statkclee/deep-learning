@@ -104,7 +104,15 @@ img_5000 <- readFrame(speech_video, 5000)
 plot(img_5000)
 ```
 
-<img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="77%" />
+<img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="57%" />
+
+### 4.2. 동영상 얼굴인식
+
+동영상에서 사람 얼굴을 인식하고 인식된 영역에 사각형으로 표식을 한다.
+이를 위해 `Rvision` 팩키지 `video()` 함수로 동영상을 읽어오고, [Microsoft Emotion API](https://www.microsoft.com/cognitive-services/en-us/emotion-api)를 통해
+동영상 분석 감정분석과 더불어 얼굴 영역을 탐지해서 저장한 데이터프레임을 불러 읽어온다.
+그리고 `plot()` 함수를 통해 시각화하고 나서 `rect` 함수로 얼굴영역에 직사각형을 그리고, 감정을 분석한 수치값을 
+감정 각각의 라벨과 더불어 표식한다.
 
 ``` {r eval=FALSE}
 # 0. 환경설정------------------------------------------------------------------
@@ -151,7 +159,16 @@ with(emo_df[iframe,],
      text(x*x_dim+75, (y_dim-(y)*y_dim)-60, bquote(paste("fear:", .(fear))), cex = .75, col="red"))
 with(emo_df[iframe,], 
      text(x*x_dim+75, (y_dim-(y)*y_dim)-70, bquote(paste("contempt:", .(contempt))), cex = .75, col="red"))
+```
 
+### 4.3. 동영상 얼굴인식 애니메이션 
+
+동영상이 수천 프레임이라 매우 길어 해당 동영상에서 10개 프레임만 뽑아 이를 `.git` 파일로 만들어 감정변화에 대한 
+내용을 확인한다. 앞서 개별적으로 동영상에서 추출한 이미지 위에 얼굴의 위치를 사각형으로 표시하고 나서,
+각 감정별 라벨과 수치도 함께 표현한 이미지를 10개 반복문을 통해 생성하고 이를 특정 디렉토리에 저장시킨다.
+그리고 나서, `animation` 팩키지 `im.convert` 함수를 사용해서 `.gif` 파일 하나로 생성한다.
+
+``` {r eval=FALSE}
 # 3. 동영상 + 감정 이미지-----------------------------------------------------------
 # 10 개 프레임만 선택
 idx <- seq(1, dim(speech_video)[3], length.out=10)
@@ -223,11 +240,139 @@ library(animation)
 im.convert("06.images/*.png", output = "img_animation.gif")
 ```
 
-<img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="100%" />
+<img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="77%" />
 
-### 4.2. 감정분석 API 사용 권한 획득
+## 5. 인공지능 API를 활용한 동영상 감정 추출
+
+동영상 속 인물의 감정을 파악하기 위해 감정분석 API를 사용할 수 있는 권한을 획득한다.
+마이크로소프트 [Emotion API](https://www.microsoft.com/cognitive-services/en-us/emotion-api)에 가입하고
+감정분석 API 키를 받아 이를 무료로 부여된 할당량만큼 사용한다. 연구 및 초기 실험 목적으로 충분히 무료로 활용할 횟수를 제공하고 있다.
+
+### 5.1. 감정분석 API 사용 권한 획득
+
+마이크로소프트 [Cognitive Services APIs](https://www.microsoft.com/cognitive-services) 중 관련있는 
+[Emotion API](https://www.microsoft.com/cognitive-services/en-us/emotion-api)의 동영상 감정분석 API키를 복사한다.
+R이나 파이썬 프로그램에서 동영상 감정분석을 요청할 때 활용되고, 외부에 유출될 경우 곤란할 수 있으니 보안에 각별히 신경쓴다.
 
 <img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" />
+
+### 5.2. 동영상을 업로드하고 감정데이터 받아오기
+
+동영상을 마이크로소프트 [Cognitive Services APIs](https://www.microsoft.com/cognitive-services)에 업로드하고 
+동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 
+인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.[^microfot-ai-and-r] [^microfot-ai-and-python]
+
+1. 마이크로소프트 감정 API를 활용할 설정을 한다.
+    - 비디오 API `perFrame` 출력결과에 대한 엔드포인트 설정
+    - 감정(Emotion) API 키값을 설정
+1. 감정을 분석할 동영상을 설정한다.
+	- 100 MB 이상되면 마이크로소프트 인공지능 API에서 동영상 분석을 거부
+	- 여러가지 이유로 보안이나 접속이 제한된 경우 동영상 분석이 되지 않을 수 있음.
+1. 각 프레임별 감정분석을 실행
+    - 각 프레임별 감정분석을 진행하고 이를 결과값으로 저장한다.
+    - 반환받은 결과값이 익숙한 형태의 데이터프레임으로 변환
+1. 인공지능 API를 실행해서 돌려받은 결과는 로컬 파일로 저장
+
+<img src="fig/ms-cognitive-trump.png" alt="미국 동영상 얼굴감정인식 사례" width="57%" />
+
+``` {r eval=FALSE}
+library(tidyverse)
+library(httr)
+
+# `perFrame` 출력결과에 대한 비디오 API의 감정 엔드포인트 설정
+apiUrl <- "https://api.projectoxford.ai/emotion/v1.0/recognizeInVideo?outputStyle=perFrame"
+# 감정(Emotion) API 키값 설정
+key <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+# 감정을 분석할 비디오 URL 설정
+urlVideo <- 'https://github.com/statkclee/identify_age_with_oxford_api/raw/master/03_data/park_speech_03_320.mp4'
+
+mybody <- list(url = urlVideo)
+# 마이크로소프트 인공지능 API에 데이터 요청
+faceEMO <- httr::POST(
+  url = apiUrl,
+  httr::content_type('application/json'),
+  httr::add_headers(.headers = c('Ocp-Apim-Subscription-Key' = key)),
+  body = mybody,
+  encode = 'json'
+)
+# 인공지능 API 요청하여 돌려받은 출력결과를 저장할 장소 설정
+operationLocation <- httr::headers(faceEMO)[["operation-location"]]
+
+while(TRUE){
+  ret <- httr::GET(operationLocation,
+                   httr::add_headers(.headers = c('Ocp-Apim-Subscription-Key' = key)))
+  con <- httr::content(ret)
+  if(is.null(con$status)){
+    warning("Connection Error, retry after 1 minute")
+    Sys.sleep(60)
+  } else if (con$status == "Running" | con$status == "Uploading"){
+    cat(paste0("status ", con$status, "\n"))
+    cat(paste0("progress ", con$progress, "\n"))
+    Sys.sleep(60)
+  } else {
+    cat(paste0("status ", con$status, "\n"))
+    break()
+  }
+}
+data <- (con$processingResult %>% jsonlite::fromJSON())$fragments
+
+# status Uploading
+# progress 
+# status Running
+# progress 3.04
+# status Running
+# progress 9.15
+# status Running
+# progress 15.27
+# status Running
+# progress 21.38
+# status Running
+# progress 24.43
+# status Running
+# progress 33.6
+# status Running
+# progress 39.71
+# status Running
+# progress 45.82
+# status Running
+# progress 51.93
+# status Running
+# progress 58.04
+# status Running
+# progress 64.15
+# status Running
+# progress 70.26
+# status Running
+# progress 76.38
+# status Running
+# progress 82.49
+# status Running
+# progress 88.86
+# status Running
+# progress 94.94
+# status Succeeded
+
+# 결과값이 data$events로 저장되어 있는데 데이터프레임 칼럼을 갖는 이벤트 리스트가 자료형이라 
+# 루프를 돌려 평평하게 펴서 익숙한 데이터프레임 형태로 변환시킨다.
+data$events <- purrr::map(data$events, function(events){
+  events %>% purrr::map(function(event){
+    jsonlite::flatten(event)
+  }) %>% bind_rows()
+})
+data
+
+# 결과값을 csv 파일로 저장시킨다.
+park_emo_03_df <- data %>% unnest(events)
+write_csv(park_emo_03_df, "04.output/park_emo_03.csv")
+```
+
+### 5.3. 동영상 감정 분석 시각화
+
+동영상 속 사람이 여럿 존재하는 경우 각각을 추적해서 식별해야 하는 문제가 있어,
+가능하면 동영상속 사람이 한명 존재하고 이를 끝까지 추적하는 것이 이후 데이터 분석과정도 단순화할 수 있는 장점이 있다.
+세차례에 걸친 담화 분석결과를 하나의 데이터 프레임으로 묶어 연결시키고 나서 이를 `ggplot` 팩키지를 통해 시각화한다.
+동영상 프레임이 쭉 연결되기 때문에 10월 25일, 11월 4일, 11월 29일 첫번째 프레임으로 기준으로 동영상 각각을 구별한다.
 
 
 ``` {r emo-api-ggplot}
@@ -256,9 +401,14 @@ emo_long_df <- emo_df %>% gather(key, value, starts_with("scores")) %>%
 # 3. 데이터 시각화-----------------------------------------------------------
 library(ggplot2)
 ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
-  # geom_line() +  # would display all the non-smoothed lines
+  # geom_line() +  # 평활이 되지 않는 모든 선이 시각화 됨.
   geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
 ```
+
+## 6. 분석 데이터
+
+동영상 감정 분석에 활용된 원본 동영상과 마이크로소프트 비디오 API와 감정 API로 반환받은 데이터는 
+[GitHub](https://github.com/statkclee/identify_age_with_oxford_api/tree/master/03_data)에서 확인할 수 있다.
