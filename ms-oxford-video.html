@@ -112,7 +112,9 @@ speech_video &lt;-<span class="st"> </span><span class="kw">video</span>(<span c
 
 img_5000 &lt;-<span class="st"> </span><span class="kw">readFrame</span>(speech_video, <span class="dv">5000</span>)
 <span class="kw">plot</span>(img_5000)</code></pre></div>
-<p><img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="77%" /></p>
+<p><img src="fig/ms-congitive-image.png" alt="동영상에서 이미지 추출" width="57%" /></p>
+<h3 id="동영상-얼굴인식">4.2. 동영상 얼굴인식</h3>
+<p>동영상에서 사람 얼굴을 인식하고 인식된 영역에 사각형으로 표식을 한다. 이를 위해 <code>Rvision</code> 팩키지 <code>video()</code> 함수로 동영상을 읽어오고, <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">Microsoft Emotion API</a>를 통해 동영상 분석 감정분석과 더불어 얼굴 영역을 탐지해서 저장한 데이터프레임을 불러 읽어온다. 그리고 <code>plot()</code> 함수를 통해 시각화하고 나서 <code>rect</code> 함수로 얼굴영역에 직사각형을 그리고, 감정을 분석한 수치값을 감정 각각의 라벨과 더불어 표식한다.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
 
 <span class="co"># devtools::install_github(&quot;swarm-lab/videoplayR&quot;)</span>
@@ -156,9 +158,10 @@ y_dim &lt;-<span class="st"> </span><span class="kw">dim</span>(img_iframe)[<spa
 <span class="kw">with</span>(emo_df[iframe,], 
      <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">60</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;fear:&quot;</span>, .(fear))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
 <span class="kw">with</span>(emo_df[iframe,], 
-     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">70</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;contempt:&quot;</span>, .(contempt))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))
-
-<span class="co"># 3. 동영상 + 감정 이미지-----------------------------------------------------------</span>
+     <span class="kw">text</span>(x*x_dim<span class="dv">+75</span>, (y_dim-(y)*y_dim)-<span class="dv">70</span>, <span class="kw">bquote</span>(<span class="kw">paste</span>(<span class="st">&quot;contempt:&quot;</span>, .(contempt))), <span class="dt">cex =</span> .<span class="dv">75</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>))</code></pre></div>
+<h3 id="동영상-얼굴인식-애니메이션">4.3. 동영상 얼굴인식 애니메이션</h3>
+<p>동영상이 수천 프레임이라 매우 길어 해당 동영상에서 10개 프레임만 뽑아 이를 <code>.git</code> 파일로 만들어 감정변화에 대한 내용을 확인한다. 앞서 개별적으로 동영상에서 추출한 이미지 위에 얼굴의 위치를 사각형으로 표시하고 나서, 각 감정별 라벨과 수치도 함께 표현한 이미지를 10개 반복문을 통해 생성하고 이를 특정 디렉토리에 저장시킨다. 그리고 나서, <code>animation</code> 팩키지 <code>im.convert</code> 함수를 사용해서 <code>.gif</code> 파일 하나로 생성한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 3. 동영상 + 감정 이미지-----------------------------------------------------------</span>
 <span class="co"># 10 개 프레임만 선택</span>
 idx &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="kw">dim</span>(speech_video)[<span class="dv">3</span>], <span class="dt">length.out=</span><span class="dv">10</span>)
 
@@ -227,9 +230,124 @@ for(iframe in <span class="kw">seq_along</span>(idx)){
 <span class="co"># GIF 만들기</span>
 <span class="kw">library</span>(animation)
 <span class="kw">im.convert</span>(<span class="st">&quot;06.images/*.png&quot;</span>, <span class="dt">output =</span> <span class="st">&quot;img_animation.gif&quot;</span>)</code></pre></div>
-<p><img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="100%" /></p>
-<h3 id="감정분석-api-사용-권한-획득">4.2. 감정분석 API 사용 권한 획득</h3>
+<p><img src="fig/img_animation.gif" alt="감정분석 애니메이션" width="77%" /></p>
+<h2 id="인공지능-api를-활용한-동영상-감정-추출">5. 인공지능 API를 활용한 동영상 감정 추출</h2>
+<p>동영상 속 인물의 감정을 파악하기 위해 감정분석 API를 사용할 수 있는 권한을 획득한다. 마이크로소프트 <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">Emotion API</a>에 가입하고 감정분석 API 키를 받아 이를 무료로 부여된 할당량만큼 사용한다. 연구 및 초기 실험 목적으로 충분히 무료로 활용할 횟수를 제공하고 있다.</p>
+<h3 id="감정분석-api-사용-권한-획득">5.1. 감정분석 API 사용 권한 획득</h3>
+<p>마이크로소프트 <a href="https://www.microsoft.com/cognitive-services">Cognitive Services APIs</a> 중 관련있는 <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">Emotion API</a>의 동영상 감정분석 API키를 복사한다. R이나 파이썬 프로그램에서 동영상 감정분석을 요청할 때 활용되고, 외부에 유출될 경우 곤란할 수 있으니 보안에 각별히 신경쓴다.</p>
 <p><img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" /></p>
+<h3 id="동영상을-업로드하고-감정데이터-받아오기">5.2. 동영상을 업로드하고 감정데이터 받아오기</h3>
+<p>동영상을 마이크로소프트 <a href="https://www.microsoft.com/cognitive-services">Cognitive Services APIs</a>에 업로드하고 동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></p>
+<ol style="list-style-type: decimal">
+<li>마이크로소프트 감정 API를 활용할 설정을 한다.
+<ul>
+<li>비디오 API <code>perFrame</code> 출력결과에 대한 엔드포인트 설정</li>
+<li>감정(Emotion) API 키값을 설정</li>
+</ul></li>
+<li>감정을 분석할 동영상을 설정한다.
+<ul>
+<li>100 MB 이상되면 마이크로소프트 인공지능 API에서 동영상 분석을 거부</li>
+<li>여러가지 이유로 보안이나 접속이 제한된 경우 동영상 분석이 되지 않을 수 있음.</li>
+</ul></li>
+<li>각 프레임별 감정분석을 실행
+<ul>
+<li>각 프레임별 감정분석을 진행하고 이를 결과값으로 저장한다.</li>
+<li>반환받은 결과값이 익숙한 형태의 데이터프레임으로 변환</li>
+</ul></li>
+<li>인공지능 API를 실행해서 돌려받은 결과는 로컬 파일로 저장</li>
+</ol>
+<p><img src="fig/ms-cognitive-trump.png" alt="미국 동영상 얼굴감정인식 사례" width="57%" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(httr)
+
+<span class="co"># `perFrame` 출력결과에 대한 비디오 API의 감정 엔드포인트 설정</span>
+apiUrl &lt;-<span class="st"> &quot;https://api.projectoxford.ai/emotion/v1.0/recognizeInVideo?outputStyle=perFrame&quot;</span>
+<span class="co"># 감정(Emotion) API 키값 설정</span>
+key &lt;-<span class="st"> &quot;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&quot;</span>
+
+<span class="co"># 감정을 분석할 비디오 URL 설정</span>
+urlVideo &lt;-<span class="st"> &#39;https://github.com/statkclee/identify_age_with_oxford_api/raw/master/03_data/park_speech_03_320.mp4&#39;</span>
+
+mybody &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">url =</span> urlVideo)
+<span class="co"># 마이크로소프트 인공지능 API에 데이터 요청</span>
+faceEMO &lt;-<span class="st"> </span>httr::<span class="kw">POST</span>(
+  <span class="dt">url =</span> apiUrl,
+  httr::<span class="kw">content_type</span>(<span class="st">&#39;application/json&#39;</span>),
+  httr::<span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>key)),
+  <span class="dt">body =</span> mybody,
+  <span class="dt">encode =</span> <span class="st">&#39;json&#39;</span>
+)
+<span class="co"># 인공지능 API 요청하여 돌려받은 출력결과를 저장할 장소 설정</span>
+operationLocation &lt;-<span class="st"> </span>httr::<span class="kw">headers</span>(faceEMO)[[<span class="st">&quot;operation-location&quot;</span>]]
+
+while(<span class="ot">TRUE</span>){
+  ret &lt;-<span class="st"> </span>httr::<span class="kw">GET</span>(operationLocation,
+                   httr::<span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>key)))
+  con &lt;-<span class="st"> </span>httr::<span class="kw">content</span>(ret)
+  if(<span class="kw">is.null</span>(con$status)){
+    <span class="kw">warning</span>(<span class="st">&quot;Connection Error, retry after 1 minute&quot;</span>)
+    <span class="kw">Sys.sleep</span>(<span class="dv">60</span>)
+  } else if (con$status ==<span class="st"> &quot;Running&quot;</span> |<span class="st"> </span>con$status ==<span class="st"> &quot;Uploading&quot;</span>){
+    <span class="kw">cat</span>(<span class="kw">paste0</span>(<span class="st">&quot;status &quot;</span>, con$status, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>))
+    <span class="kw">cat</span>(<span class="kw">paste0</span>(<span class="st">&quot;progress &quot;</span>, con$progress, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>))
+    <span class="kw">Sys.sleep</span>(<span class="dv">60</span>)
+  } else {
+    <span class="kw">cat</span>(<span class="kw">paste0</span>(<span class="st">&quot;status &quot;</span>, con$status, <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>))
+    break()
+  }
+}
+data &lt;-<span class="st"> </span>(con$processingResult %&gt;%<span class="st"> </span>jsonlite::<span class="kw">fromJSON</span>())$fragments
+
+<span class="co"># status Uploading</span>
+<span class="co"># progress </span>
+<span class="co"># status Running</span>
+<span class="co"># progress 3.04</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 9.15</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 15.27</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 21.38</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 24.43</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 33.6</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 39.71</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 45.82</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 51.93</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 58.04</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 64.15</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 70.26</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 76.38</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 82.49</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 88.86</span>
+<span class="co"># status Running</span>
+<span class="co"># progress 94.94</span>
+<span class="co"># status Succeeded</span>
+
+<span class="co"># 결과값이 data$events로 저장되어 있는데 데이터프레임 칼럼을 갖는 이벤트 리스트가 자료형이라 </span>
+<span class="co"># 루프를 돌려 평평하게 펴서 익숙한 데이터프레임 형태로 변환시킨다.</span>
+data$events &lt;-<span class="st"> </span>purrr::<span class="kw">map</span>(data$events, function(events){
+  events %&gt;%<span class="st"> </span>purrr::<span class="kw">map</span>(function(event){
+    jsonlite::<span class="kw">flatten</span>(event)
+  }) %&gt;%<span class="st"> </span><span class="kw">bind_rows</span>()
+})
+data
+
+<span class="co"># 결과값을 csv 파일로 저장시킨다.</span>
+park_emo_03_df &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">unnest</span>(events)
+<span class="kw">write_csv</span>(park_emo_03_df, <span class="st">&quot;04.output/park_emo_03.csv&quot;</span>)</code></pre></div>
+<h3 id="동영상-감정-분석-시각화">5.3. 동영상 감정 분석 시각화</h3>
+<p>동영상 속 사람이 여럿 존재하는 경우 각각을 추적해서 식별해야 하는 문제가 있어, 가능하면 동영상속 사람이 한명 존재하고 이를 끝까지 추적하는 것이 이후 데이터 분석과정도 단순화할 수 있는 장점이 있다. 세차례에 걸친 담화 분석결과를 하나의 데이터 프레임으로 묶어 연결시키고 나서 이를 <code>ggplot</code> 팩키지를 통해 시각화한다. 동영상 프레임이 쭉 연결되기 때문에 10월 25일, 11월 4일, 11월 29일 첫번째 프레임으로 기준으로 동영상 각각을 구별한다.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정------------------------------------------------------------------</span>
 <span class="co"># library(stringr)</span>
 <span class="co"># library(dplyr)</span>
@@ -302,17 +420,21 @@ emo_long_df &lt;-<span class="st"> </span>emo_df %&gt;%<span class="st"> </span>
 <span class="co"># 3. 데이터 시각화-----------------------------------------------------------</span>
 <span class="kw">library</span>(ggplot2)
 <span class="kw">ggplot</span>(emo_long_df, <span class="kw">aes</span>(speech_frame, value, <span class="dt">group =</span> key, <span class="dt">col =</span> key)) +
-<span class="st">  </span><span class="co"># geom_line() +  # would display all the non-smoothed lines</span>
+<span class="st">  </span><span class="co"># geom_line() +  # 평활이 되지 않는 모든 선이 시각화 됨.</span>
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">n =</span> <span class="dv">100000</span>, <span class="dt">se =</span> F,  <span class="dt">span =</span> <span class="fl">0.1</span>) +
 <span class="st">  </span><span class="kw">theme_minimal</span>() +
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) +
 <span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&#39;10-25_1&#39;</span>, <span class="st">&#39;11-04_1&#39;</span>, <span class="st">&#39;11-29_1&#39;</span>))</code></pre></div>
 <p><img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" /></p>
+<h2 id="분석-데이터">6. 분석 데이터</h2>
+<p>동영상 감정 분석에 활용된 원본 동영상과 마이크로소프트 비디오 API와 감정 API로 반환받은 데이터는 <a href="https://github.com/statkclee/identify_age_with_oxford_api/tree/master/03_data">GitHub</a>에서 확인할 수 있다.</p>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p><a href="https://blog.exploratory.io/analyzing-emotions-using-facial-expressions-in-video-with-microsoft-ai-and-r-8f7585dd0780#.8tkpux2i2">Analyzing Emotions using Facial Expressions in Video with Microsoft AI and R</a><a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p><a href="https://benheubl.github.io/data%20analysis/fr/">How to apply face recognition API technology to data journalism with R and python</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="https://blog.exploratory.io/analyzing-emotions-using-facial-expressions-in-video-with-microsoft-ai-and-r-8f7585dd0780#.8tkpux2i2">Analyzing Emotions using Facial Expressions in Video with Microsoft AI and R</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="https://benheubl.github.io/data%20analysis/fr/">How to apply face recognition API technology to data journalism with R and python</a><a href="#fnref4">↩</a></p></li>
 </ol>
 </div>
         </div>
