@@ -408,6 +408,42 @@ ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
   scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
 ```
 
+### 5.4. 시간별 감정 변화 
+
+대국민 담화 1차, 2차, 3차 시작 시간은 1차 담화의 경우 녹화를 하여 오후 5시에 담화를 가졌으며,
+2차 담화는 오전 10시반, 3차 담화는 오후 2시 30분 시작되었고, 각 담화별 시간은 1차 담화의 경우 1분 42초,
+2차 담화의 경우 9분 14초, 3차 담화의 경우 4분 45초 동안 진행되었다.
+
+- 제1차 담화: 10월 25일, 17시 00분 [조지 6세가 ‘킹스 스피치’를 배운 이유](http://news.joins.com/article/20800106)
+- 제2차 담화: 11월 04일, 10시 30분 [박근혜 대통령 2차 대국민사과…지지율 5% 반전?](http://www.newdaily.co.kr/news/article.html?no=326166)
+- 제3차 담화: 11월 29일, 14시 30분 [박대통령, 오후 2시30분 3차 대국민 담화 예정](http://www.polinews.co.kr/news/article.html?no=295335)
+
+담화 시작 시간별 감정 변화를 시각화해 보자. `ggplot`에서 시계열 데이터를 시각화하기 위해서 먼저 x-축에 시간 정보를 넣어야 되기 때문에
+데이터프레임에 시간정보를 갖는 변수를 생성시킨다. 시간 정보를 생성시키는 함수는 `strptime()` 함수를 사용해서 `times`라는 변수로 저장하고,
+이를 `ggplot`에서 x-축에 넣고 `scale_x_datetime` 함수를 사용하여 30초 간격으로 감정변화를 시각화시킨다.
+
+``` {r emo-time-ggplot}
+# 3차 담화 
+emo_03_df <- read_csv("data/park_emo_03.csv")
+emo_03_df$times <- strptime("2016-11-29 14:30:00", format="%Y-%m-%d %H:%M:%OS", tz="Asia/Seoul") + seq(1, by = 1/30, length.out = dim(emo_03_df)[1])
+
+emo_long_df <- emo_03_df %>% gather(key, value, starts_with("scores")) %>%
+  mutate(key = str_replace(key, "scores.", "")) %>%
+  dplyr::filter(key != 'neutral')
+
+# 3. 데이터 시각화-----------------------------------------------------------
+ggplot(emo_long_df, aes(times, value, group = key, col = key)) +
+  # geom_line() +  # would display all the non-smoothed lines
+  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_datetime(breaks = date_breaks(width ="30 sec"), labels=date_format("%H:%M:%S")) +
+  labs(colour = "Emotion") +
+  xlab("") +
+  ylab("")
+```
+
+
 ## 6. 분석 데이터
 
 동영상 감정 분석에 활용된 원본 동영상과 마이크로소프트 비디오 API와 감정 API로 반환받은 데이터는 
