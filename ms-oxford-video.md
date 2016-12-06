@@ -256,7 +256,7 @@ R이나 파이썬 프로그램에서 동영상 감정분석을 요청할 때 활
 
 동영상을 마이크로소프트 [Cognitive Services APIs](https://www.microsoft.com/cognitive-services)에 업로드하고 
 동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 
-인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.[^microfot-ai-and-r] [^microfot-ai-and-python]
+인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.
 
 1. 마이크로소프트 감정 API를 활용할 설정을 한다.
     - 비디오 API `perFrame` 출력결과에 대한 엔드포인트 설정
@@ -484,6 +484,71 @@ ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
 ~~~
 
 <img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" />
+
+### 5.4. 시간별 감정 변화 
+
+대국민 담화 1차, 2차, 3차 시작 시간은 1차 담화의 경우 녹화를 하여 오후 5시에 담화를 가졌으며,
+2차 담화는 오전 10시반, 3차 담화는 오후 2시 30분 시작되었고, 각 담화별 시간은 1차 담화의 경우 1분 42초,
+2차 담화의 경우 9분 14초, 3차 담화의 경우 4분 45초 동안 진행되었다.
+
+- 제1차 담화: 10월 25일, 17시 00분 [조지 6세가 ‘킹스 스피치’를 배운 이유](http://news.joins.com/article/20800106)
+- 제2차 담화: 11월 04일, 10시 30분 [박근혜 대통령 2차 대국민사과…지지율 5% 반전?](http://www.newdaily.co.kr/news/article.html?no=326166)
+- 제3차 담화: 11월 29일, 14시 30분 [박대통령, 오후 2시30분 3차 대국민 담화 예정](http://www.polinews.co.kr/news/article.html?no=295335)
+
+담화 시작 시간별 감정 변화를 시각화해 보자. `ggplot`에서 시계열 데이터를 시각화하기 위해서 먼저 x-축에 시간 정보를 넣어야 되기 때문에
+데이터프레임에 시간정보를 갖는 변수를 생성시킨다. 시간 정보를 생성시키는 함수는 `strptime()` 함수를 사용해서 `times`라는 변수로 저장하고,
+이를 `ggplot`에서 x-축에 넣고 `scale_x_datetime` 함수를 사용하여 30초 간격으로 감정변화를 시각화시킨다.
+
+
+~~~{.r}
+# 3차 담화 
+emo_03_df <- read_csv("data/park_emo_03.csv")
+~~~
+
+
+
+~~~{.output}
+Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+
+~~~
+
+
+
+~~~{.r}
+emo_03_df$times <- strptime("2016-11-29 14:30:00", format="%Y-%m-%d %H:%M:%OS", tz="Asia/Seoul") + seq(1, by = 1/30, length.out = dim(emo_03_df)[1])
+
+emo_long_df <- emo_03_df %>% gather(key, value, starts_with("scores")) %>%
+  mutate(key = str_replace(key, "scores.", "")) %>%
+  dplyr::filter(key != 'neutral')
+
+# 3. 데이터 시각화-----------------------------------------------------------
+ggplot(emo_long_df, aes(times, value, group = key, col = key)) +
+  # geom_line() +  # would display all the non-smoothed lines
+  geom_smooth(method = "loess", n = 100000, se = F,  span = 0.1) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_x_datetime(breaks = date_breaks(width ="30 sec"), labels=date_format("%H:%M:%S")) +
+  labs(colour = "Emotion") +
+  xlab("") +
+  ylab("")
+~~~
+
+<img src="fig/emo-time-ggplot-1.png" title="plot of chunk emo-time-ggplot" alt="plot of chunk emo-time-ggplot" style="display: block; margin: auto;" />
+
 
 ## 6. 분석 데이터
 

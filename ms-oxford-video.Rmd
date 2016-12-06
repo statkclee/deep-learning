@@ -18,6 +18,7 @@ library(dygraphs)
 library(xts)
 library(stringr)
 library(ggplot2)
+library(scales)
 ```
 > ## 학습 목표 {.objectives}
 >
@@ -260,7 +261,7 @@ R이나 파이썬 프로그램에서 동영상 감정분석을 요청할 때 활
 
 동영상을 마이크로소프트 [Cognitive Services APIs](https://www.microsoft.com/cognitive-services)에 업로드하고 
 동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 
-인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.[^microfot-ai-and-r] [^microfot-ai-and-python]
+인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.
 
 1. 마이크로소프트 감정 API를 활용할 설정을 한다.
     - 비디오 API `perFrame` 출력결과에 대한 엔드포인트 설정

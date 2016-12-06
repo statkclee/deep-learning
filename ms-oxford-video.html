@@ -237,7 +237,7 @@ for(iframe in <span class="kw">seq_along</span>(idx)){
 <p>마이크로소프트 <a href="https://www.microsoft.com/cognitive-services">Cognitive Services APIs</a> 중 관련있는 <a href="https://www.microsoft.com/cognitive-services/en-us/emotion-api">Emotion API</a>의 동영상 감정분석 API키를 복사한다. R이나 파이썬 프로그램에서 동영상 감정분석을 요청할 때 활용되고, 외부에 유출될 경우 곤란할 수 있으니 보안에 각별히 신경쓴다.</p>
 <p><img src="fig/ms-cognitive-service-emotion-key.png" alt="동영상 감정분석 API 키" width="57%" /></p>
 <h3 id="동영상을-업로드하고-감정데이터-받아오기">5.2. 동영상을 업로드하고 감정데이터 받아오기</h3>
-<p>동영상을 마이크로소프트 <a href="https://www.microsoft.com/cognitive-services">Cognitive Services APIs</a>에 업로드하고 동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></p>
+<p>동영상을 마이크로소프트 <a href="https://www.microsoft.com/cognitive-services">Cognitive Services APIs</a>에 업로드하고 동영상에서 감정을 프레임 단위로 추출하도록 R 프로그램을 작성한다. 인공지능 기술 활용 방안으로 미국 대선 트럼프와 힐러리 토론에 감정인식 기술을 적용시켜 데이터 저널리즘의 새로운 가능성을 제시했다.</p>
 <ol style="list-style-type: decimal">
 <li>마이크로소프트 감정 API를 활용할 설정을 한다.
 <ul>
@@ -426,6 +426,49 @@ emo_long_df &lt;-<span class="st"> </span>emo_df %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) +
 <span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&#39;10-25_1&#39;</span>, <span class="st">&#39;11-04_1&#39;</span>, <span class="st">&#39;11-29_1&#39;</span>))</code></pre></div>
 <p><img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" /></p>
+<h3 id="시간별-감정-변화">5.4. 시간별 감정 변화</h3>
+<p>대국민 담화 1차, 2차, 3차 시작 시간은 1차 담화의 경우 녹화를 하여 오후 5시에 담화를 가졌으며, 2차 담화는 오전 10시반, 3차 담화는 오후 2시 30분 시작되었고, 각 담화별 시간은 1차 담화의 경우 1분 42초, 2차 담화의 경우 9분 14초, 3차 담화의 경우 4분 45초 동안 진행되었다.</p>
+<ul>
+<li>제1차 담화: 10월 25일, 17시 00분 <a href="http://news.joins.com/article/20800106">조지 6세가 ‘킹스 스피치’를 배운 이유</a></li>
+<li>제2차 담화: 11월 04일, 10시 30분 <a href="http://www.newdaily.co.kr/news/article.html?no=326166">박근혜 대통령 2차 대국민사과…지지율 5% 반전?</a></li>
+<li>제3차 담화: 11월 29일, 14시 30분 <a href="http://www.polinews.co.kr/news/article.html?no=295335">박대통령, 오후 2시30분 3차 대국민 담화 예정</a></li>
+</ul>
+<p>담화 시작 시간별 감정 변화를 시각화해 보자. <code>ggplot</code>에서 시계열 데이터를 시각화하기 위해서 먼저 x-축에 시간 정보를 넣어야 되기 때문에 데이터프레임에 시간정보를 갖는 변수를 생성시킨다. 시간 정보를 생성시키는 함수는 <code>strptime()</code> 함수를 사용해서 <code>times</code>라는 변수로 저장하고, 이를 <code>ggplot</code>에서 x-축에 넣고 <code>scale_x_datetime</code> 함수를 사용하여 30초 간격으로 감정변화를 시각화시킨다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 3차 담화 </span>
+emo_03_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/park_emo_03.csv&quot;</span>)</code></pre></div>
+<pre class="output"><code>Parsed with column specification:
+cols(
+  x = col_double(),
+  y = col_double(),
+  width = col_double(),
+  height = col_double(),
+  scores.neutral = col_double(),
+  scores.happiness = col_double(),
+  scores.surprise = col_double(),
+  scores.sadness = col_double(),
+  scores.anger = col_double(),
+  scores.disgust = col_double(),
+  scores.fear = col_double(),
+  scores.contempt = col_double()
+)
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">emo_03_df$times &lt;-<span class="st"> </span><span class="kw">strptime</span>(<span class="st">&quot;2016-11-29 14:30:00&quot;</span>, <span class="dt">format=</span><span class="st">&quot;%Y-%m-%d %H:%M:%OS&quot;</span>, <span class="dt">tz=</span><span class="st">&quot;Asia/Seoul&quot;</span>) +<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dt">by =</span> <span class="dv">1</span>/<span class="dv">30</span>, <span class="dt">length.out =</span> <span class="kw">dim</span>(emo_03_df)[<span class="dv">1</span>])
+
+emo_long_df &lt;-<span class="st"> </span>emo_03_df %&gt;%<span class="st"> </span><span class="kw">gather</span>(key, value, <span class="kw">starts_with</span>(<span class="st">&quot;scores&quot;</span>)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">key =</span> <span class="kw">str_replace</span>(key, <span class="st">&quot;scores.&quot;</span>, <span class="st">&quot;&quot;</span>)) %&gt;%
+<span class="st">  </span>dplyr::<span class="kw">filter</span>(key !=<span class="st"> &#39;neutral&#39;</span>)
+
+<span class="co"># 3. 데이터 시각화-----------------------------------------------------------</span>
+<span class="kw">ggplot</span>(emo_long_df, <span class="kw">aes</span>(times, value, <span class="dt">group =</span> key, <span class="dt">col =</span> key)) +
+<span class="st">  </span><span class="co"># geom_line() +  # would display all the non-smoothed lines</span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;loess&quot;</span>, <span class="dt">n =</span> <span class="dv">100000</span>, <span class="dt">se =</span> F,  <span class="dt">span =</span> <span class="fl">0.1</span>) +
+<span class="st">  </span><span class="kw">theme_minimal</span>() +
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">90</span>, <span class="dt">hjust =</span> <span class="dv">1</span>)) +
+<span class="st">  </span><span class="kw">scale_x_datetime</span>(<span class="dt">breaks =</span> <span class="kw">date_breaks</span>(<span class="dt">width =</span><span class="st">&quot;30 sec&quot;</span>), <span class="dt">labels=</span><span class="kw">date_format</span>(<span class="st">&quot;%H:%M:%S&quot;</span>)) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">colour =</span> <span class="st">&quot;Emotion&quot;</span>) +
+<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;&quot;</span>) +
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><img src="fig/emo-time-ggplot-1.png" title="plot of chunk emo-time-ggplot" alt="plot of chunk emo-time-ggplot" style="display: block; margin: auto;" /></p>
 <h2 id="분석-데이터">6. 분석 데이터</h2>
 <p>동영상 감정 분석에 활용된 원본 동영상과 마이크로소프트 비디오 API와 감정 API로 반환받은 데이터는 <a href="https://github.com/statkclee/identify_age_with_oxford_api/tree/master/03_data">GitHub</a>에서 확인할 수 있다.</p>
 <div class="footnotes">
@@ -433,8 +476,6 @@ emo_long_df &lt;-<span class="st"> </span>emo_df %&gt;%<span class="st"> </span>
 <ol>
 <li id="fn1"><p><a href="https://blog.exploratory.io/analyzing-emotions-using-facial-expressions-in-video-with-microsoft-ai-and-r-8f7585dd0780#.8tkpux2i2">Analyzing Emotions using Facial Expressions in Video with Microsoft AI and R</a><a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p><a href="https://benheubl.github.io/data%20analysis/fr/">How to apply face recognition API technology to data journalism with R and python</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="https://blog.exploratory.io/analyzing-emotions-using-facial-expressions-in-video-with-microsoft-ai-and-r-8f7585dd0780#.8tkpux2i2">Analyzing Emotions using Facial Expressions in Video with Microsoft AI and R</a><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><a href="https://benheubl.github.io/data%20analysis/fr/">How to apply face recognition API technology to data journalism with R and python</a><a href="#fnref4">↩</a></p></li>
 </ol>
 </div>
         </div>
