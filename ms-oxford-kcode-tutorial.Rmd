@@ -94,16 +94,6 @@ rasterImage(lena,0,0,1,1)
 ### 3.2. Lena 이미지 얼굴 위치 파악
 
 ``` {r dl-image-location, warn=FALSE, message=FALSE}
-## 1. Lena 이미지
-
-library(httr)
-
-par(mar=c(0,0,0,0))
-plot.new()
-
-lena <- readPNG("02_data/lena.png")
-rasterImage(lena,0,0,1,1, interpolate = TRUE)
-
 ## 2. 얼굴 위치 파악
 img <- httr::upload_file("02_data/lena.png")
 
@@ -188,7 +178,6 @@ suji_face_df
 ```
 
 ### 3.4. 사진속 나이
-
 
 ``` {r dl-image-age, warn=FALSE, message=FALSE}
 # 0. 환경설정--------------------------------------------------

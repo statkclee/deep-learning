@@ -88,6 +88,169 @@
 </div>
 </aside>
 <h2 id="코딩">3. 코딩</h2>
+<p>이미지를 컴퓨터에 넣어 이미지에 들어있는 사람얼굴을 인식하고 사람얼굴을 숫자로 뽑아내는 실습을 진행한다.</p>
+<h3 id="lena-이미지-불러오기">3.1. Lena 이미지 불러오기</h3>
+<p>가장 먼저 R로 이미지를 불러온다. 메모리에 적재되어 중앙처리장치를 통해 R로 만든 명령어를 수행하기 위한 선행작업이다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(ggplot2)
+
+<span class="co"># install.packages(&quot;png&quot;)</span>
+<span class="co"># install.packages(&quot;grid&quot;)</span>
+
+<span class="kw">library</span>(png)
+<span class="kw">library</span>(grid)
+
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
+<span class="kw">plot.new</span>()
+
+lena &lt;-<span class="st"> </span><span class="kw">readPNG</span>(<span class="st">&quot;02_data/lena.png&quot;</span>)
+<span class="kw">rasterImage</span>(lena,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>)</code></pre></div>
+<p><img src="fig/dl-read-raw-image-1.png" title="plot of chunk dl-read-raw-image" alt="plot of chunk dl-read-raw-image" style="display: block; margin: auto;" /></p>
+<h3 id="lena-이미지-얼굴-위치-파악">3.2. Lena 이미지 얼굴 위치 파악</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 2. 얼굴 위치 파악
+img &lt;-<span class="st"> </span>httr::<span class="kw">upload_file</span>(<span class="st">&quot;02_data/lena.png&quot;</span>)
+
+face_api_url =<span class="st"> &quot;https://api.projectoxford.ai/face/v1.0/detect?returnFaceLandmarks=true&amp;returnFaceAttributes=age,gender,headPose,smile,facialHair,glasses&quot;</span>
+
+<span class="co"># faceKEY &lt;- &#39;53xxxxxxxxxxxxxxxxxxxxxxxxxx&#39;</span>
+<span class="kw">source</span>(<span class="st">&quot;03_code/private-keys.R&quot;</span>) 
+
+result &lt;-<span class="st"> </span><span class="kw">POST</span>(<span class="dt">url =</span> face_api_url,
+               <span class="dt">body =</span> img,
+               <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Content-Type&#39;</span> =<span class="st"> &#39;application/octet-stream&#39;</span>,
+                                        <span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>faceKEY))
+)</code></pre></div>
+<pre class="error"><code>Error in eval(expr, envir, enclos): 함수 &quot;POST&quot;를 찾을 수 없습니다
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">face_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">content</span>(result))</code></pre></div>
+<pre class="error"><code>Error in as.data.frame(content(result)): 함수 &quot;content&quot;를 찾을 수 없습니다
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 3. 얼굴 위치 사각형 표시
+
+rect &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> face_df$faceRectangle.left,
+                   <span class="dt">x2 =</span> face_df$faceRectangle.left +<span class="st"> </span>face_df$faceRectangle.width,
+                   <span class="dt">y1 =</span> <span class="kw">dim</span>(lena)[<span class="dv">1</span>] -<span class="st"> </span>face_df$faceRectangle.top,
+                   <span class="dt">y2 =</span> <span class="kw">dim</span>(lena)[<span class="dv">1</span>] -<span class="st"> </span>face_df$faceRectangle.top -<span class="st"> </span>face_df$faceRectangle.height)</code></pre></div>
+<pre class="error"><code>Error in data.frame(x1 = face_df$faceRectangle.left, x2 = face_df$faceRectangle.left + : 객체 &#39;face_df&#39;를 찾을 수 없습니다
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">2</span>], <span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">1</span>])
+
+
+g &lt;-<span class="st"> </span><span class="kw">rasterGrob</span>(lena, <span class="dt">interpolate=</span><span class="ot">TRUE</span>)
+
+<span class="kw">ggplot</span>(df) +<span class="st">  </span>
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">512</span>)) +
+<span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">limits =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">512</span>)) +
+<span class="st">  </span><span class="kw">annotation_custom</span>(g, <span class="dt">xmin=</span><span class="dv">0</span>, <span class="dt">xmax=</span><span class="kw">dim</span>(lena)[<span class="dv">2</span>], <span class="dt">ymin=</span><span class="dv">0</span>, <span class="dt">ymax=</span><span class="kw">dim</span>(lena)[<span class="dv">1</span>]) +
+<span class="st">  </span><span class="kw">geom_rect</span>(<span class="dt">data=</span>rect, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">xmin=</span>x1, <span class="dt">xmax=</span>x2, <span class="dt">ymin=</span>y1, <span class="dt">ymax=</span>y2), <span class="dt">color=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.0</span>) +
+<span class="st">  </span><span class="kw">coord_fixed</span>()</code></pre></div>
+<pre class="error"><code>Error in f(...): (리스트) 객체는 유형 &#39;double&#39;로 강제형변환 될 수 없습니다
+</code></pre>
+<p><img src="fig/dl-image-location-1.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" /></p>
+<h3 id="수지-감정">3.3. 수지 감정</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 00. 환경설정  ========================================================================================== 
+<span class="kw">library</span>(<span class="st">&quot;httr&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;XML&quot;</span>)
+<span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)
+
+## 01. 마이크로소프트 API 설정 ==========================================================================================
+
+<span class="co"># 적용할 마이크로소프트 API 지정</span>
+URL.emoface &lt;-<span class="st"> &#39;https://api.projectoxford.ai/emotion/v1.0/recognize&#39;</span>
+
+<span class="co"># 접속 인증키 설정</span>
+<span class="co"># emotionKEY = &#39;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX&#39;</span>
+<span class="kw">source</span>(<span class="st">&quot;03_code/private-keys.R&quot;</span>) 
+
+## 02. 감정분석할 이미지 지정 및 호출 ==========================================================================================
+
+img &lt;-<span class="st"> </span>httr::<span class="kw">upload_file</span>(<span class="st">&quot;02_data/suji.jpg&quot;</span>)
+emotion_api_url =<span class="st"> &quot;https://api.projectoxford.ai/emotion/v1.0/recognize&quot;</span>
+
+suji_face &lt;-<span class="st"> </span><span class="kw">POST</span>(<span class="dt">url =</span> emotion_api_url,
+            <span class="dt">body =</span> img,
+            <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Content-Type&#39;</span> =<span class="st"> &#39;application/octet-stream&#39;</span>,
+                        <span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>emotionKEY))
+)
+
+## 03. 감정분석결과 추가분석 (Suji Face) ==========================================================================================
+<span class="co"># 얼굴 분석결과</span>
+suji_face_lst &lt;-<span class="st"> </span>httr::<span class="kw">content</span>(suji_face)[[<span class="dv">1</span>]]
+suji_face_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(suji_face_lst[<span class="dv">2</span>]) %&gt;%<span class="st"> </span>t %&gt;%<span class="st"> </span>as.data.frame
+
+suji_face_df$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(suji_face_df$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
+suji_face_df$V1 &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(suji_face_df$V1)
+<span class="kw">colnames</span>(suji_face_df)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Level&quot;</span>
+
+suji_face_df$Emotion &lt;-<span class="st"> </span><span class="kw">sub</span>(<span class="st">&quot;scores.&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">rownames</span>(suji_face_df))
+
+<span class="co"># 시각화</span>
+<span class="kw">ggplot</span>(suji_face_df, <span class="kw">aes</span>(<span class="dt">x=</span>Emotion, <span class="dt">y=</span>Level)) +<span class="st">   </span>
+<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>)</code></pre></div>
+<p><img src="fig/dl-image-emotion-1.png" title="plot of chunk dl-image-emotion" alt="plot of chunk dl-image-emotion" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">suji_face_df</code></pre></div>
+<pre class="output"><code>                     Level   Emotion
+scores.anger     1.0956078     anger
+scores.contempt  1.4617596  contempt
+scores.disgust   1.8161433   disgust
+scores.fear      4.8990230      fear
+scores.happiness 0.9999176 happiness
+scores.neutral   7.6674960   neutral
+scores.sadness   1.2341061   sadness
+scores.surprise  4.2812660  surprise
+</code></pre>
+<h3 id="사진속-나이">3.4. 사진속 나이</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정--------------------------------------------------</span>
+<span class="kw">library</span>(httr)
+<span class="kw">library</span>(XML)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(png)
+<span class="kw">library</span>(grid)
+<span class="kw">library</span>(jsonlite)
+<span class="kw">library</span>(dplyr)
+
+<span class="co"># 1. 데이터 불러오기 ----------------------------------------------</span>
+
+img_list &lt;-<span class="st"> </span><span class="kw">list.files</span>(<span class="st">&quot;02_data/&quot;</span>)
+
+<span class="co"># 2. 얼굴인식 API 호출 ------------------------------------------------</span>
+
+face_api_url &lt;-<span class="st"> &quot;https://api.projectoxford.ai/face/v1.0/detect?returnFaceAttributes=age,gender&quot;</span>
+
+<span class="co"># faceKEY &lt;- &#39;53xxxxxxxxxxxxxxxxxx&#39;</span>
+<span class="kw">source</span>(<span class="st">&quot;03_code/private-keys.R&quot;</span>)
+
+img_bucket &lt;-<span class="st"> </span><span class="kw">list</span>()
+
+for(lst in <span class="kw">seq_along</span>(img_list)){
+  img_name &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;02_data/&quot;</span>, img_list[lst])
+  img &lt;-<span class="st"> </span>httr::<span class="kw">upload_file</span>(img_name)
+  
+  result &lt;-<span class="st"> </span><span class="kw">POST</span>(<span class="dt">url =</span> face_api_url,
+                 <span class="dt">body =</span> img,
+                 <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Content-Type&#39;</span> =<span class="st"> &#39;application/octet-stream&#39;</span>,
+                                          <span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>faceKEY))
+  )
+  
+  img_bucket[[lst]] &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">content</span>(result))[,<span class="kw">c</span>(<span class="st">&quot;faceAttributes.gender&quot;</span>, <span class="st">&quot;faceAttributes.age&quot;</span>)]
+}
+
+<span class="co"># 3. 데이터 정리-------------------------------------</span>
+
+img_buckets &lt;-<span class="st"> </span><span class="kw">do.call</span>(rbind, img_bucket)
+
+img_buckets &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">idate=</span>img_list, img_buckets)
+img_buckets &lt;-<span class="st"> </span>img_buckets %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">rename</span>(<span class="dt">gender =</span> faceAttributes.gender, <span class="dt">age=</span>faceAttributes.age)
+
+img_buckets</code></pre></div>
+<pre class="output"><code>           idate gender  age
+1 angry-face.jpg female  6.2
+2         hq.png   male 45.9
+3       lena.png female 27.7
+4     suji-2.png female 23.8
+5       suji.jpg female 22.3
+</code></pre>
 <div class="footnotes">
 <hr />
 <ol>
