@@ -107,6 +107,16 @@ lena &lt;-<span class="st"> </span><span class="kw">readPNG</span>(<span class="
 <span class="kw">rasterImage</span>(lena,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>)</code></pre></div>
 <p><img src="fig/dl-read-raw-image-1.png" title="plot of chunk dl-read-raw-image" alt="plot of chunk dl-read-raw-image" style="display: block; margin: auto;" /></p>
 <h3 id="lena-이미지-얼굴-위치-파악">3.2. Lena 이미지 얼굴 위치 파악</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1. Lena 이미지
+
+<span class="kw">library</span>(httr)
+
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>))
+<span class="kw">plot.new</span>()
+
+lena &lt;-<span class="st"> </span><span class="kw">readPNG</span>(<span class="st">&quot;02_data/lena.png&quot;</span>)
+<span class="kw">rasterImage</span>(lena,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">1</span>, <span class="dt">interpolate =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="fig/dl-image-location-1.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 2. 얼굴 위치 파악
 img &lt;-<span class="st"> </span>httr::<span class="kw">upload_file</span>(<span class="st">&quot;02_data/lena.png&quot;</span>)
 
@@ -119,21 +129,19 @@ result &lt;-<span class="st"> </span><span class="kw">POST</span>(<span class="d
                <span class="dt">body =</span> img,
                <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Content-Type&#39;</span> =<span class="st"> &#39;application/octet-stream&#39;</span>,
                                         <span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>faceKEY))
-)</code></pre></div>
-<pre class="error"><code>Error in eval(expr, envir, enclos): 함수 &quot;POST&quot;를 찾을 수 없습니다
-</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">face_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">content</span>(result))</code></pre></div>
-<pre class="error"><code>Error in as.data.frame(content(result)): 함수 &quot;content&quot;를 찾을 수 없습니다
-</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 3. 얼굴 위치 사각형 표시
+)
+
+face_df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">content</span>(result))
+
+
+## 3. 얼굴 위치 사각형 표시
 
 rect &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> face_df$faceRectangle.left,
                    <span class="dt">x2 =</span> face_df$faceRectangle.left +<span class="st"> </span>face_df$faceRectangle.width,
                    <span class="dt">y1 =</span> <span class="kw">dim</span>(lena)[<span class="dv">1</span>] -<span class="st"> </span>face_df$faceRectangle.top,
-                   <span class="dt">y2 =</span> <span class="kw">dim</span>(lena)[<span class="dv">1</span>] -<span class="st"> </span>face_df$faceRectangle.top -<span class="st"> </span>face_df$faceRectangle.height)</code></pre></div>
-<pre class="error"><code>Error in data.frame(x1 = face_df$faceRectangle.left, x2 = face_df$faceRectangle.left + : 객체 &#39;face_df&#39;를 찾을 수 없습니다
-</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">2</span>], <span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">1</span>])
+                   <span class="dt">y2 =</span> <span class="kw">dim</span>(lena)[<span class="dv">1</span>] -<span class="st"> </span>face_df$faceRectangle.top -<span class="st"> </span>face_df$faceRectangle.height)
+
+df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">2</span>], <span class="dv">0</span>:<span class="kw">dim</span>(lena)[<span class="dv">1</span>])
 
 
 g &lt;-<span class="st"> </span><span class="kw">rasterGrob</span>(lena, <span class="dt">interpolate=</span><span class="ot">TRUE</span>)
@@ -144,9 +152,7 @@ g &lt;-<span class="st"> </span><span class="kw">rasterGrob</span>(lena, <span c
 <span class="st">  </span><span class="kw">annotation_custom</span>(g, <span class="dt">xmin=</span><span class="dv">0</span>, <span class="dt">xmax=</span><span class="kw">dim</span>(lena)[<span class="dv">2</span>], <span class="dt">ymin=</span><span class="dv">0</span>, <span class="dt">ymax=</span><span class="kw">dim</span>(lena)[<span class="dv">1</span>]) +
 <span class="st">  </span><span class="kw">geom_rect</span>(<span class="dt">data=</span>rect, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">xmin=</span>x1, <span class="dt">xmax=</span>x2, <span class="dt">ymin=</span>y1, <span class="dt">ymax=</span>y2), <span class="dt">color=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">alpha=</span><span class="fl">0.0</span>) +
 <span class="st">  </span><span class="kw">coord_fixed</span>()</code></pre></div>
-<pre class="error"><code>Error in f(...): (리스트) 객체는 유형 &#39;double&#39;로 강제형변환 될 수 없습니다
-</code></pre>
-<p><img src="fig/dl-image-location-1.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" /></p>
+<p><img src="fig/dl-image-location-2.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" /></p>
 <h3 id="수지-감정">3.3. 수지 감정</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 00. 환경설정  ========================================================================================== 
 <span class="kw">library</span>(<span class="st">&quot;httr&quot;</span>)

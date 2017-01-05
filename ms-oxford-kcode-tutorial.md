@@ -90,6 +90,20 @@ rasterImage(lena,0,0,1,1)
 
 
 ~~~{.r}
+## 1. Lena 이미지
+
+library(httr)
+
+par(mar=c(0,0,0,0))
+plot.new()
+
+lena <- readPNG("02_data/lena.png")
+rasterImage(lena,0,0,1,1, interpolate = TRUE)
+~~~
+
+<img src="fig/dl-image-location-1.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" />
+
+~~~{.r}
 ## 2. 얼굴 위치 파악
 img <- httr::upload_file("02_data/lena.png")
 
@@ -103,49 +117,17 @@ result <- POST(url = face_api_url,
                add_headers(.headers = c('Content-Type' = 'application/octet-stream',
                                         'Ocp-Apim-Subscription-Key' = faceKEY))
 )
-~~~
 
-
-
-~~~{.error}
-Error in eval(expr, envir, enclos): 함수 "POST"를 찾을 수 없습니다
-
-~~~
-
-
-
-~~~{.r}
 face_df <- as.data.frame(content(result))
-~~~
 
 
-
-~~~{.error}
-Error in as.data.frame(content(result)): 함수 "content"를 찾을 수 없습니다
-
-~~~
-
-
-
-~~~{.r}
 ## 3. 얼굴 위치 사각형 표시
 
 rect <- data.frame(x1 = face_df$faceRectangle.left,
                    x2 = face_df$faceRectangle.left + face_df$faceRectangle.width,
                    y1 = dim(lena)[1] - face_df$faceRectangle.top,
                    y2 = dim(lena)[1] - face_df$faceRectangle.top - face_df$faceRectangle.height)
-~~~
 
-
-
-~~~{.error}
-Error in data.frame(x1 = face_df$faceRectangle.left, x2 = face_df$faceRectangle.left + : 객체 'face_df'를 찾을 수 없습니다
-
-~~~
-
-
-
-~~~{.r}
 df <- data.frame(0:dim(lena)[2], 0:dim(lena)[1])
 
 
@@ -159,14 +141,7 @@ ggplot(df) +
   coord_fixed()
 ~~~
 
-
-
-~~~{.error}
-Error in f(...): (리스트) 객체는 유형 'double'로 강제형변환 될 수 없습니다
-
-~~~
-
-<img src="fig/dl-image-location-1.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" />
+<img src="fig/dl-image-location-2.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" />
 
 ### 3.3. 수지 감정
 
@@ -235,6 +210,7 @@ scores.surprise  4.2812660  surprise
 ~~~
 
 ### 3.4. 사진속 나이
+
 
 
 ~~~{.r}
