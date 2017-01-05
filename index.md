@@ -46,7 +46,8 @@ title: xwMOOC 딥러닝과 $H_2 O$
             - [옥스포드 - 감정 API](ms-oxford-emotion.html)
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
             - [사진속 나이 추정](ms-oxford-age.html)
-            - [동영상 감정 분석](ms-oxford-video.html)
+                - [R을 이용한 인공지능 튜토리얼](ms-oxford-my-face.html)
+            - [동영상 감정 분석](ms-oxford-video.html)            
     - **음성**
         - [음성 API](speech-api.html)
     - [IBM 왓슨](r-watson.html)
@@ -72,7 +73,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [$100 오픈 컴퓨터](http://computer.xwmooc.org/)   
     - [$100 오픈 슈퍼컴퓨터](http://computers.xwmooc.org/)
 - **데이터 과학**
-    - [R 데이터과학](http://data-science.xwmooc.org/)
+    - [R 데이터과학](http://statkclee.github.io/data-science)
     - [R 팩키지](http://r-pkgs.xwmooc.org/)
     - [R 도커](http://statkclee.github.io/r-docker/)
     - [통계적 사고](http://think-stat.xwmooc.org/)
@@ -81,5 +82,5 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [기계학습](http://statkclee.github.io/ml)
     - [고생대 프로젝트](http://statkclee.github.io/trilobite)
 - [기호 수학(Symbolic Math)](http://sympy.xwmooc.org/)
-- [선거와 투표](http://politics.xwmooc.org/)
+- [선거와 투표](http://statkclee.github.io/politics)
 
