@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: xwMOOC 딥러닝</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    -->
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
+          <h2 class="subtitle">정보과학교육연합회-R을 이용한 인공지능 튜토리얼</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>본인 나이, 사진속 얼굴 나이, 기계가 판단하는 나이를 비교한다.</li>
+<li>인공지능 API 서비스의 다양한 면을 살펴본다.</li>
+<li>인공지능 API 코딩 실습을 통해 코딩교육의 방향을 (나름) 설정한다.</li>
+</ul>
+</div>
+</section>
+<h2 id="r을-이용한-인공지능-튜토리얼">1. R을 이용한 인공지능 튜토리얼</h2>
+<ul>
+<li><a href="http://163.239.199.187:8888/ws2016/">소프트웨어교육 어디로 가야 하는가?, 등록사이트</a></li>
+<li><a href="http://kcode.kr/">한국정보과학교육연합회(KiSEF) 홈페이지</a></li>
+<li><a href="http://kcode.kr/notice/761">학술대회, 4차 산업혁명 시대의 소프트웨어 교육 어디로 가야 하는가? 공지사항</a></li>
+</ul>
+<p><img src="fig/kcode-tutorial.png" alt="R 인공지능 튜토리얼 일정" width="77%" /></p>
+<h2 id="나이측정-인공지능-서비스-how-to-detect-face-algorithm">2. 나이측정 인공지능 서비스 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h2>
+<p><img src="fig/ai-product-service-raw-material.png" alt="인공지능 서비스" width="77%" /></p>
+<h3 id="나이측정-앱서비스">2.1. 나이측정 앱서비스</h3>
+<ul>
+<li><a href="https://how-old.net/">How-Old.net, How old do I look? #HowOldRobot</a></li>
+</ul>
+<h3 id="나이측정-api-둘러보기">2.2. 나이측정 API 둘러보기</h3>
+<ul>
+<li><a href="https://www.microsoft.com/cognitive-services/en-us/face-api">마이크로소프트 Cognitive Services - Face API</a></li>
+</ul>
+<h3 id="나이측정-api-개발-사용자-인터페이스">2.3. 나이측정 API 개발 사용자 인터페이스</h3>
+<ul>
+<li><strong>사전 준비물</strong>
+<ul>
+<li>구독 열쇠(subscription keys) : https://www.microsoft.com/cognitive-services/en-us/apis</li>
+<li>사진 url: <a href="https://raw.githubusercontent.com/statkclee/2016-11-06-sogang/gh-pages/figure/angry-face.jpg" class="uri">https://raw.githubusercontent.com/statkclee/2016-11-06-sogang/gh-pages/figure/angry-face.jpg</a></li>
+<li>매개변수: <strong>returnFaceAttributes</strong> : Age,Gender,Smile,FacialHair,HeadPose,Glasses</li>
+</ul></li>
+<li><a href="https://www.microsoft.com/cognitive-services/en-us/documentation">마이크로소프트 Cognitive Services</a>
+<ul>
+<li>Face API → API reference → Open API Testing Console : <a href="https://dev.projectoxford.ai/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f30395236/console">실습 웹콘솔</a></li>
+</ul></li>
+</ul>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="얼굴인식-중요정보face-landmark"><span class="glyphicon glyphicon-pushpin"></span>얼굴인식 중요정보(face landmark)</h3>
+</div>
+<div class="panel-body">
+<p><img src="fig/face-landmarks.jpg" alt="얼굴 중요식별자" width="57%" /></p>
+</div>
+</aside>
+<h2 id="코딩">3. 코딩</h2>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://www.microsoft.com/cognitive-services/en-us/face-api/documentation/face-api-how-to-topics/HowtoDetectFacesinImage">How to Detect Faces in Image</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-37305346-2', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </body>
+</html>
