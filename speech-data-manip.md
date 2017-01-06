@@ -11,9 +11,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-```
+
 
 > ## 학습 목표 {.objectives}
 >
