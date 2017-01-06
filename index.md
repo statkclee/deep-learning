@@ -49,6 +49,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
                 - [R을 이용한 인공지능 튜토리얼](ms-oxford-kcode-tutorial.html)
             - [동영상 감정 분석](ms-oxford-video.html)            
     - **음성**
+        - [오디오 데이터](speech-data-manip.html)
         - [음성 API](speech-api.html)
     - [IBM 왓슨](r-watson.html)
 1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
