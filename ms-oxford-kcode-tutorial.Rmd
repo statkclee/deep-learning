@@ -189,6 +189,8 @@ suji_face_df
 
 ### 3.4. 사진속 나이
 
+<img src="fig/dl-image-stack.png" alt="사진속 나이 이미지" />
+
 
 ``` {r dl-image-age, warn=FALSE, message=FALSE}
 # 0. 환경설정--------------------------------------------------
