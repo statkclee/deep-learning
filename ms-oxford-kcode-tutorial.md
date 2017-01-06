@@ -211,6 +211,8 @@ scores.surprise  4.2812660  surprise
 
 ### 3.4. 사진속 나이
 
+<img src="fig/dl-image-stack.png" alt="사진속 나이 이미지" />
+
 
 
 ~~~{.r}
