@@ -60,7 +60,11 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
     - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
     - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
+    
+1. R
     - [전통 R 신경망](r-nnet.html)    
+    - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)    
+
 
 ### xwMOOC 오픈 교재
 
