@@ -64,6 +64,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
 1. R
     - [전통 R 신경망](r-nnet.html)    
     - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)    
+    - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)    
 
 
 ### xwMOOC 오픈 교재
