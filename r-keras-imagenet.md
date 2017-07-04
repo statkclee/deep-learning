@@ -1,29 +1,7 @@
----
-layout: page
-title: xwMOOC 딥러닝
-subtitle: R 케라스(keras) - 이미지넷(Imagenet)
-output:
-  html_document: 
-    toc: yes
-    keep_md: yes
-  pdf_document:
-    latex_engine: xelatex
-mainfont: NanumGothic
----
+# xwMOOC 딥러닝
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
 
-knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
-
-library(keras)
-library(tidyverse)
-library(ggplot2)
-library(jpeg)
-
-options(scipen = 999)
-```
 
 ## 1. 전이 학습(transfer learning)과 학습된 모형(Pretrained Model) [^transfer-learning-pretrained] [^tim-urban-language] [^r-python-keras-tensorflow]
 
@@ -53,7 +31,8 @@ GPU를 활용하여 개발된 학습모형은 현재 어떻게 보면 소중한 
 [`elephant.jpg` 이미지](https://cran.r-project.org/web/packages/kerasR/vignettes/introduction.html)를 가져온다. 
 어떤 이미지인지 확인해보자. 그리고 데이터의 차원정보가 중요하니 `dim` 함수로 살펴본다.
 
-``` {r imagenet-transfer-learning-setup}
+
+~~~{.r}
 # 0. 환경설치 -------------------------------------
 # library(keras)
 # library(tidyverse)
@@ -66,9 +45,20 @@ GPU를 활용하여 개발된 학습모형은 현재 어떻게 보면 소중한 
 img <- readJPEG("data/elephant.jpg")
 plot(0:1, 0:1, type="n", ann=FALSE, axes=FALSE)
 rasterImage(img, 0,0,1,1)
+~~~
 
+<img src="fig/imagenet-transfer-learning-setup-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 dim(img)
-```
+~~~
+
+
+
+~~~{.output}
+[1] 639 969   3
+
+~~~
 
 ### 2.2. 전이학습(transfer learning)
 
@@ -78,7 +68,8 @@ dim(img)
 객체를 식별한다. `imagenet_decode_predictions` 함수를 실행시키면 
 `elephant.jpg` 파일에 담긴 객체에 대한 라벨을 붙여 상위 10개를 반환한다.
 
-``` {r imagenet-transfer-learning}
+
+~~~{.r}
 # 2. 사전 훈련된 신경망 모형 -------------------------------------
 ## 2.1. 이미지 데이터 준비 ---------------------------------------
 img2keras <- image_load("data/elephant.jpg", target_size = c(224, 224))
@@ -95,4 +86,21 @@ pred_vg19 <- model_vgg19 %>%
 
 ## 2.3. 모형 평가 ------------------------------------------------
 imagenet_decode_predictions(pred_vg19, top = 10)[[1]]
-```
+~~~
+
+
+
+~~~{.output}
+   class_name class_description           score
+1   n02504013   Indian_elephant 0.3892541825771
+2   n01871265            tusker 0.3646132647991
+3   n02504458  African_elephant 0.2460024803877
+4   n02437312     Arabian_camel 0.0001198433820
+5   n01704323       triceratops 0.0000059890613
+6   n02397096           warthog 0.0000019631786
+7   n02129165              lion 0.0000010881332
+8   n01695060     Komodo_dragon 0.0000003959828
+9   n02408429     water_buffalo 0.0000002134601
+10  n02398521      hippopotamus 0.0000001564582
+
+~~~
