@@ -63,6 +63,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     
 1. **R**
     - [전통 R 신경망](r-nnet.html)
+    - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
     - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
     - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
     - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
