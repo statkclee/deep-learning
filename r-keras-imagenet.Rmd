@@ -48,6 +48,14 @@ GPU를 활용하여 개발된 학습모형은 현재 어떻게 보면 소중한 
 
 ## 2. 이미지넷(ImageNet) 딥러닝 모형 
 
+R 케라스 팩키지에 5개 사전학습된 딥러닝 모형이 제공되고 있다.
+이를 활용하려면 사전훈련된 딥러닝 모형에 맞게 이미지를 전처리해서 준비한다.
+그리고 나서 각 사전훈련된 딥러닝 모형에 넣어주면 예측 결과를 뿜어낸다.
+
+각 사전훈련된 딥러닝 모형에 대해 성능을 파악하고 추후 이를 각자 갖고 있는 문제에 맞춰 적절히 활용한다.
+
+<img src="fig/keras_pretrained_model.png" alt="케라스 사전학습된 모형" width="77%" />
+
 ### 2.1. 환경설정 및 데이터 가져오기
 
 [`elephant.jpg` 이미지](https://cran.r-project.org/web/packages/kerasR/vignettes/introduction.html)를 가져온다. 
@@ -89,10 +97,29 @@ img2array <- imagenet_preprocess_input(img2array)
 
 ## 2.2. 사전 훈련된 모형 적합 ------------------------------------
 model_vgg19 <- application_vgg19(weights="imagenet")
+model_vgg16 <- application_vgg16(weights="imagenet")
+model_resnet50 <- application_resnet50(weights="imagenet")
 
-pred_vg19 <- model_vgg19 %>% 
-    predict(img2array)
+pred_vgg19 <- model_vgg19 %>% predict(img2array)
+pred_vgg16 <- model_vgg16 %>% predict(img2array)
+pred_resnet50 <- model_resnet50 %>% predict(img2array)
+
 
 ## 2.3. 모형 평가 ------------------------------------------------
-imagenet_decode_predictions(pred_vg19, top = 10)[[1]]
+vgg19_df <- imagenet_decode_predictions(pred_vgg19, top = 10)[[1]]
+vgg16_df <- imagenet_decode_predictions(pred_vgg16, top = 10)[[1]]
+resnet50_df <- imagenet_decode_predictions(pred_resnet50, top = 10)[[1]]
+
+vgg19_df <- vgg19_df %>% mutate(pre_model = "vgg19") %>% 
+    select(pre_model_vgg19 = pre_model, class_vgg19 = class_description, score_vgg19=score)
+
+vgg16_df <- vgg16_df %>% mutate(pre_model = "vgg16") %>% 
+    select(pre_model_vgg16 = pre_model, class_vgg16=class_description, score_vgg16=score)
+
+resnet50_df <- resnet50_df %>% mutate(pre_model = "resnet50") %>% 
+    select(pre_model_resnet50=pre_model, class_resnet50 = class_description, score_resnet50=score)
+
+pretrain_df <- bind_cols(vgg19_df, vgg16_df, resnet50_df)
+
+DT::datatable(pretrain_df)
 ```
