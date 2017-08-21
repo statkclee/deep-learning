@@ -1,0 +1,8 @@
+default:
+  employees:
+    driver: 'MySQL' 
+    server: 'localhost'
+    uid: 'root'
+    pwd: 'pa$$word'  
+    port: 3306
+    database: 'employees'
