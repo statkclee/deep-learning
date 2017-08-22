@@ -224,12 +224,14 @@ salary_df %>% group_by(emp_no) %>%
 dbDisconnect(conn)
 ```
 
+## 4. 비밀번호와 인증키 잘 관리하는 방법 {#r-countermeasure-against-hackers}
+
 `user = "root"`, `password = "pa$$word"` 가 R 개발 코드에 그대로 노출되는 위험은 있지만,
 순쉽게 데이터베이스에 붙어 분석이 가능한 장점이 있다. 
 하지만, 이와 같이 코드를 작성하게 되면 비밀번호가 그대로 노출되어 누출될 경우 데이터베이스 전체가 위험에 빠질 수가 있다.
 R 개발자 관점에서도 정신건강에 무척이나 해롭다.
 
-## 4. DSN(Data Source Name)을 통한 보안 {#r-mariadb-dsn}
+### 4.1. DSN(Data Source Name)을 통한 보안 {#r-mariadb-dsn}
 
 ODBC 연결이 누군가에 의해 먼저 설정된 경우 R 개발자 입장에서는 편리하다. 즉, `mariadb_employees` 같은 별명만 알고 있다면 
 이를 바탕으로 데이터베이스에 접속해서 데이터를 뽑아내서 분석하는 것이 가능하기 때문이다.
@@ -268,7 +270,7 @@ emp_df %>% collect() %>%
 dbDisconnect(con)
 ```
 
-## 5. `config.yml` 파일을 활용한 방법 {#r-config-yaml}
+### 4.2. `config.yml` 파일을 활용한 방법 {#r-config-yaml}
 
 `install.packages("config")` 명령어로 `config` 팩키지를 설치하게 되면 
 `config.yml` 파일 내부에 환경설정에 필요한 정보를 담을 수가 있다.
@@ -313,5 +315,74 @@ dbListTables(con)
 dbDisconnect(con)
 ```
 
+### 4.3. R 시작과정을 활용한 방법 {#r-Renviron} [^r-startup] [^jenny-solution]
 
-    
+[^r-startup]: [R for Enterprise: Understanding R’s Startup, 2017-04-19, by Sean Lopp](https://rviews.rstudio.com/2017/04/19/r-for-enterprise-understanding-r-s-startup/)
+[^jenny-solution]: [How to store and use webservice keys and authentication details with R](http://blog.revolutionanalytics.com/2015/11/how-to-store-and-use-authentication-details-with-r.html)
+
+[Initialization at Start of an R Session](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html) 웹페이지에 
+R 시작과정이 잘 정리되어 있다. 이를 활용하여 데이터베이스 접속에 필요한 비밀번호나 API 키값을 안전하게 보관할 수 있다.
+윈도우, 유닉스냐에 따라 설정파일 명칭이 다소 차이가 날 수 있다.
+
+즉, `R.home()`을 통해 R이 설치된 디렉토리 아래 `etc` 디렉토리의 `Renviron.site` (없는 경우 생성)하여 
+유저ID와 비밀번호를 저장해 놓고 `Sys.getenv()` 함수로 저장된 값을 불러온다.
+
+> #### `C:\Program Files\R\R-3.4.0\etc\Renviron.site` 파일 
+> 
+> ``` {r Renviron-site-file, eval=FALSE}
+>
+> uid = "root"
+> pwd = "pa$$word"
+> ``` 
+
+``` {r Renviron-site-setup}
+
+# 1. 데이터베이스 연결 ------------
+
+con <- DBI::dbConnect(RMySQL::MySQL(), 
+                      host = "localhost",
+                      dbname = "employees",
+                      user = Sys.getenv("uid"),
+                      password = Sys.getenv("pwd"))
+
+dbListTables(con)
+
+# 2. 데이터베이스 연결해제 ------------
+dbDisconnect(con)
+```
+
+
+### 4.4. `options` {#r-options}
+
+`options()`를 활용하여 설정하고 나서, `getOption()` 명령어를 통해 불러오는 것도 또다른 대안으로 경우에 따라 잘 활용할 수도 있다.
+대표적으로 현재 작업하고 있는 데이터와 코드가 담긴 R 프로젝트 디렉토리 `.Profile`에 `options()`내용을 저장시켜 놓고 이를 
+분석하고 있는 데이터에 활용한다.
+
+> #### `~\.Rprofile` 파일 
+> 
+> ``` {r Rprofile-file, eval=FALSE}
+>
+> options(db_userid = "root")
+> options(db_password = "pa$$word")
+> ``` 
+
+
+``` {r options-setup}
+options(db_userid = "root")
+options(db_password = "pa$$word")
+
+# 1. 데이터베이스 연결 ------------
+
+con <- DBI::dbConnect(RMySQL::MySQL(), 
+                      host = "localhost",
+                      dbname = "employees",
+                      user = getOption("db_userid"),
+                      password = getOption("db_password"))
+
+dbListTables(con)
+
+# 2. 데이터베이스 연결해제 ------------
+dbDisconnect(con)
+```
+
+
