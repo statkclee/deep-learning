@@ -56,6 +56,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
 1. 기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정
 1. 완전 새로운 문제에 자체 기계학습 모형 개발 
 1. [$H_2 O$ 기계학습](h20-arch.html)
+    - [$H_2 O$ R 연습문제](h2o-r-exercise.html)
     - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
     - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
     - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
