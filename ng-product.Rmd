@@ -1,0 +1,31 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: Structuring Machine Learning Projects
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+
+options(scipen = 999)
+options(family="NanumGothic")
+```
+
+
+## 초모수 미세조정(Hyperparameter tuning)
+
+## 정규화(Regularization)
+
+## 최적화(Optimization)

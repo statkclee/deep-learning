@@ -68,6 +68,12 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
     - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
+1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
+    - [기계학습과 딥러닝 (Neural Networks and Deep Learning)](ng-intro.html)
+    - [Improving Deep Neural Networks: Hyperparameter tuning, Regularization and Optimization](ng-tuning.html)
+    - [Structuring Machine Learning Projects](ng-product.html)
+    - Convolutional Neural Networks
+    - Sequence Models
 
 
 ### xwMOOC 오픈 교재
