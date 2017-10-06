@@ -63,10 +63,14 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
 1. **R**
     - [전통 R 신경망](r-nnet.html)
-    - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
-    - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
-    - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
-    - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
+    - **케라스(keras)**
+        - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
+        - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
+        - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
+        - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
+    - **텐서플로우(tensorflow)**
+        - [텐서플로우(tensorflow) 설치](r-tensorflow-install.html)
+        - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
     - [기계학습과 딥러닝 (Neural Networks and Deep Learning)](ng-intro.html)
