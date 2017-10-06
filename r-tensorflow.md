@@ -1,5 +1,16 @@
-# xwMOOC 딥러닝
-`r Sys.Date()`  
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: 텐서플로우(tensorflow) 설치
+date: "2017-10-06"
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -189,7 +200,7 @@ sess$run(hello)
 
 
 ~~~{.output}
-b'Hello, TensorFlow!'
+[1] "Hello, TensorFlow!"
 
 ~~~
 

@@ -69,7 +69,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
     - **텐서플로우(tensorflow)**
-        - [텐서플로우(tensorflow) 설치](r-tensorflow-install.html)
+        - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
