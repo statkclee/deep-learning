@@ -30,6 +30,7 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 
 # 2. 이미지 데이터 가져오기 {#image-data}
 
+[비행기 vs 자동차 - 강아지 vs 고양이](http://statkclee.github.io/deep-learning/r-keras-cats-and-dogs.html)와 동일한 방법으로 이번에는 배를 추가한다.
 
 - phantomJS를 설치한다.
 - `imageScrape.js` 파일으로 R로 가져와서 구글 이미지 검색어를 바꾸어서 `phantomJS`를 실행시킨다.
@@ -84,15 +85,23 @@ car_df <- scrapeJSSite(searchTerm = "car") %>%
 
 downloadImages(as.character(car_df$images), "car")
 
-## 3.3. 다운로드 받을 이미지 목록
-image_df <- bind_rows(airplane_df, car_df)
-DT::datatable(image_df)
+## 3.3. 배 이미지 다운로드 
+ship_df <- scrapeJSSite(searchTerm = "ship jpg") %>% 
+    filter(!str_detect(images, "tia.png"))
+
+downloadImages(as.character(ship_df$images), "ship")
+
+images_df <- bind_rows(airplane_df, car_df) %>% 
+    bind_rows(ship_df)
+
+DT::datatable(images_df)
+
 ```
 
 # 3. 이미지 데이터 살펴보기 {#image-data-look-around}
 
-다운로드받은 이미지를 쭉 살펴보고 나서 비행기와 자동차 이미지 분류 딥러닝 모형구축을 서둘러 보자.
-앞서 다운로드 받은 이미지 파일이 비행기 10개, 자동차 10개 `data/images/` 디렉토리에 저장되어 있다.
+다운로드받은 이미지를 쭉 살펴보고 나서 비행기, 자동차, 배 이미지 분류 딥러닝 모형구축을 서둘러 보자.
+앞서 다운로드 받은 이미지 파일이 비행기 20개, 자동차 20개, 배 20개 `data/images/` 디렉토리에 저장되어 있다.
 `EBImage` 팩키지 `readImage()` 함수로 이미지 데이터를 모두 불러와서 하나의 리스트에 담아 놓는다.
 그리고 나서 Base 그래프 시각화 함수, `plot()`을 사용해서 한장의 그래프로 담아본다.
 
@@ -106,16 +115,16 @@ imgs_lst <- map(img_lst, readImage)
 
 ## 1.1. 이미지 살펴보기 -----
 
-par(mfrow = c(8,5))
-for (i in 1:40) plot(imgs_lst[[i]])
+par(mfrow = c(10,6))
+for (i in 1:60) plot(imgs_lst[[i]])
 ```
 
-이미지 크기가 균일하지 않기 때문에 `EBImage` 팩키지 `resize()` 함수를 통해 폭(width, w)과 높이(height, h)가 28인 크기로 
+이미지 크기가 균일하지 않기 때문에 `EBImage` 팩키지 `resize()` 함수를 통해 폭(width, w)과 높이(height, h)가 100인 크기로 
 통일시킨 후에 `combine()` 함수와 `tile()` 함수를 통해 하나의 그래프로 만들어 살펴본다.
 
 ``` {r import-images-EBImage}
 # 2. 이미지 시각화 -----
-imgs_resize_lst <- map(imgs_lst, resize, w =28, h=28)
+imgs_resize_lst <- map(imgs_lst, resize, w =100, h=100)
 
 imgs_resize_combined <- combine(imgs_resize_lst)
 
@@ -123,70 +132,31 @@ tile(imgs_resize_combined, 8) %>%
     display()
 ```
 
-# 4. 비행기 자동차 분류 환경설정 {#image-setup}
+# 4. 비행기, 자동차, 배 이미지 분류 {#image-airplane-car-ship-classification}
 
-`keras` 팩키지를 윈도우에서 설치해서 실행하는 것은 추천되지 않는다. 갖가지 위험이 도사리고 있고 심각하게 딥러닝을 
-고민하시는 분들은 거의 모두 유닉스 운영체계를 활용하고 있다. 
-`install_keras()` 함수를 통해 윈도우나 해당 운영체제에 설치를 하게 되면 
-`reticulate` 팩키지 `py_config()`, `py_discover_config("keras")` 함수를 통해 설치사항을 철저히 확인한다.
+## 4.1. 자료구조 맞추기 {#image-airplane-car-ship-data}
 
-``` {r airplane-car-setup, eval=FALSE}
-> library(reticulate)
-> py_config()
-python:         C:\PROGRA~3\ANACON~1\python.exe
-libpython:      C:/PROGRA~3/ANACON~1/python36.dll
-pythonhome:     C:\PROGRA~3\ANACON~1
-version:        3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 10:22:32) [MSC v.1900 64 bit (AMD64)]
-Architecture:   64bit
-numpy:          C:\PROGRA~3\ANACON~1\lib\site-packages\numpy
-numpy_version:  1.14.0
-
-python versions found: 
- C:\PROGRA~3\ANACON~1\python.exe
- C:\ProgramData\Anaconda3\python.exe
- C:\Users\xxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe
-
-> py_discover_config("keras")
-python:         C:\Users\xxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe
-libpython:      C:/Users/xxxxxxx/AppData/Local/conda/conda/envs/r-tensorflow/python36.dll
-pythonhome:     C:\Users\xxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1
-version:        3.6.4 | packaged by conda-forge | (default, Dec 24 2017, 10:11:43) [MSC v.1900 64 bit (AMD64)]
-Architecture:   64bit
-numpy:          C:\Users\xxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1\lib\site-packages\numpy
-numpy_version:  1.14.1
-keras:          C:\Users\xxxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1\lib\site-packages\keras
-
-python versions found: 
- C:\PROGRA~3\ANACON~1\python.exe
- C:\ProgramData\Anaconda3\python.exe
- C:\Users\xxxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe 
-``` 
-
-# 5. 비행기, 자동차 이미지 분류 [^rai-keras-r] {#image-airplane-car-classification}
-
-[^rai-keras-r]: [Image Recognition & Classification with Keras in R | TensorFlow for Machine Intelligence by Google](https://www.youtube.com/watch?v=iExh0qj2Ouo)
-
-## 5.1. 자료구조 맞추기 {#image-airplane-car-data}
-
-가장 먼저 리스트(`imgs_lst`)를 데이터프레임으로 변환시킨다.
-`train_x` 데이터프레임은 훈련데이터 모형설계행렬($X$)에 해당된다.
-다음에 `train_y`를 설정하는데 `to_categorical()` 함수를 통해서 가변수처리(one-hot-encoding)를 한다.
+CNN 자료구조를 맞추기 위해서 `aperm()` 함수를 통해 입력받은 데이터 자료구조를 맞춰 넣는다.
 
 ``` {r airplane-car-image-data}
 # 2. 이미지 데이터 케라스 모형용으로 변환 -----
 ## 2.1. 훈련데이터 모형설계행렬(X) 
-train_x <- do.call(rbind, imgs_resize_lst)
+
+train_x <- combine(imgs_resize_lst)
+train_x <- aperm(train_x, c(4, 1, 2, 3))
 
 ## 2.2. 훈련데이터 예측(Y)
-train_y <- c(rep(0,20), rep(1,20))
+train_y <- c(rep(0,20), rep(1,20), rep(2,20))
 train_label <- to_categorical(train_y)
 ```
 
-## 5.2. 딥러닝 모형 적합 {#image-airplane-car-fit}
+## 4.2. 딥러닝 모형 적합 {#image-airplane-car-fit}
 
 `keras_model_sequential()` 모형을 생성시키면서 모형구조를 설정한다. 
-`input_shape`는 비행기와 자동차 이미지 크기가 폭(28)과 높이(28) 그리고 RGB채널로 3으로 즉, $28 \times 28 \times 3 = 2,352$가 된다.
-입력층을 하나 세우고, 중간층도 놓고 마지막 출력층은 비행기와 자동차 두개라서 `activation` 인자는 `softmax`로 설정한다.
+`input_shape`는 앞서 정의한 비행기, 자동차, 배 이미지 크기가 폭(100)과 높이(100) 그리고 RGB채널로 3에 맞춰넣는다.
+그리고 나서 `layer_conv_2d()`, `layer_max_pooling_2d()`, `layer_dropout()`을 조합하여 계층을 적절히 쌓는다.
+`layer_flatten()`으로 출력계층으로 넘길 준비를 하고 나서 `layer_dense()`, 마지막으로 `layer_dense()`의 `activation = 'softmax'`을 설정하여 
+출력값을 사전 정의한다.
 
 그리고 나서 모형 컴파일에서 손실함수(`loss`)와 최적화 방식(`optimizer`) 그리고 극대화하고자 하는 측도(metric)를 지정한다.
 마지막으로 `epochs`, `batch_size`, `validation_split`를 설정하면 `fit()` 함수를 통해 딥러닝 학습이 시작된다.
@@ -196,77 +166,103 @@ train_label <- to_categorical(train_y)
 ``` {r airplane-car-image-fit}
 # 3. 딥러닝 모형 -----
 ## 3.1. 모형 설계
-car_airplane_model <- keras_model_sequential()
+car_airplane_ship_model <- keras_model_sequential()
 
-car_airplane_model %>%
-    layer_dense(units = 256, activation = 'relu', input_shape = c(2352)) %>%
-    layer_dense(units = 128, activation = 'relu') %>%
-    layer_dense(units = 64, activation = 'relu') %>%
-    layer_dense(units = 2, activation = 'softmax')
-
-summary(car_airplane_model)
+car_airplane_ship_model %>%
+    layer_conv_2d(filters = 32, 
+                  kernel_size = c(3,3),
+                  activation = 'relu',
+                  input_shape = c(100, 100, 3)) %>%
+    layer_conv_2d(filters = 32,
+                  kernel_size = c(3,3),
+                  activation = 'relu') %>%
+    layer_max_pooling_2d(pool_size = c(2,2)) %>%
+    layer_dropout(rate = 0.25) %>%
+    layer_conv_2d(filters = 64,
+                  kernel_size = c(3,3),
+                  activation = 'relu') %>%
+    layer_conv_2d(filters = 64,
+                  kernel_size = c(3,3),
+                  activation = 'relu') %>%
+    layer_max_pooling_2d(pool_size = c(2,2)) %>%
+    layer_dropout(rate = 0.25) %>%
+    layer_conv_2d(filters = 64,
+                  kernel_size = c(3,3),
+                  activation = 'relu') %>%
+    layer_conv_2d(filters = 64,
+                  kernel_size = c(3,3),
+                  activation = 'relu') %>%
+    layer_max_pooling_2d(pool_size = c(2,2)) %>%
+    layer_dropout(rate = 0.25) %>%
+    layer_flatten() %>%
+    layer_dense(units = 256, activation = 'relu') %>%
+    layer_dropout(rate=0.25) %>%
+    layer_dense(units = 3, activation = 'softmax') %>%
+    
+summary(car_airplane_ship_model)
 
 ## 3.2. 모형 컴파일
-car_airplane_model %>%
-    compile(loss = 'binary_crossentropy',
-            optimizer = optimizer_rmsprop(),
+car_airplane_ship_model %>%
+    compile(loss = 'categorical_crossentropy',
+            optimizer = optimizer_sgd(lr = 0.01,
+                                      decay = 1e-6,
+                                      momentum = 0.9,
+                                      nesterov = T),
             metrics = c('accuracy'))
 
 ## 3.3. 모형 적합
-car_airplane_history <- car_airplane_model %>%
+car_airplane_ship_history <- car_airplane_ship_model %>%
     fit(train_x,
         train_label,
-        epochs = 30,
+        epochs = 60,
         batch_size = 40,
-        validation_split = 0.3)
+        validation_split = 0.1)
 
-plot(car_airplane_history)
+plot(car_airplane_ship_history)
+
 ```
 
-## 5.3. 딥러닝 모형 평가 {#image-airplane-car-fit}
+## 5.3. 딥러닝 모형 평가 {#image-airplane-car-ship-fit}
 
 `evaluate()`함수를 통해 손실함수를 통한 최종 결과값과 정확도(accuracy)를 살펴보고 
 딥러닝 모형향상을 위한 데이터프레임으로 정리한다.
 
 ``` {r airplane-car-image-eval}
-
 ## 3.4. 모형 평가 및 예측
-car_airplane_model %>% evaluate(train_x, train_label)
+car_airplane_ship_model %>% evaluate(train_x, train_label)
 
-car_airplane_pred <- car_airplane_model %>% predict_classes(train_x)
-car_airplane_prob <- car_airplane_model %>% predict_proba(train_x) %>% as_tibble() %>% 
-    rename(airplane = V1, car = V2)
+car_airplane_ship_pred <- car_airplane_ship_model %>% predict_classes(train_x)
+car_airplane_ship_prob <- car_airplane_ship_model %>% predict_proba(train_x) %>% as_tibble() %>% 
+    rename(airplane = V1, car = V2, ship = V3)
 
-car_airplane_df <- car_airplane_prob %>% 
+car_airplane_ship_df <- car_airplane_ship_prob %>% 
     mutate(img_no = row_number()) %>% 
-    mutate(pred = car_airplane_pred,
+    mutate(pred = car_airplane_ship_pred,
            actual = train_y) %>% 
     mutate(error = ifelse(pred == actual, 'good', 'bad')) %>% 
     arrange(error)
 
-DT::datatable(car_airplane_df)
+DT::datatable(car_airplane_ship_df)
 ```
 
-## 5.4. 딥러닝 모형 예측모형 오류 {#image-airplane-car-error}
+## 5.4. 딥러닝 모형 예측모형 오류 {#image-airplane-car-ship-error}
 
 딥러닝 예측모형에서 분류에 실패한 이미지를 뽑아 내서 시각적으로 살펴보고 개선방향에 대해 고민해본다.
 
-``` {r airplane-car-image-error, eval=FALSE}
+``` {r airplane-car-image-ship-error, eval=TRUE}
 ## 3.5. 딥러닝 결과 보고서 작성
-error_img_v <- car_airplane_df %>% filter(error == "bad") %>% 
+error_img_v <- car_airplane_ship_df %>% filter(error == "bad") %>% 
     pull(img_no)
 
 error_img_lst <- list()
 
 for(i in seq_along(error_img_v)) {
-    error_img_lst[[i]] <- imgs_lst %>% pluck(error_img_v[i])
+    error_img_lst[[i]] <- imgs_resize_lst[[error_img_v[i]]]
 }
 
-# error_imgs <- combine(error_img_lst)
-# tile(error_imgs, length(error_img_lst)) %>%
-#     display()
+error_imgs <- combine(error_img_lst)
+tile(error_imgs, length(error_img_lst)) %>%
+    display()
 
-par(mfrow = c(1,length(error_img_v)))
-for (i in 1:length(error_img_v)) plot(error_img_lst[[i]])
 ```
 

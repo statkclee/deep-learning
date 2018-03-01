@@ -1,4 +1,4 @@
-var url ='https://www.google.de/search?q=car&source=lnms&tbm=isch&sa=X';
+var url ='https://www.google.de/search?q=ship jpg&source=lnms&tbm=isch&sa=X';
    var page = new WebPage()
     var fs = require('fs');
 
