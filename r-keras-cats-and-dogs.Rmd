@@ -203,6 +203,7 @@ car_airplane_model <- keras_model_sequential()
 car_airplane_model %>%
     layer_dense(units = 256, activation = 'relu', input_shape = c(2352)) %>%
     layer_dense(units = 128, activation = 'relu') %>%
+    layer_dense(units = 64, activation = 'relu') %>%
     layer_dense(units = 2, activation = 'softmax')
 
 summary(car_airplane_model)
@@ -252,7 +253,7 @@ DT::datatable(car_airplane_df)
 
 딥러닝 예측모형에서 분류에 실패한 이미지를 뽑아 내서 시각적으로 살펴보고 개선방향에 대해 고민해본다.
 
-``` {r airplane-car-image-error}
+``` {r airplane-car-image-error, eval=FALSE}
 ## 3.5. 딥러닝 결과 보고서 작성
 error_img_v <- car_airplane_df %>% filter(error == "bad") %>% 
     pull(img_no)
@@ -264,7 +265,7 @@ for(i in seq_along(error_img_v)) {
 }
 
 # error_imgs <- combine(error_img_lst)
-# tile(error_imgs, length(error_img_lst)) %>% 
+# tile(error_imgs, length(error_img_lst)) %>%
 #     display()
 
 par(mfrow = c(1,length(error_img_v)))
