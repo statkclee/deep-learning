@@ -253,7 +253,7 @@ DT::datatable(car_airplane_df)
 
 딥러닝 예측모형에서 분류에 실패한 이미지를 뽑아 내서 시각적으로 살펴보고 개선방향에 대해 고민해본다.
 
-``` {r airplane-car-image-error, eval=FALSE}
+``` {r airplane-car-image-error, eval=TRUE}
 ## 3.5. 딥러닝 결과 보고서 작성
 error_img_v <- car_airplane_df %>% filter(error == "bad") %>% 
     pull(img_no)
@@ -261,14 +261,12 @@ error_img_v <- car_airplane_df %>% filter(error == "bad") %>%
 error_img_lst <- list()
 
 for(i in seq_along(error_img_v)) {
-    error_img_lst[[i]] <- imgs_lst %>% pluck(error_img_v[i])
+    error_img_lst[[i]] <- imgs_resize_lst[[error_img_v[i]]]
 }
 
-# error_imgs <- combine(error_img_lst)
-# tile(error_imgs, length(error_img_lst)) %>%
-#     display()
+error_imgs <- combine(error_img_lst)
+tile(error_imgs, length(error_img_lst)) %>%
+    display()
 
-par(mfrow = c(1,length(error_img_v)))
-for (i in 1:length(error_img_v)) plot(error_img_lst[[i]])
 ```
 

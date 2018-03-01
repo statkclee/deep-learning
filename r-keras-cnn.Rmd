@@ -1,0 +1,272 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: 비행기 vs 자동차 vs 배 - CNN
+output:
+  html_document: 
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: hide
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+
+```
+
+# 1. 비행기, 자동차, 배 이미지 분류 [^car-boat-plane] {#plane-car-ship}
+
+[^car-boat-plane]: [Convolutional Neural Network wirh Keras in R | Large Scale Image Recognition & Classification](https://www.youtube.com/watch?v=LxTDLEdetmI)
+
+[비행기 vs 자동차 - 강아지 vs 고양이](http://statkclee.github.io/deep-learning/r-keras-cats-and-dogs.html) 이미지 분류를 넘어 자동차, 배, 비행기 3종 이미지를 분류해보자.
+이를 위해서 CNN(Convolution Neural Network)을 사용하는데 CNN 아키텍쳐는 입력 데이터가 이미지라는 가정을하여 이미지 데이터가 갖는 특성들을 인코딩에 반영한다.
+
+
+# 2. 이미지 데이터 가져오기 {#image-data}
+
+
+- phantomJS를 설치한다.
+- `imageScrape.js` 파일으로 R로 가져와서 구글 이미지 검색어를 바꾸어서 `phantomJS`를 실행시킨다.
+- 다운로드 받은 `1.html` 파일을 파싱하여 이미지 url을 추출한다.
+- `downloadImages()` 함수를 참조하여 이미지를 다운로드한다.
+
+``` {r download-images}
+# 0. 환경설정 -----
+library(tidyverse)
+library(purrr)
+library(rvest) 
+library(keras) # install_keras()
+library(EBImage)
+library(reticulate)
+
+# 1. 검색어 불러오기 -----
+
+scrapeJSSite <- function(searchTerm){
+    url <- paste0("https://www.google.de/search?q=",searchTerm, "&source=lnms&tbm=isch&sa=X")
+    
+    lines <- readLines("code/airplane_car/imageScrape.js")
+    lines[1] <- paste0("var url ='", url ,"';")
+    writeLines(lines, "code/airplane_car/imageScrape.js")
+    
+    ## 다운로드 웹사이트 실행
+    system("phantomjs code/airplane_car/imageScrape.js")
+    
+    pg <- read_html("1.html")
+    files <- pg %>% html_nodes("img") %>% html_attr("src")
+    df <- data.frame(images=files, search=searchTerm)
+    return(df)
+}
+
+# 2. 검색 이미지 다운로드 함수 -----
+
+downloadImages <- function(files, type, outPath="data/images"){
+    for(i in 1:length(files)){
+        download.file(files[i], destfile = paste0(outPath, "/", type, "_", i, ".jpg"), mode = 'wb')
+    }
+}
+
+# 3. 이미지 다운로드 실행 -----
+## 3.1. 비행기 이미지 다운로드 
+airplane_df <- scrapeJSSite(searchTerm = "airplane") %>% 
+    filter(!str_detect(images, "tia.png"))
+
+downloadImages(as.character(airplane_df$images), "airplane")
+
+## 3.2. 자동차 이미지 다운로드 
+car_df <- scrapeJSSite(searchTerm = "car") %>% 
+    filter(!str_detect(images, "tia.png"))
+
+downloadImages(as.character(car_df$images), "car")
+
+## 3.3. 다운로드 받을 이미지 목록
+image_df <- bind_rows(airplane_df, car_df)
+DT::datatable(image_df)
+```
+
+# 3. 이미지 데이터 살펴보기 {#image-data-look-around}
+
+다운로드받은 이미지를 쭉 살펴보고 나서 비행기와 자동차 이미지 분류 딥러닝 모형구축을 서둘러 보자.
+앞서 다운로드 받은 이미지 파일이 비행기 10개, 자동차 10개 `data/images/` 디렉토리에 저장되어 있다.
+`EBImage` 팩키지 `readImage()` 함수로 이미지 데이터를 모두 불러와서 하나의 리스트에 담아 놓는다.
+그리고 나서 Base 그래프 시각화 함수, `plot()`을 사용해서 한장의 그래프로 담아본다.
+
+``` {r import-images}
+# 1. 이미지 불러오기 -----
+
+img_lst <- list.files("data/images/")
+img_lst <- map(img_lst, function(x) paste0("data/images/", x))
+
+imgs_lst <- map(img_lst, readImage)
+
+## 1.1. 이미지 살펴보기 -----
+
+par(mfrow = c(8,5))
+for (i in 1:40) plot(imgs_lst[[i]])
+```
+
+이미지 크기가 균일하지 않기 때문에 `EBImage` 팩키지 `resize()` 함수를 통해 폭(width, w)과 높이(height, h)가 28인 크기로 
+통일시킨 후에 `combine()` 함수와 `tile()` 함수를 통해 하나의 그래프로 만들어 살펴본다.
+
+``` {r import-images-EBImage}
+# 2. 이미지 시각화 -----
+imgs_resize_lst <- map(imgs_lst, resize, w =28, h=28)
+
+imgs_resize_combined <- combine(imgs_resize_lst)
+
+tile(imgs_resize_combined, 8) %>% 
+    display()
+```
+
+# 4. 비행기 자동차 분류 환경설정 {#image-setup}
+
+`keras` 팩키지를 윈도우에서 설치해서 실행하는 것은 추천되지 않는다. 갖가지 위험이 도사리고 있고 심각하게 딥러닝을 
+고민하시는 분들은 거의 모두 유닉스 운영체계를 활용하고 있다. 
+`install_keras()` 함수를 통해 윈도우나 해당 운영체제에 설치를 하게 되면 
+`reticulate` 팩키지 `py_config()`, `py_discover_config("keras")` 함수를 통해 설치사항을 철저히 확인한다.
+
+``` {r airplane-car-setup, eval=FALSE}
+> library(reticulate)
+> py_config()
+python:         C:\PROGRA~3\ANACON~1\python.exe
+libpython:      C:/PROGRA~3/ANACON~1/python36.dll
+pythonhome:     C:\PROGRA~3\ANACON~1
+version:        3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 10:22:32) [MSC v.1900 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:\PROGRA~3\ANACON~1\lib\site-packages\numpy
+numpy_version:  1.14.0
+
+python versions found: 
+ C:\PROGRA~3\ANACON~1\python.exe
+ C:\ProgramData\Anaconda3\python.exe
+ C:\Users\xxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe
+
+> py_discover_config("keras")
+python:         C:\Users\xxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe
+libpython:      C:/Users/xxxxxxx/AppData/Local/conda/conda/envs/r-tensorflow/python36.dll
+pythonhome:     C:\Users\xxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1
+version:        3.6.4 | packaged by conda-forge | (default, Dec 24 2017, 10:11:43) [MSC v.1900 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:\Users\xxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1\lib\site-packages\numpy
+numpy_version:  1.14.1
+keras:          C:\Users\xxxxxxx~1\AppData\Local\conda\conda\envs\R-TENS~1\lib\site-packages\keras
+
+python versions found: 
+ C:\PROGRA~3\ANACON~1\python.exe
+ C:\ProgramData\Anaconda3\python.exe
+ C:\Users\xxxxxxx\AppData\Local\conda\conda\envs\r-tensorflow\python.exe 
+``` 
+
+# 5. 비행기, 자동차 이미지 분류 [^rai-keras-r] {#image-airplane-car-classification}
+
+[^rai-keras-r]: [Image Recognition & Classification with Keras in R | TensorFlow for Machine Intelligence by Google](https://www.youtube.com/watch?v=iExh0qj2Ouo)
+
+## 5.1. 자료구조 맞추기 {#image-airplane-car-data}
+
+가장 먼저 리스트(`imgs_lst`)를 데이터프레임으로 변환시킨다.
+`train_x` 데이터프레임은 훈련데이터 모형설계행렬($X$)에 해당된다.
+다음에 `train_y`를 설정하는데 `to_categorical()` 함수를 통해서 가변수처리(one-hot-encoding)를 한다.
+
+``` {r airplane-car-image-data}
+# 2. 이미지 데이터 케라스 모형용으로 변환 -----
+## 2.1. 훈련데이터 모형설계행렬(X) 
+train_x <- do.call(rbind, imgs_resize_lst)
+
+## 2.2. 훈련데이터 예측(Y)
+train_y <- c(rep(0,20), rep(1,20))
+train_label <- to_categorical(train_y)
+```
+
+## 5.2. 딥러닝 모형 적합 {#image-airplane-car-fit}
+
+`keras_model_sequential()` 모형을 생성시키면서 모형구조를 설정한다. 
+`input_shape`는 비행기와 자동차 이미지 크기가 폭(28)과 높이(28) 그리고 RGB채널로 3으로 즉, $28 \times 28 \times 3 = 2,352$가 된다.
+입력층을 하나 세우고, 중간층도 놓고 마지막 출력층은 비행기와 자동차 두개라서 `activation` 인자는 `softmax`로 설정한다.
+
+그리고 나서 모형 컴파일에서 손실함수(`loss`)와 최적화 방식(`optimizer`) 그리고 극대화하고자 하는 측도(metric)를 지정한다.
+마지막으로 `epochs`, `batch_size`, `validation_split`를 설정하면 `fit()` 함수를 통해 딥러닝 학습이 시작된다.
+
+결과값은 `plot()` 함수를 통해 정적 그래프로 확인할 수 있다.
+
+``` {r airplane-car-image-fit}
+# 3. 딥러닝 모형 -----
+## 3.1. 모형 설계
+car_airplane_model <- keras_model_sequential()
+
+car_airplane_model %>%
+    layer_dense(units = 256, activation = 'relu', input_shape = c(2352)) %>%
+    layer_dense(units = 128, activation = 'relu') %>%
+    layer_dense(units = 64, activation = 'relu') %>%
+    layer_dense(units = 2, activation = 'softmax')
+
+summary(car_airplane_model)
+
+## 3.2. 모형 컴파일
+car_airplane_model %>%
+    compile(loss = 'binary_crossentropy',
+            optimizer = optimizer_rmsprop(),
+            metrics = c('accuracy'))
+
+## 3.3. 모형 적합
+car_airplane_history <- car_airplane_model %>%
+    fit(train_x,
+        train_label,
+        epochs = 30,
+        batch_size = 40,
+        validation_split = 0.3)
+
+plot(car_airplane_history)
+```
+
+## 5.3. 딥러닝 모형 평가 {#image-airplane-car-fit}
+
+`evaluate()`함수를 통해 손실함수를 통한 최종 결과값과 정확도(accuracy)를 살펴보고 
+딥러닝 모형향상을 위한 데이터프레임으로 정리한다.
+
+``` {r airplane-car-image-eval}
+
+## 3.4. 모형 평가 및 예측
+car_airplane_model %>% evaluate(train_x, train_label)
+
+car_airplane_pred <- car_airplane_model %>% predict_classes(train_x)
+car_airplane_prob <- car_airplane_model %>% predict_proba(train_x) %>% as_tibble() %>% 
+    rename(airplane = V1, car = V2)
+
+car_airplane_df <- car_airplane_prob %>% 
+    mutate(img_no = row_number()) %>% 
+    mutate(pred = car_airplane_pred,
+           actual = train_y) %>% 
+    mutate(error = ifelse(pred == actual, 'good', 'bad')) %>% 
+    arrange(error)
+
+DT::datatable(car_airplane_df)
+```
+
+## 5.4. 딥러닝 모형 예측모형 오류 {#image-airplane-car-error}
+
+딥러닝 예측모형에서 분류에 실패한 이미지를 뽑아 내서 시각적으로 살펴보고 개선방향에 대해 고민해본다.
+
+``` {r airplane-car-image-error, eval=FALSE}
+## 3.5. 딥러닝 결과 보고서 작성
+error_img_v <- car_airplane_df %>% filter(error == "bad") %>% 
+    pull(img_no)
+
+error_img_lst <- list()
+
+for(i in seq_along(error_img_v)) {
+    error_img_lst[[i]] <- imgs_lst %>% pluck(error_img_v[i])
+}
+
+# error_imgs <- combine(error_img_lst)
+# tile(error_imgs, length(error_img_lst)) %>%
+#     display()
+
+par(mfrow = c(1,length(error_img_v)))
+for (i in 1:length(error_img_v)) plot(error_img_lst[[i]])
+```
+

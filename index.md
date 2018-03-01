@@ -70,6 +70,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
     - **전이학습(transfer learning)**        
         - [비행기 vs 자동차 - 강아지 vs 고양이](r-keras-cats-and-dogs.html)
+        - [비행기 vs 자동차 vs 배 - CNN](r-keras-cnn.html)
     - **텐서플로우(tensorflow)**
         - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
