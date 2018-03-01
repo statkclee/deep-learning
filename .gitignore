@@ -10,3 +10,6 @@ _site
 .DS_Store
 fig/Thumbs.db
 03_code/
+1.html
+data/images/
+r-keras-cats-and-dogs_cache/
