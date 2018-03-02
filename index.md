@@ -34,6 +34,27 @@ title: xwMOOC 딥러닝과 $H_2 O$
 [^andrew-ng-spark-2016]: [AI-The New Electricity](https://www.youtube.com/watch?v=4eJhcxfYR4I)
 
 1. [딥러닝이 주목받는 이유](why-dl.html)
+1. **[R에서 바라본 딥러닝](r-keras.html)**
+    - [이미지 처리 101 - 건축학개론](http://statkclee.github.io/trilobite/cv-architecture-101.html)
+    - [전통 R 신경망](r-nnet.html)
+    - **전이학습(transfer learning)**
+        - [비행기 vs 자동차 - 강아지 vs 고양이](r-keras-cats-and-dogs.html)
+        - [비행기 vs 자동차 vs 배 - CNN](r-keras-cnn.html)
+    - **케라스(keras)**
+        - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
+        - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
+        - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
+        - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
+    - **텐서플로우(tensorflow)**
+        - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
+        - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
+1. [R 개발자가 알아야 되는 보안](r-security.html)
+1. [$H_2 O$ 기계학습](h20-arch.html)
+    - [$H_2 O$ R 연습문제](h2o-r-exercise.html)
+    - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
+    - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
+    - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
+    - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
 1. 클라우드 API 활용 딥러닝 구현
     - [R 구글 url 축약-googleAuthR](r-short-url.html)
     - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
@@ -52,29 +73,6 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [오디오 데이터](speech-data-manip.html)
         - [음성 API](speech-api.html)
     - [IBM 왓슨](r-watson.html)
-1. 자체 구축한 하드웨어 혹은 도커환경에 오픈소스 텐서플로우 적용
-1. 기존 모형 아키텍쳐를 사용하고 데이터를 바꿔 재훈련 혹은 모수 조정
-1. 완전 새로운 문제에 자체 기계학습 모형 개발 
-1. [$H_2 O$ 기계학습](h20-arch.html)
-    - [$H_2 O$ R 연습문제](h2o-r-exercise.html)
-    - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
-    - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
-    - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
-    - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
-1. **[R에서 바라본 딥러닝](r-keras.html)**
-    - [전통 R 신경망](r-nnet.html)
-    - **케라스(keras)**
-        - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
-        - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
-        - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
-        - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
-    - **전이학습(transfer learning)**        
-        - [비행기 vs 자동차 - 강아지 vs 고양이](r-keras-cats-and-dogs.html)
-        - [비행기 vs 자동차 vs 배 - CNN](r-keras-cnn.html)
-    - **텐서플로우(tensorflow)**
-        - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
-        - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
-1. [R 개발자가 알아야 되는 보안](r-security.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
     - [기계학습과 딥러닝 (Neural Networks and Deep Learning)](ng-intro.html)
     - [Improving Deep Neural Networks: Hyperparameter tuning, Regularization and Optimization](ng-tuning.html)
