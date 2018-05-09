@@ -1,0 +1,211 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: 국회의원 사진 - Computer Vision API
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_depth: 2
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+    self_contained: false
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+np_img_api_list <- readRDS("data/naver_people_api.rds")
+
+```
+
+# 국회의원 프로필 사진 {#profile}
+
+## 네이버 인물정보 크롤링 {#naver-crawl}
+
+위키백과사전과 네이버에서 인물정보를 크롤링하여 국회의원 인물정보 데이터를 생성한다.
+
+- [데이터 가져오기 - 네이버 인물정보](https://statkclee.github.io/ingest-data/naver-people-info.html#1_%EB%84%A4%EC%9D%B4%EB%B2%84_%EC%9D%B8%EB%AC%BC%EC%A0%95%EB%B3%B4)
+
+크롤링하여 다운로드 데이터를 데이터프레임으로 변환하고 나서, [trelliscopejs](https://github.com/hafen/trelliscopejs) 팩키지를 활용하여 시각화한다.
+
+``` {r trelliscope-naver}
+# 0. 환경설정 -----
+library(tidyverse)
+library(trelliscopejs)
+
+# 1. 국회의원 인물정보 -----
+
+np_comp_list <- read_rds("data/naver_people_info.rds")
+np_comp_list <- plyr::compact(np_comp_list) # NULL 제거
+```
+
+## 데이터프레임 변환 {#viz-naver-people-info-dataframe}
+
+리스트 데이터를 데이터프레임으로 변환시킨다. 이를 위해서 함수형 프로그래밍을 지원하는 `purrr` 팩키지를 적극사용한다.
+
+``` {r trelliscope-naver-dataframe}
+# 2. 소셜 데이터 -----
+## 리스트 --> 데이터프레임
+np_comp_df <- tibble(
+  이름 = map_chr(np_comp_list, "name", .default = NA),
+  출생 = map_chr(np_comp_list, "출생", .default = NA),
+  소속 = map_chr(np_comp_list, "소속", .default = NA),
+  사이트 = map_chr(np_comp_list, "사이트", .default = NA),
+  사진 = map_chr(np_comp_list, "사진", .default = NA),
+  학력 = map_chr(np_comp_list, "학력", .default = NA),
+  수상 = map_chr(np_comp_list, "수상", .default = NA),
+  경력 = map_chr(np_comp_list, "경력", .default = NA),
+  가족 = map_chr(np_comp_list, "가족", .default = NA)
+)
+
+np_comp_df %>% 
+  select(이름, 출생, 사이트) %>% 
+  DT::datatable()
+```
+
+## 작은창(trelliscope) 시각화 {#viz-naver-people-info-trelliscope}
+
+데이터프레임을 `trelliscope`을 활용하여 작은창(trellis)을 쭉 연결하여 인터랙티브하게 구현해 보자.
+
+``` {r trelliscope-naver-viz, eval=TRUE}
+# options(encoding = "utf8")
+
+np_comp_df %>%
+  mutate(panel = img_panel(사진)) %>%
+  trelliscope("naver_people", nrow = 3, ncol = 6,
+              state = list(labels = c("이름", "출생", "소속")),
+              path="congress_trellis")
+```
+
+
+# 애저 컴퓨터 비젼 API [^azure-computer-vision-tutorial] {#azure-computer-vision-api}
+
+[^azure-computer-vision-tutorial]: [Microsoft Cognitive Services Vision API in R](https://www.stoltzmaniac.com/microsoft-cognitive-services-vision-api-in-r/)
+
+인공지능 클라우드 서비스는 아마존, 구글, 마이크로소프트가 자웅을 겨루고 있다. 그외에도 다수 업체들이 인공지능 서비스를 API형태로 제공하고 있다. 제공업체마다 알고리즘도 그렇고 서비스 수준도 그렇고 대동소이하지만, 서로간에 초격차를 벌리기 위해서 어마어마한 노력을 하고 있는 것은 사실이다. 애저 컴퓨터 비전 API를 활용하여 보자.
+
+- [마이크로소프트 애저 계정](https://azure.microsoft.com/en-us/free/)을 생성한다.
+    - 다른 클라우드 서비스와 마찬가지로 신용카드 등록이 필수적이다.
+- [애저 포탈](https://portal.azure.com)에 로그인한다.
+    - <img src="fig/azure-ai-portal.png" alt="애저 포탈 로그인" width="77%" />
+- 좌측메뉴에서 `+ 리소스 만들기`를 클릭한다.
+- `AI + Cognitive Services` 메뉴를 클릭하고 `Computer Vision API`를 선택한다.
+    - <img src="fig/azure-ai-menu.png" alt="애저 AI + Cognitive Services" width="77%" />
+- `Computer Vision API` 서비스 신청에 필요한 항목을 지정한다: 이름 구독(Subscription) 유형, 데이터센터 위치, 가격 등등.
+    - <img src="fig/azure-ai-computer-vision.png" alt="서비스 신청" width="77%" />
+- 결국 API 키값을 얻기 위함이므로 상기 과정을 마치게 되면 "Keys" 메뉴에서 원하는 키를 발급받게 된다.
+    - <img src="fig/azure-ai-menu-face-api-key.png" alt="키발급" width="77%" />
+- 이제 `Computer Vision API`를 사용할 준비가 완료되었으니 다음 단계로 나가보자.
+
+
+# 인공지능 서비스 활용 {#azure-computer-vision-api-call}
+
+## API 호출 스크립트 {#azure-computer-vision-api-script}
+
+앞서 인공지능서비스 활용에 대한 준비가 마무리되면 사진을 한장 던져서 사진에 대한 정보를 받아올 수 있는지 
+간단한 호출 R코드를 작성한다.
+
+- `api_key`: API 키값
+- `api_endpoint_url`: API 끝점
+- `req_url`: RESTful API 호출 URL 적성
+
+``` {r azure-api-call}
+# 0. 환경설정 -----
+library(tidyverse)
+library(rvest)
+library(httr)
+library(glue)
+
+# 1. 데이터 받아오기 -----
+api_key <- "5463d62395e84bd1a9e6cb3e379ce692"
+api_endpoint_url = "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze"
+
+visual_features <- "Description,Tags,Categories,Faces,Adult" # options = "Categories, Tags, Description, Faces, ImageType, Color, Adult"
+details <- "Landmarks" # options = Landmarks, Celebrities
+
+img_url <- 'https://imgur.com/rapIn0u.jpg'
+
+req_url <- glue(api_endpoint_url, "?visualFeatures=", visual_features, "&details=", details)
+
+api_resp <- POST(url = req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = api_key)),
+                 body=list(url = img_url),
+                 encode = "json") 
+
+img_list <- content(api_resp)
+
+listviewer::jsonedit(img_list)
+```
+
+## API 호출 함수 {#azure-computer-vision-api-function}
+
+API를 통해 국회의원 사진을 던질 예정이라 국회의원 이름과 사진을 뽑아내서 별도 데이터프레임(`np_info_df`)으로 준비한다.
+이를 앞서 제작한 스크립트를 함수(`call_caption()`)로 제작하여 `call_caption()`에 사진을 던져 사진정보를 받아온다.
+국회의원중 분당을 지역구 김병욱 의원을 뽑아서 애저 컴퓨터 비젼 API에 던져 사진 정보를 받아본다.
+
+``` {r azure-api-function}
+# 1. 데이터 받아오기 -----
+## 국회의원 명단 데이터프레임
+np_info_df <- tibble(
+    name = map_chr(np_comp_list, "name", .default=NA),
+    pic  = map_chr(np_comp_list, "사진", .default=NA)
+)
+
+# 2. API 호출 -----
+
+api_key <- "5463d62395e84bd1a9e6cb3e379ce692"
+api_endpoint_url <- "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze"
+visual_features <- "Description,Adult"
+
+call_caption <- function(img_url, api_key, api_endpoint_url, visual_features) {
+
+    req_url <- glue(api_endpoint_url, "?visualFeatures=", visual_features, "&details=", details)
+    
+    api_resp <- POST(url = req_url,
+                     content_type('application/json'),
+                     add_headers(.headers = c('Ocp-Apim-Subscription-Key' = api_key)),
+                     body=list(url = img_url),
+                     encode = "json") 
+    
+    img_list <- content(api_resp)
+    return(img_list)
+}
+
+
+김병욱_list <- call_caption(np_info_df$pic[109], api_key, api_endpoint_url, visual_features)
+
+listviewer::jsonedit(김병욱_list)
+```
+
+
+## 국회의원 전체 사진 정보 {#azure-computer-vision-api-function-all}
+
+이제 국회의원 전체를 앞서 작성한 `call_caption()`에 던져 결과를 받아 이를 `np_img_api_list`에 저장한다.
+
+``` {r azure-api-function-all, eval=FALSE}
+# 3. 전체 API 호출 -----
+np_img_api_list <- vector("list", length=nrow(np_info_df))
+
+for(i in 1:nrow(np_info_df)) {
+    np_img_api_list[[i]] <- call_caption(np_info_df$pic[i], api_key, api_endpoint_url, visual_features)
+    if(i %% 20 == 0) {
+        cat(i, ":\n")
+        Sys.sleep(60)
+    }
+}
+
+names(np_img_api_list) <- np_info_df$name
+```
+
+분당 20개이상 호출을 할 수 없는 제약조건이라... 잠시 기다려서 시간을 갖고 호출을 하게 되면 전체 국회의원 프로필 사진에 대한 데이터를 받아올 수 있다.
+
+``` {r azure-api-function-all-check}
+listviewer::jsonedit(np_img_api_list)
+```

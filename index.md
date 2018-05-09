@@ -68,7 +68,8 @@ title: xwMOOC 딥러닝과 $H_2 O$
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
             - [사진속 나이 추정](ms-oxford-age.html)
                 - [R을 이용한 인공지능 튜토리얼](ms-oxford-kcode-tutorial.html)
-            - [동영상 감정 분석](ms-oxford-video.html)            
+            - [동영상 감정 분석](ms-oxford-video.html)    
+            - [국회의원 사진 - Computer Vision API](ms-azure-computer-vision.html)        
     - **음성**
         - [오디오 데이터](speech-data-manip.html)
         - [음성 API](speech-api.html)
