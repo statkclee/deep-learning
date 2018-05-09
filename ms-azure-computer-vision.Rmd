@@ -123,7 +123,7 @@ library(httr)
 library(glue)
 
 # 1. 데이터 받아오기 -----
-api_key <- "5463d62395e84bd1a9e6cb3e379ce692"
+api_key <- "7bbbe18842a14a1cb6da67a23095c2fc"
 api_endpoint_url = "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze"
 
 visual_features <- "Description,Tags,Categories,Faces,Adult" # options = "Categories, Tags, Description, Faces, ImageType, Color, Adult"
@@ -160,7 +160,7 @@ np_info_df <- tibble(
 
 # 2. API 호출 -----
 
-api_key <- "5463d62395e84bd1a9e6cb3e379ce692"
+api_key <- "7bbbe18842a14a1cb6da67a23095c2fc"
 api_endpoint_url <- "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze"
 visual_features <- "Description,Adult"
 
