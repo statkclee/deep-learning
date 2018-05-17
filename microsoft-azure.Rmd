@@ -1,0 +1,90 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: 마이크로소프트 애저(Azure)
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_depth: 2
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+    self_contained: false
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+# 이미지 {#image-computer-vision}
+
+## 컴퓨터 비전(Computer Vision) API {#computer-vision-api}
+
+- 이미지 분석: 이미지에서 찾은 시각적 콘텐츠에 대한 정보를 반환
+    - 이미지 태그
+    - 사람 얼굴 인식
+    - 잠재적인 성인 콘텐츠를 감지하여 성인/외설 설정 적용이 가능하다.
+    - 사진의 이미지 형식, 크기, 색 구성표를 파악
+- 이미지 텍스트 읽기: OCR(광학 문자 인식)을 사용하여 이미지에서 텍스트를 감지하고 인식된 단어를 사용 가능한 문자 스트림으로 추출
+    - 이미지를 분석하여 포함된 텍스트를 감지하고 문자 스트림을 생성하고 검색을 지원
+    - 텍스트를 복사하는 대신 사진을 찍어 시간과 노력을 절약.
+    - 필기체를 인식하여 미리보기가 가능(현재, 영어만 지원)
+- 유명인 및 랜드마크 인식 
+    - 전 세계 비즈니스, 정치, 스포츠 및 연예계의 유명인 200,000명뿐 아니라 자연 및 인공 랜드마크 9,000곳을 인식
+- 축소판 그림 생성
+    - 이미지를 기반으로 저장에 효율적인 고품질 미리 보기를 생성하고 이미지의 크기, 모양 및 스타일을 필요에 맞게 수정. 
+    - 스마트 자르기를 사용하여 원래 이미지와 가로 세로 비율은 다르지만 관심 영역은 그대로인 미리 보기를 생성.
+
+## 얼굴(Face) API {#face-api}
+
+- 얼굴 확인: 두 얼굴이 같은 사람의 것일 가능성을 확인
+    -두 얼굴이 한 사람의 것일 가능성에 대한 신뢰도 점수를 반환
+- 얼굴 감지: 이미지에서 하나 이상의 사람 얼굴을 감지
+    - 이미지에서 얼굴이 있는 위치에 얼굴 사각형과 얼굴 특징의 기계 학습 기반 예측을 포함하는 얼굴 특성을 함께 표시
+    - 얼굴 특성 기능 사용할 수 있는 기능은 연령, 감정, 성별, 자세, 미소, 수염 및 이미지의 각 얼굴에 대한 27개의 특징.
+- 감정 인식
+    - 이미지에 있는 각 얼굴의 분노, 경멸, 혐오, 공포, 행복, 무표정, 슬픔, 놀라움 같은 일련의 감정에서 신뢰도를 반환
+    - 특정 얼굴 표정으로 서로 다른 문화에서 보편적으로 의사 소통하는 것으로 이해.
+- 기타
+    - 얼굴 인식: 최대 1백만 명의 사람으로 구성되는 개인 리포지토리에서 얼굴을 검색 및 식별하고 비슷한 얼굴을 찾을 수 있음.
+    - 유사 얼굴 검색: 유사하게 보이는 얼굴을 쉽게 찾을 수 있음.
+    - 얼굴 그룹화: 시각적 유사성에 따라 식별되지 않은 많은 얼굴을 함께 그룹으로 구성.
+
+# 텍스트 {#text-api}
+
+## 텍스트 분석 {#text-analytics}
+
+텍스트에서 정보 추출(Text Analytics API)를 통해 텍스트에서 언어, 감정, 핵심 문구 및 엔터티를 식별한다.
+
+- 감성 분석
+    - 텍스트 분석 API를 통해 0~1 사이의 숫자 점수를 반환
+    - 점수가 1에 가까울수록 긍정적 감정을 나타내고 점수가 0에 가까울수록 부정적 감정을 표출.
+    - 분류자 입력 기능으로 N-그램, 음성 부분 태그에서 생성된 기능 및 단어 포함이 포함.
+    - 한국어는 현재(`r Sys.Date()`) 핵심문구(key phrase) 만 [지원(언어별 지원현황 참조)](https://docs.microsoft.com/ko-kr/azure/cognitive-services/text-analytics/text-analytics-supported-languages)
+- 핵심 문구 추출
+    - 입력 텍스트의 핵심 요지를 나타내는 문자열 목록을 반환.
+- 언어 감지
+   - 검색된 언어 및 0~1 사이의 숫자 점수를 반환. 점수가 1에 가까울수록 식별된 언어가 확실하다는 표시하며 `true`인 경우 100% 확실성을 표현함.    
+- 텍스트에서 엔터티 식별 미리 보기
+    - 조직, 사람, 위치 등 텍스트에서 모든 명명된 엔터티를 검색. 예를 들어, 엔터티 링크 설정을 사용하여 “times” 등의 용어가 “The New York Times” 또는 “Times Square”를 가리키는지 확인.
+
+<img src="fig/azure-text.png" alt="애저 텍스트 기능" width="100%" />
+
+## 텍스트 번역 {#text-translation}
+
+[What languages does Microsoft Translator support?](https://www.microsoft.com/en-us/translator/languages.aspx)를 참조하면 현재(`r Sys.Date()`) 시점 한국어 지원 사항을 파악할 수 있다.
+
+- Text Translation(텍스트 번역): 지원
+- Speech Translation(음성 번역): 비지원
+- Text to speech(텍스트를 음성변환): 지원
+- Neural Translation(신경망 번역): 지원
+- Transliteration(바꿔 씀, 음역): 비지원
+- Dictionary(사전): 지원
+
+영어, 중국어, 일본어는 상기 6가지 기능을 모두 지원함.
