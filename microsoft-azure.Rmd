@@ -4,7 +4,6 @@ title: xwMOOC 딥러닝
 subtitle: 마이크로소프트 애저(Azure)
 output:
   html_document: 
-    theme: journal
     toc: yes
     toc_depth: 2
     toc_float: true
