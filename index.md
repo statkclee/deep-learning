@@ -49,31 +49,32 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
+    - **음성**: [오디오 데이터](speech-data-manip.html)
 1. [$H_2 O$ 기계학습](h20-arch.html)
     - [$H_2 O$ R 연습문제](h2o-r-exercise.html)
     - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
     - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
     - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
     - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
-1. 클라우드 API 활용 딥러닝 구현
-    - [R 구글 url 축약-googleAuthR](r-short-url.html)
-    - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
-    - **이미지**
-        - **구글**
-            - [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
-            - [R 구글 클라우드 비젼 API](r-google-vision-api.html)
-            - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
-        - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**            
+1. 클라우드 API 활용 딥러닝 앱개발
+    - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
+        - [텍스트와 이미지 API](ms-text-image.html)
+        - [국회의원 사진 - Computer Vision API](ms-azure-computer-vision.html)
+        - [동영상 감정 분석](ms-oxford-video.html): [KBS(2016-12-07),인공지능으로 분석한 대통령의 마음…슬픔은 어디에?](http://news.kbs.co.kr/news/view.do?ncd=3390429&ref=D)
+        - [사진속 나이 추정](ms-oxford-age.html)
+            - [R을 이용한 인공지능 튜토리얼](ms-oxford-kcode-tutorial.html)
+        - **옥스퍼드 시절** 
             - [옥스포드 - 감정 API](ms-oxford-emotion.html)
             - [인지서비스(Cognitive Service) - 텍스트 감성분석](ms-cognitive-text-sentiment.html)
-            - [사진속 나이 추정](ms-oxford-age.html)
-                - [R을 이용한 인공지능 튜토리얼](ms-oxford-kcode-tutorial.html)
-            - [동영상 감정 분석](ms-oxford-video.html)    
-            - [국회의원 사진 - Computer Vision API](ms-azure-computer-vision.html)        
-    - **음성**
-        - [오디오 데이터](speech-data-manip.html)
-        - [음성 API](speech-api.html)
-    - [IBM 왓슨](r-watson.html)
+    - **구글**
+        - [R 구글 클라우드 비젼 API-RoogleVision](r-google-vision-rooglevision.html)
+        - [R 구글 클라우드 비젼 API](r-google-vision-api.html)
+        - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
+        - [R 구글 url 축약-googleAuthR](r-short-url.html)
+        - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
+        - [구글 음성 API](speech-api.html)
+    - **IBM**
+        - [IBM 왓슨](r-watson.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
     - [기계학습과 딥러닝 (Neural Networks and Deep Learning)](ng-intro.html)
     - [Improving Deep Neural Networks: Hyperparameter tuning, Regularization and Optimization](ng-tuning.html)

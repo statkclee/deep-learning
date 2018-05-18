@@ -1,0 +1,495 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: 텍스트와 이미지 API
+output:
+  html_document: 
+    toc: yes
+    toc_depth: 2
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+# API 인증키 {#azure-text-api-key}
+
+애저를 비롯한 다양한 클라우드 서비스를 사용하는 경우 해당 클라우드 사업자가 발급하는 
+인증키를 사용하는 방식을 취한다. 텍스트 번역이나 컴퓨터 비전, 이미지 감성분석을 위해서 
+텍스트와 이미지를 클라우드 서비스 끝점(endpoint)으로 보낼 때 인증키도 함께 보내야 
+클라우드 서비스 제공자가 무료인지, 유료인지, 어떤 서비스에 가입(subscription)했는지 파악할 수 있다.
+
+이런 경우 클라우드 사업자가 발급하는 **키(key)**를 관리해야 해야될 필요가 있는데 
+R에서 호출하고자 할 때 R이 설치되어 있는 디렉토리(예를 들어 `C:\Program Files\R\R-3.5.0\etc\Rprofile.site
+`) 혹은, 데이터 분석과 개발을 진행하는 해당 디렉토리(예를 들어, D:\azure\computer_vision\.Rprofile
+) 파일에 인증키 정보를 넣어두고 필요시 호출할 때 사용한다. 
+
+<img src="fig/azure-r-api-key.png" alt="API KEY관리" width="100%" />
+
+
+# 텍스트 [^locke-data-cognitive-service] [^ms-translator-text-api] {#azure-text-api}
+
+[^locke-data-cognitive-service]: [R QUICK TIP: MICROSOFT COGNITIVE SERVICES’ TEXT ANALYTICS API - March 1, 2017 Steph R](https://itsalocke.com/blog/r-quick-tip-microsoft-cognitive-services-text-analytics-api/)
+
+[^ms-translator-text-api]: [Microsoft Azure - Translator Text API Documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/translator/)
+
+- Text Analytics API
+    - 언어 탐지: https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/**languages**
+    - 언어 감성(sentiment): https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/**sentiment**
+    - 핵심 용어(key phrases): https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/**keyPhrases**
+- Translator Text API
+    - 언어 탐지: https://api.cognitive.microsofttranslator.com/detect?api-version=3.0
+    - 텍스트 번역: https://api.cognitive.microsofttranslator.com/translate?api-version=3.0
+        - `&to=en&to=ko` 
+    - 사전(Dictionary): https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0
+        - `&to=en&to=ko` 
+    - 사전단어 사용례: https://api.cognitive.microsofttranslator.com/dictionary/examples?api-version=3.0    
+        - `&to=en&to=ko` 
+- Computer Vision API
+    - 컴퓨터 비전: https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze
+    - 감성분석: https://eastasia.api.cognitive.microsoft.com/face/v1.0/detect
+
+## Text Analytics - 텍스트 언어 탐지 {#language-detect}
+
+언어 탐지를 위해서 다양한 표본 데이터를 준비한다.
+중국어, 영어, 프랑스어, 한국어, 베트남어 등이 포함된다.
+
+JSON 형태로 데이터를 넘겨야 언어 탐지 API를 활용할 수 있기 때문에 
+`jsonlite` 팩키지 `toJSON()` 함수를 사용한다. 
+
+마지막으로 API 호출결과를 받아와서 이를 후속 분석을 위해서 데이터프레임으로 변환시켜 놓는다.
+
+``` {r azure-text-detect}
+# 0. 환경설정 -----
+library(tidyverse)
+library(rvest)
+library(httr)
+library(glue)
+library(jsonlite)
+library(magick)
+
+# 1. 표본 데이터 -----
+
+text <- c("is this english?"
+       ,"tak er der mere kage"
+       ,"merci beaucoup"
+       ,"guten morgen"
+       ,"대한민국"
+       ,"That's terrible"
+       ,"R is awesome"
+       ,"中國"
+       ,"thống kê học")
+
+text_df <- data_frame(id=1:length(text), text)
+df_list <-list(documents = text_df)
+
+# 2. 언어탐지 API 호출 -----
+
+text_analytics_endpoint <- "https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/languages"
+
+api_resp <- POST(url = text_analytics_endpoint,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_analytics_api_key)),
+                 body = toJSON(df_list),
+                 encode = "json") 
+
+text_list <- content(api_resp,  as="text")
+
+# listviewer::jsonedit(text_list)
+
+# 2. 언어탐지 API 호출 -----
+
+text_api_df <- tibble(
+    id = as.integer(fromJSON(text_list)$documents$id),
+    name = map_chr(fromJSON(text_list)$documents$detectedLanguages, "name"),
+    iso6391Name = map_chr(fromJSON(text_list)$documents$detectedLanguages, "iso6391Name"),
+    score = map_chr(fromJSON(text_list)$documents$detectedLanguages, "score")
+)
+
+inner_join(text_df, text_api_df) %>% DT::datatable()
+```
+
+## Text Analytics - 텍스트 감성 {#text-sentiment}
+
+텍스트 언어탐지와 유사한 방식으로 진행하나 끝점에 **sentiment**를 지정한다.
+영어를 포함한 다양한 언어를 섞어 던져보았다. 특정 언어에 대한 감성을 파악하는 것도 좋을 듯 싶다.
+
+``` {r text-analytics-sentiment}
+# 2. 텍스트 감성 요청 API -----
+text_analytics_endpoint <- "https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/"
+
+emotion_req_url <- glue(text_analytics_endpoint, "sentiment")
+
+api_resp <- POST(url = emotion_req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_analytics_api_key)),
+                 body = toJSON(df_list),
+                 encode = "json") 
+
+text_list <- content(api_resp,  as="text")
+
+# listviewer::jsonedit(text_list)
+
+text_emo_api_df <- tibble(
+    id = as.integer(fromJSON(text_list)$documents$id),
+    emo_score = fromJSON(text_list)$documents$score
+)
+
+inner_join(text_df, text_emo_api_df) %>% DT::datatable()
+```
+
+## Text Analytics - 텍스트 감성 {#text-key-phrases}
+
+텍스트 언어탐지, 감성분석과 유사한 방식으로 진행하나 끝점에 **keyPhrases**를 지정한다.
+영어를 포함한 다양한 언어를 섞어 던져보았다. 특정 언어 텍스트에 대한 핵심용어 요약하는 것도 좋을 듯 싶다.
+
+``` {r text-analytics-key-phrases}
+# 1. 데이터 (표본) -----
+text <- c("Hello world. This is some input text that I love."
+          ,"Bonjour tout le monde"
+          ,"La carretera estaba atascada. Había mucho tráfico el día de ayer."
+          ,"구글이 2005년 내놓은 세계 최초의 위성영상지도 구글 어스는 지구촌에 큰 충격을 던졌다.")
+
+text_df <- data_frame(id=1:length(text), text)
+df_list <-list(documents = text_df)
+
+# 2. 텍스트 감성 요청 API -----
+
+text_analytics_endpoint <- "https://eastasia.api.cognitive.microsoft.com/text/analytics/v2.0/"
+
+key_phrases_req_url <- glue(text_analytics_endpoint, "keyPhrases")
+
+api_resp <- POST(url = key_phrases_req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_analytics_api_key)),
+                 body = toJSON(df_list),
+                 encode = "json") 
+
+text_list <- content(api_resp,  as="text")
+
+# listviewer::jsonedit(text_list)
+
+text_kp_api_df <- tibble(
+    id = as.integer(fromJSON(text_list)$documents$id),
+    key_phrases = map(fromJSON(text_list)$documents$keyPhrases, paste0, collapse="")
+)
+
+inner_join(text_df, text_kp_api_df) %>% DT::datatable() 
+```
+
+## Translator Text API - 언어 탐지 {#translator-text-api}
+
+한국어를 비롯한 총 5개 서로 다른 언어를 식별하기 위해서 `Translator Text API` 끝점에 
+던져 언어를 탐지하고 번역이 가능한지 판단한다.
+
+``` {r translator-text-api-detect}
+# 1. 데이터 (표본) -----
+text <- c("Hello world. This is some input text that I love."
+          ,"Bonjour tout le monde"
+          ,"La carretera estaba atascada. Había mucho tráfico el día de ayer."
+          ,"대한민국... 여우"
+          ,"中共中央总书记")
+
+text_df <- data_frame(id=1:length(text), text)
+df_list <-list(text_df)
+
+# 2. 텍스트 번역 요청 API: 데이터프레임 -----
+text_translation_endpoint <- "https://api.cognitive.microsofttranslator.com/detect?api-version=3.0"
+
+api_resp <- POST(url = text_translation_endpoint,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_translation_api_key)),
+                 body = toJSON(text_df),
+                 encode = "json") 
+
+text_list <- content(api_resp)
+
+# 3. 데이터프레임 변환-----
+text_translated_lang_df <- tibble(
+    language = map_chr(text_list, ~.$language),
+    score = map_chr(text_list, ~.$score),
+    isTranslationSupported = map_chr(text_list, ~.$isTranslationSupported),
+    isTransliterationSupported = map_chr(text_list, ~.$isTransliterationSupported)
+)
+
+bind_cols(text_df, text_translated_lang_df) %>% DT::datatable()
+```
+
+## Translator Text API - 영어 &rarr; 한국어 {#translator-text-api-translator}
+
+영어문장 5개를 넣고 이를 한국어로 번역하는 작업을 진행해본다.
+앞서와 유사하게 텍스트 번역 API 끝점을 지정하고 `glue()` 함수를 통해 번역방향을 
+영어에서 한국어로 `&to=en&to=ko`와 같이 지정하고 번역결과를 취합하여 후속 작업을 위한 
+데이터프레임으로 변환시킨다.
+
+``` {r translator-text-api-translate}
+# 1. 데이터 (표본) -----
+text <- c("Hello world. This is some input text that I love."
+          ,"the quick brown fox jumps over the lazy dog"
+          ,"JFK got my VHS, PC and XLR web quiz"
+          ,"Pack my box with five dozen liquor jugs."
+          ,"Amazingly few discotheques provide jukeboxes")
+
+text_df <- data_frame(id=1:length(text), text)
+df_list <-list(text_df)
+
+# 2. 텍스트 번역 요청 API -----
+text_translation_endpoint <- "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0"
+
+text_translation_req_url <- glue(text_translation_endpoint, "&to=en&to=ko")
+
+api_resp <- POST(url = text_translation_req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_translation_api_key)),
+                 body = toJSON(text_df),
+                 encode = "json") 
+
+text_list <- content(api_resp)
+
+# listviewer::jsonedit(text_list)
+
+# 3. 번역 -----
+translation_list <- vector("list", length = length(text_list))
+
+for(i in 1:length(text_list)) {
+    translation_list[[i]] <-  list(from=text_list[[i]]$translations[[1]]$text, to=text_list[[i]]$translations[[2]]$text)
+}
+
+# listviewer::jsonedit(translation_list)
+
+from_df <- map(translation_list, ~.$from) %>% enframe %>% mutate(value=unlist(value)) %>% rename(from = value)
+to_df   <- map(translation_list, ~.$to)   %>% enframe %>% mutate(value=unlist(value)) %>% rename(to = value)
+
+inner_join(from_df, to_df) %>% DT::datatable()
+```
+
+## Translator Text API - 영한사전 {#translator-text-api-dictionary}
+
+영어단어 5개를 넣고 이를 한국어로 번역하는 작업을 진행해본다.
+앞서와 유사하게 사전 번역 API 끝점을 지정하고 `glue()` 함수를 통해 번역방향을 
+영어에서 한국어로 `&to=en&to=ko`와 같이 지정하고 번역결과를 취합하여 후속 작업을 위한 
+데이터프레임으로 변환시킨다.
+
+``` {r translator-text-api-dictionary, eval=TRUE}
+text <- c("great", "bank", "sky", "pill", "medicine")
+
+text_df <- data_frame(id=1:length(text), text)
+
+# 2. 텍스트 번역 요청 API -----
+dic_translation_endpoint <- "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0"
+
+dic_translation_req_url <- glue(dic_translation_endpoint, "&from=en&to=ko")
+
+api_resp <- POST(url = dic_translation_req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_translation_api_key)),
+                 body = toJSON(text_df),
+                 encode = "json") 
+
+text_list <- content(api_resp)
+
+# 3. 사전 번역 -----
+
+translated_word_list <- map(text_list, ~.$translations)
+
+translated_dic_word_list <- vector("list", length=nrow(text_df))
+
+for(i in 1:nrow(text_df)) {
+    translated_dic_word_list[[i]] <- map(translated_word_list[[i]], ~.$normalizedTarget) %>% unlist %>% str_c(., collapse = ",")
+}
+
+translated_dic_word_list %>% enframe(name="id", value="translated") %>% 
+    mutate(translated = unlist(translated)) %>% 
+    inner_join(text_df) %>% 
+    select(id, text, translated) %>% 
+    DT::datatable()
+```
+
+
+## Translator Text API - 사전 단어 활용 사례 {#translator-text-api-dictionary-example}
+
+영어단어를 넣고 이에 대응되는 한국어 단어를 넣으면 해당 사전 단어에 대응되는 활용사례를 받을 수 있다.
+앞서와 유사하게 사전 번역 API 끝점을 지정하고 `glue()` 함수를 통해 번역방향을 
+영어에서 한국어로 `&to=en&to=ko`와 같이 지정하고 번역결과를 취합하여 후속 작업을 위한 
+데이터프레임으로 변환시킨다.
+
+``` {r translator-text-api-dictionary-example}
+text <- c("pill")
+translation <- c("약")
+
+text_df <- data_frame(id=1:length(text), text, translation)
+df_list <-list(text_df)
+
+# 2. 텍스트 번역 요청 API -----
+dic_exam_translation_endpoint <- "https://api.cognitive.microsofttranslator.com/dictionary/examples?api-version=3.0"
+
+dic_exam_translation_req_url <- glue(dic_exam_translation_endpoint, "&from=en&to=ko")
+
+api_resp <- POST(url = dic_exam_translation_req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = text_translation_api_key)),
+                 body = toJSON(text_df),
+                 encode = "json") 
+
+text_list <- content(api_resp)
+
+# listviewer::jsonedit(text_list)
+
+# 3. 번역 -----
+
+dic_exam_list <- map(text_list, ~.$examples)[[1]]
+
+dic_examples_df <- tibble(
+    from = map_chr(text_list, ~.$normalizedSource),
+    to   = map_chr(text_list, ~.$normalizedTarget),
+    sourcePrefix = map_chr(dic_exam_list, ~.$sourcePrefix),
+    sourceTerm   = map_chr(dic_exam_list, ~.$sourceTerm),
+    sourceSuffix = map_chr(dic_exam_list, ~.$sourceSuffix),
+    targetPrefix = map_chr(dic_exam_list, ~.$targetPrefix),
+    targetTerm   = map_chr(dic_exam_list, ~.$targetTerm),
+    targetSuffix = map_chr(dic_exam_list, ~.$targetSuffix)
+)
+
+dic_examples_df <- dic_examples_df %>% 
+    mutate(from_example = str_c(sourcePrefix, sourceTerm, sourceSuffix),
+           to_example   = str_c(targetPrefix, targetTerm, targetSuffix)) %>% 
+    select(from, to, from_example, to_example) 
+
+dic_examples_df %>% DT::datatable()
+```
+
+
+# 이미지 {#azure-image-api}
+
+## 컴퓨터 비전 {#azure-image-computer-vision-api} 
+
+컴퓨터 비전 API 문서를 참조해서 정확한 이미지 전달과 이를 통해 꼭 필요한 정보만 받아 올 수 있도록 설정을 하여 API에 호출을 한다.
+
+```{r computer-vision}
+# 1. 이미지 데이터 -----
+
+img_url <- 'https://imgur.com/rapIn0u.jpg'
+
+image_read(img_url)
+
+# 2. 컴퓨터 비전 API 호출 -----
+
+computer_vision_endpoint <- "https://eastasia.api.cognitive.microsoft.com/vision/v1.0/analyze"
+
+visual_features <- "Description,Tags,Categories,Faces,Adult" # options = "Categories, Tags, Description, Faces, ImageType, Color, Adult"
+details <- "Landmarks" # options = Landmarks, Celebrities
+
+req_url <- glue(computer_vision_endpoint, "?visualFeatures=", visual_features, "&details=", details)
+
+api_resp <- POST(url = req_url,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = computer_vision_api_key)),
+                 body=list(url = img_url),
+                 encode = "json") 
+
+img_info_list <- content(api_resp)
+
+listviewer::jsonedit(img_info_list)
+```
+
+이미지에 붙은 태그를 후속 분석을 위해서 데이터프레임으로 변환시킨다.
+
+```{r computer-vision-tag}
+# 3. 데이터프레임 변환 -----
+## 3.1. 이미지 태그
+img_tag_df <- tibble(
+    tags_name = map_chr(img_info_list$tags, ~.$name),
+    tags_conf = map_chr(img_info_list$tags, ~.$confidence),
+    desc_tag = img_info_list$description$tags %>% unlist %>% str_c(collapse=',')
+) %>% DT::datatable()
+```
+
+이미지를 특정하는 정보, 즉 성인물(is_adult), 인종차별(is_racy), 이미지 정보, 캡션 등 정보를 데이터프레임으로 저정한다.
+
+```{r computer-vision-dataframe}
+## 3.2. 이미지 정보
+img_info_df <- tibble(
+    is_adult = img_info_list$adult$isAdultContent,
+    adult_score =img_info_list$adult$adultScore,
+    is_racy = img_info_list$adult$isRacyContent,
+    racy_score = img_info_list$adult$racyScore,
+    height = img_info_list$metadata$height,
+    width = img_info_list$metadata$width,
+    format = img_info_list$metadata$format,
+    caption = map_chr(img_info_list$description$captions, ~.$text),
+    caption_conf = map_chr(img_info_list$description$captions, ~.$confidence),
+    age = map_int(img_info_list$faces, ~.$age),
+    gender = map_chr(img_info_list$faces, ~.$gender),
+    face_top = map(img_info_list$faces, ~.$faceRectangle)[[1]]$top,
+    face_left = map(img_info_list$faces, ~.$faceRectangle)[[1]]$left,
+    face_width = map(img_info_list$faces, ~.$faceRectangle)[[1]]$width,
+    face_height = map(img_info_list$faces, ~.$faceRectangle)[[1]]$height
+)
+    
+img_info_df %>% 
+    gather(metric, value) %>% 
+    DT::datatable()
+```
+
+이미지 인식 중 사람얼굴과 관련된 부분을 뽑아내서 사각형으로 눈,코,입을 포함하는 사각형으로 표식한다.
+
+```{r computer-vision-face-location}
+## 3.3. 얼굴인식
+plot.new()
+image_read(img_url)
+rect(img_info_df$face_left, img_info_df$face_top + img_info_df$face_height, img_info_df$face_left + img_info_df$face_width, img_info_df$face_top, border = "red", lty = "dashed", lwd = 5)
+
+```
+
+## 감성분석 [^azure-face-api-bloggers] {#azure-image-emotion-api} 
+
+[^azure-face-api-bloggers]: [Using Microsoft’s Azure Face API to analyze videos (in R) December 12, 2017 By Adi Sarid](https://www.r-bloggers.com/using-microsofts-azure-face-api-to-analyze-videos-in-r/)
+
+사진에 나타난 감성을 8가지 측면에서 계량화한다.
+이를 위해서 이미지를 인터넷에서 가져와서 Face API에 호출하고 결과값을 데이터프레임으로 변환시킨다.
+
+```{r computer-vision-emotion}
+# 1. 이미지 데이터 -----
+img_url <- 'https://i.imgur.com/Rew9eFB.jpg'
+image_read(img_url)
+
+# 2. 감성 API 호출 -----
+face_endpoint <- "https://eastasia.api.cognitive.microsoft.com/face/v1.0/detect"
+
+api_resp <- POST(url = face_endpoint,
+                 content_type('application/json'),
+                 add_headers(.headers = c('Ocp-Apim-Subscription-Key' = face_api_key)),
+                 # body = '{"url":"https://i.imgur.com/Rew9eFB.jpg"}',
+                 body = list(url = img_url),
+                 query = list(returnFaceAttributes = "emotion,age,gender,hair,makeup,accessories"),
+                 encode = "json")
+
+img_list <- content(api_resp)
+
+# listviewer::jsonedit(img_list)
+
+# 3. 데이터프레임 변환 -----
+img_face_list <- map(img_list, ~.$faceAttributes)
+
+## 얼굴 개요
+tibble(
+    gender = map_chr(img_face_list, "gender"),
+    age = map_dbl(img_face_list, "age"),
+    bald = map(img_face_list, ~.$hair)[[1]]$bald %>% unlist
+)
+
+## 얼굴 감성
+map(img_face_list, ~.$emotion)[[1]] %>% enframe %>% 
+    mutate(value = unlist(value)) %>% 
+    DT::datatable()
+```
+
+
