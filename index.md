@@ -59,6 +59,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
 1. 클라우드 API 활용 딥러닝 앱개발
     - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
         - [텍스트와 이미지 API](ms-text-image.html)
+        - [카드뉴스 (Card News) - 프로토타입](ai-card-news.html)
         - [국회의원 사진 - Computer Vision API](ms-azure-computer-vision.html)
         - [동영상 감정 분석](ms-oxford-video.html): [KBS(2016-12-07),인공지능으로 분석한 대통령의 마음…슬픔은 어디에?](http://news.kbs.co.kr/news/view.do?ncd=3390429&ref=D)
         - [사진속 나이 추정](ms-oxford-age.html)
