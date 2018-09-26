@@ -147,14 +147,17 @@ ggplot(image_1, aes(x = x, y = y, fill = value)) +
 train_images <- train_images / 255
 test_images <- test_images / 255
 
-par(mfcol=c(5,5))
-par(mar=c(0, 0, 1.5, 0), xaxs='i', yaxs='i')
-for (i in 1:25) { 
-  img <- train_images[i, , ]
-  img <- t(apply(img, 2, rev))
-  image(1:28, 1:28, img, col = gray((0:255)/255), xaxt = 'n', yaxt = 'n',
+display_fashion <- function(input, i){
+  m <- matrix(unlist(input), nrow = 28, byrow = FALSE)
+  # m <- t(apply(apply(m, 2, rev),2, rev))
+  # m <- t(apply(m, 2, rev))
+  m <- t(apply(t(m), 2, rev))
+  image(m, col=grey.colors(255),  xaxt = 'n', yaxt = 'n',
         main = paste(class_names[train_labels[i] + 1]))
 }
+
+par(mfrow = c(3,5))
+map(sample(1:nrow(train_images), 15), ~display_fashion(train_images[.x,], .x))
 ```
 
 
