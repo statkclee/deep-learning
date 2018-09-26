@@ -45,9 +45,11 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
         - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
+        - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html) &larr; 신규
     - **텐서플로우(tensorflow)**
         - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
+
 1. [R 개발자가 알아야 되는 보안](r-security.html)
     - **음성**: [오디오 데이터](speech-data-manip.html)
 1. [$H_2 O$ 기계학습](h20-arch.html)
