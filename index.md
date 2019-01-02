@@ -50,12 +50,6 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
     - **음성**: [오디오 데이터](speech-data-manip.html)
-1. [$H_2 O$ 기계학습](h20-arch.html)
-    - [$H_2 O$ R 연습문제](h2o-r-exercise.html)
-    - [$H_2 O$ 헬로 월드](h2o-hello-world.html)
-    - [$H_2 O$ 앙상블 모형](h2o-ensemble-higgs.html)
-    - [$H_2 O$ GBM 모형 세부조정](h2o-gbm-titanic.html)
-    - [$H_2 O$ vs 딥러닝 랜딩클럽 대출 데이터](h2o-deep-learning-landingclub.html)
 1. 클라우드 API 활용 딥러닝 앱개발
     - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
         - [텍스트와 이미지 API](ms-text-image.html)
