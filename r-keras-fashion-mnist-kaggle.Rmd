@@ -1,0 +1,179 @@
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: R 케라스(keras) - 패션 MNIST (캐글 데이터)
+output:
+  html_document: 
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+    self_contained: true
+    lib_dir: gapminder
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include=FALSE}
+# source("tools/chunk-options.R")
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,
+                    comment="", digits = 3, tidy = FALSE, prompt = TRUE, fig.align = 'center')
+
+library(here)
+```
+
+# 패션 MNIST 데이터 {#keras-fashion-mnist}
+
+캐글 [패션 MNIST](https://www.kaggle.com/zalando-research/fashionmnist)를 다운로드 받아도 되고, 
+앞서 [RStudio Keras](https://keras.rstudio.com/)를 설치하게 되면 포함된 데이터를 사용했다.
+
+## 데이터 가져오기 [^keras-tutorial] {#keras-fashion-mnist-import}
+
+[^keras-tutorial]: [RStudio Keras, "Tutorial: Basic Classification"](https://keras.rstudio.com/articles/tutorial_basic_classification.html)
+
+[fashion-mnist](https://github.com/zalandoresearch/fashion-mnist) 데이터는 10개 범주로 구분된 70,000개 흑백이미지 데이터로 구성되고,
+각 이미지 크기는 $28 \times 28$ 크기를 갖고 `keras` 팩키지 `dataset_fashion_mnist()` 함수를 사용해서 데이터를 받아낼 수 있지만,
+직접 데이터를 다운로드 받아 이를 패션 MNIST 이미지 분류에 사용한다.
+
+
+```{r keras-fashion-mnist-data}
+# 1. 데이터 -----
+library(tidyverse)
+library(gridExtra)
+library(keras)
+library(glue)
+
+# 이미지 폴더 경로설정
+cur_dir <- getwd()
+
+train_image_files_path <- glue(cur_dir, "/data/fashion/fashion-mnist_train.csv")
+test_image_files_path <- glue(cur_dir,  "/data/fashion/fashion-mnist_test.csv")
+
+class_names <- c('T-shirt/top',
+                'Trouser',
+                'Pullover',
+                'Dress',
+                'Coat', 
+                'Sandal',
+                'Shirt',
+                'Sneaker',
+                'Bag',
+                'Ankle boot')
+
+## 1.1. 데이터 불러오기-----
+train_df <- read_csv(train_image_files_path)
+test_df <- read_csv(test_image_files_path)
+
+
+## 1.2. 훈련/시험 데이터 분할
+train_x_df <- train_df %>% select(-label)
+train_y_df <- train_df %>% select(label)
+
+test_x_df <- test_df %>% select(-label)
+test_y_df <- test_df %>% select(label)
+
+```
+
+# 탐색적 데이터 분석 {#keras-fashion-mnist-EDA}
+
+훈련과 시험 데이터로 이미지를 나누고, 훈련데이터 수는 70,000개 중에서 60,000개, 시험데이터는 10,000개로 구성된다.
+`table(train_labels)` 함수로 10개 범주에 각 6,000개씩 훈련범주로 구성된 것이 확인된다. 이미지 다수 뽑아내서 `image` 함수로 시각화한다.
+
+```{r fashion-mnist-eda-many}
+display_fashion <- function(input, i){
+  m <- matrix(unlist(input), nrow = 28, byrow = FALSE)
+  # m <- t(apply(apply(m, 2, rev),2, rev))
+  # m <- t(apply(m, 2, rev))
+  m <- t(apply(t(m), 2, rev))
+  image(m, col=grey.colors(255),  xaxt = 'n', yaxt = 'n',
+        main = paste(class_names[train_y_df$label[i] + 1]))
+}
+
+par(mfrow = c(3,5))
+map(sample(1:nrow(train_x_df), 15), ~display_fashion(train_x_df[.x,], .x))
+```
+
+
+# 딥러닝 예측모형 {#keras-fashion-mnist-cnn}
+
+## 계층 설정(Setup the layer) {#keras-fashion-mnist-cnn-setup}
+
+첫번째 계층은 입력값($25 \times 25 = 784 \text{픽셀}$)을 받도록 `layer_flatten()`을 지정하고,
+이에 맞춰 데이터를 배열로 정리해 둔다.
+그리고, 중간에 `dropout`도 두어 딥러닝 계층을 적당히 쌓아 구성하여 학습시킨다.
+
+```{r fashion-mnist-cnn}
+# 3. 딥러닝 예측모형 -----
+## 3.1. 입력값을 배열로 변환
+train_x <- array(data.matrix(train_x_df), dim = c(dim(train_x_df)[[1]], 784))
+test_x <- array(data.matrix(test_x_df), dim = c(dim(test_x_df)[[1]], 784))
+
+## 0과 1 사이 값으로 조정
+train_x <- train_x / 255
+test_x <- test_x / 255
+
+## 3.2.  딥러닝 학습
+model <- keras_model_sequential()
+
+model %>%
+  layer_dense(units=128, input_shape=c(784))  %>%
+  layer_dropout(rate=0.7) %>%
+  layer_dense(units=64, activation="relu")  %>%
+  layer_dropout(rate=0.5) %>%
+  layer_dense(units=64, activation="relu")  %>%
+  layer_dropout(rate=0.5) %>%
+  layer_dense(units=10,activation="softmax") 
+
+model %>% compile(
+  optimizer = 'adam', 
+  loss = 'sparse_categorical_crossentropy',
+  metrics = c('accuracy')
+)
+
+model %>% fit(train_x, train_y_df$label, epochs = 5)
+
+```
+
+
+
+## 모형 평가(evaluate-the-model) {#keras-fashion-mnist-cnn-evaluate}
+
+`evaluate()` 함수를 통해서 훈련에 사용된 적이 없는 시험 데이터를 활용해서 패션 MNIST 옷범주 예측 성능을 평가한다.
+
+```{r fashion-mnist-cnn-evaluate}
+score <- model %>% evaluate(test_x, test_y_df$label)
+
+cat('Test loss:', score$loss, "\n")
+cat('Test accuracy:', score$acc, "\n")
+```
+
+## 예측 {#keras-fashion-mnist-cnn-predict}
+
+`evaluate()` 함수를 통해서 훈련에 사용된 적이 없는 시험 데이터를 활용해서 패션 MNIST 옷범주 예측 성능을 평가한다.
+
+```{r fashion-mnist-cnn-predict}
+predictions <- model %>% predict(test_x)
+predictions[1,]
+which.max(predictions[1, ])
+
+class_pred <- model %>% predict_classes(test_x)
+class_pred[1:20]
+```
+
+직접 이미지를 넣어 예측할 수도 있다.
+
+```{r fashion-mnist-cnn-predict-viz-image}
+smpl_img <- test_x[15, , drop = FALSE]
+dim(smpl_img)
+
+smpl_predictions <- model %>% predict(smpl_img)
+smpl_predictions
+
+class_pred <- model %>% predict_classes(smpl_img)
+class_pred
+```
+
+

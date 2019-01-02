@@ -45,6 +45,8 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
         - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
+        - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html) &larr; 신규
+        - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html) &larr; 신규
     - **텐서플로우(tensorflow)**
         - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
         - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
