@@ -36,6 +36,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
 1. [딥러닝이 주목받는 이유](why-dl.html)
 1. **텐서플로우(tensorflow)**
     - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
+    - [텐서플로우(tensorflow) 자료구조](tensorflow-data-structure.html)
     - [텐서플로우(tensorflow) 회귀분석](r-tensorflow-regression.html)
 1. **[R에서 바라본 딥러닝](r-keras.html)**
     - [이미지 처리 101 - 건축학개론](http://statkclee.github.io/trilobite/cv-architecture-101.html)
