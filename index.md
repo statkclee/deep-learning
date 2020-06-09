@@ -49,8 +49,9 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
         - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
-        - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html) &larr; 신규
-        - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html) &larr; 신규
+        - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html)
+        - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html)
+    - [캡챠(captcha) 깨기](r-keras-captcha.html)    
 1. [R 개발자가 알아야 되는 보안](r-security.html)
     - **음성**: [오디오 데이터](speech-data-manip.html)
 1. 클라우드 API 활용 딥러닝 앱개발
