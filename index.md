@@ -47,11 +47,11 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - **케라스(keras)**
         - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
         - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
-        - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
         - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html)
         - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html)
-    - [캡챠(captcha) 깨기](r-keras-captcha.html)    
+1. [캡챠(captcha) 깨기](r-keras-captcha.html)    
+    - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
     - **음성**: [오디오 데이터](speech-data-manip.html)
 1. 클라우드 API 활용 딥러닝 앱개발
@@ -82,44 +82,4 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - Sequence Models
 
 
-### [xwMOOC 오픈 교재](https://statkclee.github.io/xwMOOC/)
-
-- **컴퓨팅 사고력(Computational Thinking)**
-    - [컴퓨터 과학 언플러그드](http://statkclee.github.io/unplugged)  
-    - [리보그 - 프로그래밍과 문제해결](https://statkclee.github.io/code-perspectives/)  
-         - [러플](http://statkclee.github.io/rur-ple/)  
-    - [파이썬 거북이](http://swcarpentry.github.io/python-novice-turtles/index-kr.html)  
-    - [정보과학을 위한 파이썬](https://statkclee.github.io/pythonlearn-kr/)  
-    - [소프트웨어 카펜트리 5.3](http://statkclee.github.io/swcarpentry-version-5-3-new/)
-    - [기호 수학(Symbolic Math)](https://statkclee.github.io/symbolic-math/)
-    - [데이터 과학을 위한 R 알고리즘](https://statkclee.github.io/r-algorithm/)
-    - [데이터 과학을 위한 저작도구](https://statkclee.github.io/ds-authoring/)
-        - [The Official xwMOOC Blog](https://xwmooc.netlify.com/)
-    - [비즈니스를 위한 오픈 소스 소프트웨어](http://statkclee.github.io/open-source-for-business/)
-- **데이터 과학**
-    - [R 데이터과학](https://statkclee.github.io/data-science/)
-    - [시각화](https://statkclee.github.io/viz/)
-    - [텍스트 - 자연어처리(NLP)](https://statkclee.github.io/text/)
-    - [네트워크(network)](https://statkclee.github.io/network)
-    - [데이터 과학– 기초 통계](https://statkclee.github.io/statistics/)    
-        - [공개 기초 통계학 - OpenIntro Statistics](https://statkclee.github.io/openIntro-statistics-bookdown/)
-    - [공간통계를 위한 데이터 과학](https://statkclee.github.io/spatial/)
-    - [~~R 팩키지~~](http://r-pkgs.xwmooc.org/)
-    - [~~통계적 사고~~](http://think-stat.xwmooc.org/)
-    - [보안 R](https://statkclee.github.io/security/) - TBA
-- **빅데이터**
-    - [빅데이터(Big Data)](http://statkclee.github.io/bigdata)
-    - [데이터 제품](https://statkclee.github.io/data-product/)
-    - [R 도커](http://statkclee.github.io/r-docker/)
-- **기계학습, 딥러닝, 인공지능**
-    - [기계학습](http://statkclee.github.io/ml)
-    - [딥러닝](http://statkclee.github.io/deep-learning)
-    - [R 병렬 프로그래밍](http://statkclee.github.io/parallel-r/)
-    - [고생대 프로젝트](http://statkclee.github.io/trilobite)
-    - [인공지능 연구회](https://statkclee.github.io/ai-lab/)
-- [IoT 오픈 하드웨어(라즈베리 파이)](http://statkclee.github.io/raspberry-pi)
-    - [$100 오픈 컴퓨터](https://statkclee.github.io/one-page/)   
-    - [$100 오픈 슈퍼컴퓨터](https://statkclee.github.io/hpc/)
-- [선거와 투표](http://statkclee.github.io/politics)
-    - [저녁이 있는 삶과 새판짜기 - 제7공화국](https://statkclee.github.io/hq/)
 

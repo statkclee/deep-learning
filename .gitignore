@@ -15,3 +15,4 @@ data/images/
 r-keras-cats-and-dogs_cache/
 .ipynb_checkpoints/
 .Rproj.user
+logs/
