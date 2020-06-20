@@ -59,11 +59,13 @@ def mnist_function():
               epochs=epochs,
               verbose=1,
               validation_data=(x_test, y_test))
-
     score = model.evaluate(x_test, y_test, verbose=0)
     
-    return score
+    y_pred = model.predict(x_test)
+    
+    return [y_pred, y_test]
 
-score = mnist_function()
 
-score
+# result = mnist_function()
+# 
+# result

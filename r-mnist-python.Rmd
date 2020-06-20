@@ -54,10 +54,30 @@ mnist_function()
 
 함수로 작성하여 결과를 R로 반환시켜 추가 작업을 수행한다.
 
-```{r keras-mnist-function-object}
+```{r keras-mnist-function-object, eval = FALSE}
 source_python("code/mnist-keras-function-object.py")
 score <- mnist_function()
 
 cat('Test loss:', score[1])
 cat('Test accuracy:', score[2])
+```
+
+# 예측값 {#mnist-python-classifier-predict}
+
+함수로 작성하여 결과를 R로 반환시켜 추가 작업을 수행한다.
+
+```{r keras-mnist-function-object-predict}
+library(tidyverse)
+
+source_python("code/mnist-keras-function-object-predict.py")
+result <- mnist_function()
+
+tibble(y_pred = result[[0]], y_label = result[[1]])
+
+y_pred <- result[[1]]
+y_label <- result[[2]]
+
+y_pred %>% as_tibble()
+y_label %>% as_tibble()
+
 ```
