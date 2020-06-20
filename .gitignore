@@ -16,3 +16,5 @@ r-keras-cats-and-dogs_cache/
 .ipynb_checkpoints/
 .Rproj.user
 logs/
+data/gzip/
+data/matlab/
