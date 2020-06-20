@@ -1,0 +1,12 @@
+__loadDisplayList__c51deee6([
+  {
+    "group": "common",
+    "name": "mnist",
+    "desc": "",
+    "n": 10,
+    "height": 500,
+    "width": 500,
+    "updated": "2020-06-21 00:00:40",
+    "keySig": "4fa5dd4e182f82a23ea2027fd20533d7"
+  }
+])

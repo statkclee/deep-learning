@@ -165,6 +165,8 @@ visualize_character <- function(index) {
 visualize_character(10)
 ```
 
+## EMNIST Matlab GIF 시각화 {#emnist-matlab-viz}
+
 `image_read() %>% image_join() %>% image_animate()` 작업흐름을 통해서 10,000개 손글씨 이미지에서 임으로 100개를 추출하여 
 정답(`label`)과 손글씨 이미지를 Gif 파일로 시각화한다. `trelliscope`으로 시각화한 사례는 [딥러닝: 캡챠(captcha) 깨기](http://statkclee.github.io/deep-learning/r-keras-captcha.html)를 참조한다.
 
@@ -179,3 +181,73 @@ emnist_joined <- image_join(emnist_random_image)
 
 image_animate(emnist_joined, fps = 1)
 ```
+
+## EMNIST Matlab GIF 시각화 {#emnist-matlab-viz}
+
+각각 처리한 이미지를 10개를 뽑아, `image_join()` 함수로 붙이고 나서, 
+`image_append()` 하나로 쭉 이어 붙인다.
+
+```{r emnist-matlab-viz-many-rows}
+
+random_img <- sample(1:10000, 10, replace = FALSE)
+
+emnist_random_image <- map(random_img, visualize_character)
+
+image_join(emnist_random_image) %>% 
+  image_append(stack = FALSE)
+```
+
+# `trelliscope` 작은 창 {#emnist-trelliscope}
+
+먼저 `MATLAB` 객체를 R 배열(Array) 객체로 변환시키고 이를 `Magick` 객체로 변환시킨 후에 `PNG` 파일로 저장시킨다.
+
+```{r save-mnist-image, eval = FALSE}
+
+save_image <- function(index) {
+  img_arr <- array(test_img[index,], c(28, 28, 1))
+  img_magick <- magick::image_read(img_arr / 255) %>% 
+    magick::image_scale("500x500") %>% 
+    image_annotate(test_img_labels[index], location = geometry_point(10, 10), size = 137, color = "red")
+  
+  image_write(img_magick, glue::glue("data/mnist/image_{index}.png"))
+}
+
+save_random_img <- sample(1:10000, 10, replace = FALSE) # 9683 4879 6692 5490 3315 5476 3003 2444 5421 7476
+
+map(save_random_img, save_image)
+```
+
+
+```{r move-files}
+list.files("data/mnist/")
+```
+
+다음으로 이를 `trellisocpe`으로 불러 읽어들여 시각화한다.
+이를 위해서 먼저 데이터프레임을 준비한다.
+
+```{r trelliscope-mnist-image}
+library(glue)
+
+file_names <- list.files("data/mnist/")
+
+mnist_df <- tibble(random = c(9683L, 4879L, 6692L, 5490L, 3315L, 5476L, 3003L, 2444L, 5421L, 7476L),
+                   label = test_img_labels[c(9683L, 4879L, 6692L, 5490L, 3315L, 5476L, 3003L, 2444L, 5421L, 7476L)], 
+                   image = glue("data/mnist/image_{random}.png"))
+
+mnist_df
+```
+
+이제 시각화를 해보자.
+
+```{r trelliscope-mnist-image-viz}
+library(trelliscopejs)
+
+mnist_df <- mnist_df %>%
+  mutate(panel = img_panel_local(image))
+
+trelliscope(mnist_df, name = "mnist", 
+            nrow = 2, ncol=5,
+            state = list(labels = c("label")),
+            path="mnist")
+```
+
