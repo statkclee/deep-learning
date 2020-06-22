@@ -54,6 +54,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
     - [필기숫자 인식 데이터(MNIST): 파이썬 스크립트](r-mnist-python.html)
     - [확장된 필기숫자 인식 데이터(EMNIST): 확장 손글씨](r-emnist-dataset.html)
+    - [이미지 주석/라벨(annotation) 달기](r-image-annotation.html)
 1. [R 개발자가 알아야 되는 보안](r-security.html)
     - **음성**: [오디오 데이터](speech-data-manip.html)
 1. 클라우드 API 활용 딥러닝 앱개발
