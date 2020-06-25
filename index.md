@@ -34,6 +34,9 @@ title: xwMOOC 딥러닝과 $H_2 O$
 [^andrew-ng-spark-2016]: [AI-The New Electricity](https://www.youtube.com/watch?v=4eJhcxfYR4I)
 
 1. [딥러닝이 주목받는 이유](why-dl.html)
+    - [R 개발자가 알아야 되는 보안](r-security.html)
+    - **음성**: [오디오 데이터](speech-data-manip.html)
+    - [R 딥러닝 환경설정: `openmp` 맥](dl-mac-openmp.html)
 1. **텐서플로우(tensorflow)**
     - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
     - [텐서플로우(tensorflow) 자료구조](tensorflow-data-structure.html)
@@ -58,8 +61,6 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [이미지 주석/라벨(annotation) 달기](r-image-annotation.html)
     - [캡챠 샤이니 뷰어(Captcha Shiny Viewer)](r-captcha-shiny-viewer.html)
     - [캡챠 회전목마(carousel, merry-go-round): `slickR`](r-captcha-carousel.html)
-1. [R 개발자가 알아야 되는 보안](r-security.html)
-    - **음성**: [오디오 데이터](speech-data-manip.html)
 1. 클라우드 API 활용 딥러닝 앱개발
     - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
         - [텍스트와 이미지 API](ms-text-image.html)
