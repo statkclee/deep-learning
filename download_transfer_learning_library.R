@@ -36,15 +36,15 @@ download.file(url = "https://pjreddie.com/media/files/resnet101.weights", destfi
 
 # Resnet 152
 download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet152.cfg", destfile = "DL_library/resnet152.cfg")
-download.file(url = "https://pjreddie.com/media/files/resnet152.weights", destfile = "DL_library/resnet152.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet152.weights", destfile = "DL_library/resnet152.weights")
 
 # ResNeXt 50
 download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext50.cfg", destfile = "DL_library/resnext50.cfg")
 download.file(url = "https://pjreddie.com/media/files/resnext50.weights", destfile = "DL_library/resnext50.weights")
 
 # ResNeXt 101 (32x4d)
-download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext101-32x4d.cfg", destfile = "DL_library/32x4d.cfg")
-download.file(url = "https://pjreddie.com/media/files/resnext101-32x4d.weights", destfile = "DL_library/32x4d.weights")
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext101-32x4d.cfg", destfile = "DL_library/resnext101-32x4d.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnext101-32x4d.weights", destfile = "DL_library/resnext101-32x4d.weights")
 
 # ResNeXt 152 (32x4d)
 download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext152-32x4d.cfg", destfile = "DL_library/resnext152-32x4d.cfg")

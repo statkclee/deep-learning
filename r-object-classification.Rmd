@@ -87,11 +87,10 @@ image_append(c(trilobite, airplane, wagon, 경복궁, 설악산, bear, elephant)
 
 AlexNet을 다운로드 받아 사전 훈련된 모형(Pre-Trained Model)을 사용해서 이미지를 분류해보자.
 
-```{r image-darknet-alexnet, eval = FALSE}
+```{r image-darknet-alexnet, eval = TRUE}
 library(image.darknet)
 
 # download.file(url = "https://pjreddie.com/media/files/alexnet.weights", destfile = "DL_library/alexnet.weights")
-# download.file(url = "https://pjreddie.com/media/files/darknet.weights", destfile = "DL_library/darknet.weights")
 
 ## ImageNet 라벨
 labels <- readLines(system.file(package="image.darknet", "include", "darknet", "data", "imagenet.shortnames.list"))
@@ -115,8 +114,6 @@ image_darknet_classify(file = "fig/airplane.jpeg", object = alexnet)
 Darknet19를 사용해서 동일하게 분류해보자.
 
 ```{r resnet-classification}
-# ImageNet 라벨
-labels <- readLines(system.file(package="image.darknet", "include", "darknet", "data", "imagenet.shortnames.list"))
 
 darknet19_weights <- "DL_library/darknet19.weights"
 
@@ -131,22 +128,149 @@ image_darknet_classify(file = "fig/airplane.jpeg", object = darknet19)
 
 # 자동화 {#automate-classification}
 
-```{r automate-classification-for-loop}
-library(tidyverse)
+[ImageNet Classification](https://pjreddie.com/darknet/imagenet/) 사전 학습 모형(pre-trained Model)을 다운로드 받아 이를 기반으로 분류작업을 수행한다. 먼저 Pre-trained Model을 다운로드 받는다.
 
-# ImageNet 라벨
-labels <- readLines(system.file(package="image.darknet", "include", "darknet", "data", "imagenet.shortnames.list"))
+- AlexNet: alexnet
+- VGG-16: vgg-16
+- Google Extraction: extraction
+- Darknet19: darknet19
+- Darknet19 448x448: darknet19_448
+- Resnet 18: resnet18
+- Resnet 34: resnet34
+- Resnet 50: resnet50
+- Resnet 101:resnet101
+- Resnet 152:resnet152
+- ResNeXt 50: resnext50
+- ResNeXt 101 (32x4d): resnext101-32x4d
+- ResNeXt 152 (32x4d): resnext152-32x4d
+- Densenet 201: densenet201
+- Darknet53: darknet53
+- Darknet53 448x448: darknet53_448
+
+상기 모델을 다운로드 받기 위해서 백그라운드(background) 작업을 위해 `Start Local Job` RStudio 기능을 활용한다. `download_transfer_learning_library.R` 파일에 다음 내용을 저장하고 실행시킨다. 
+
+```{r download-script, eval = FALSE}
+# AlexNet
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/alexnet.cfg", destfile = "DL_library/alexnet.cfg")
+download.file(url = "https://pjreddie.com/media/files/alexnet.weights", destfile = "DL_library/alexnet.weights")
+
+# VGG-16
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/vgg-16.cfg", destfile = "DL_library/vgg-16.cfg")
+download.file(url = "https://pjreddie.com/media/files/vgg-16.weights", destfile = "DL_library/vgg-16.weights")
+
+# Google Extraction
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/extraction.cfg", destfile = "DL_library/extraction.cfg")
+download.file(url = "https://pjreddie.com/media/files/extraction.weights", destfile = "DL_library/extraction.weights")
+
+# Darknet19
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet19.cfg", destfile = "DL_library/darknet19.cfg")
+download.file(url = "https://pjreddie.com/media/files/darknet19.weights", destfile = "DL_library/darknet19.weights")
+
+# Darknet19 448x448
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet19_448.cfg", destfile = "DL_library/darknet19_448.cfg")
+download.file(url = "https://pjreddie.com/media/files/darknet19_448.weights", destfile = "DL_library/darknet19_448.weights")
+
+# Resnet 18
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet18.cfg", destfile = "DL_library/resnet18.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet18.weights", destfile = "DL_library/resnet18.weights")
+
+# Resnet 34
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet34.cfg", destfile = "DL_library/resnet34.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet34.weights", destfile = "DL_library/resnet34.weights")
+
+# Resnet 50
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet50.cfg", destfile = "DL_library/resnet50.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet50.weights", destfile = "DL_library/resnet50.weights")
+
+# Resnet 101
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet101.cfg", destfile = "DL_library/resnet101.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet101.weights", destfile = "DL_library/resnet101.weights")
+
+# Resnet 152
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnet152.cfg", destfile = "DL_library/resnet152.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnet152.weights", destfile = "DL_library/resnet152.weights")
+
+# ResNeXt 50
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext50.cfg", destfile = "DL_library/resnext50.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnext50.weights", destfile = "DL_library/resnext50.weights")
+
+# ResNeXt 101 (32x4d)
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext101-32x4d.cfg", destfile = "DL_library/resnext101-32x4d.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnext101-32x4d.weights", destfile = "DL_library/resnext101-32x4d.weights")
+
+# ResNeXt 152 (32x4d)
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/resnext152-32x4d.cfg", destfile = "DL_library/resnext152-32x4d.cfg")
+download.file(url = "https://pjreddie.com/media/files/resnext152-32x4d.weights", destfile = "DL_library/resnext152-32x4d.weights")
+
+# Densenet 201
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/densenet201.cfg", destfile = "DL_library/densenet201.cfg")
+download.file(url = "https://pjreddie.com/media/files/densenet201.weights", destfile = "DL_library/densenet201.weights")
+
+# Darknet53
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet53.cfg", destfile = "DL_library/darknet53.cfg")
+download.file(url = "https://pjreddie.com/media/files/darknet53.weights", destfile = "DL_library/darknet53.weights")
+
+# Darknet53 448x448
+download.file(url = "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/darknet53_448.cfg", destfile = "DL_library/darknet53_448.cfg")
+download.file(url = "https://pjreddie.com/media/files/darknet53_448.weights", destfile = "DL_library/darknet53_448.weights")
+```
+
+## 이미지 평가 {#pretrained-model}
+
+앞서 각각 Pre-trained Model을 사용했다면 이번에는 설치한 모형에 이미지를 던저 이미지에 담긴 객체분류 작업을 수행한다.
+
+```{r automate-classification-for-loop}
 
 # Pretrained Model
-# pretrained_models <- c("darknet", "darknet19", "densenet201", "resnet101")
-pretrained_models <- c("darknet", "densenet201")
+# pretrained_models <- c("alexnet", "vgg-16", "extraction", "darknet19", "darknet19_448", 
+#                        "resnet18","resnet34", "resnet50", "resnet101", "resnet152", 
+#                        "resnext50", "resnext101-32x4d", "resnext152-32x4d", "densenet201", 
+#                        "darknet53", "darknet53_448")
 
-## darknet
-darknet_weights <- "DL_library/darknet.weights"
+pretrained_models <- c("alexnet", "vgg16", "extraction", 
+                       "darknet19", "densenet201", "darknet19_448")
 
-darknet <- image_darknet_model(type = 'classify', 
-                                 model = "DL_library/darknet.cfg",
-                                 weights = darknet_weights, 
+## alexnet
+alexnet_weights <- "DL_library/alexnet.weights"
+
+alexnet <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/alexnet.cfg",
+                                 weights = alexnet_weights, 
+                                 labels = labels,
+                                 resize = FALSE)
+
+## vgg-16
+vgg_weights <- "DL_library/vgg-16.weights"
+
+vgg16 <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/vgg-16.cfg",
+                                 weights = vgg_weights, 
+                                 labels = labels,
+                                 resize = FALSE)
+
+## Google extraction
+extraction_weights <- "DL_library/extraction.weights"
+
+extraction <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/extraction.cfg",
+                                 weights = extraction_weights, 
+                                 labels = labels)
+
+
+## darknet19
+darknet19_weights <- "DL_library/darknet19_448.weights"
+
+darknet19 <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/darknet19_448.cfg",
+                                 weights = darknet19_weights, 
+                                 labels = labels)
+
+## resnet18
+resnet18_weights <- "DL_library/resnet18.weights"
+
+resnet18 <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/resnet18.cfg",
+                                 weights = resnet18_weights, 
                                  labels = labels)
 
 ## densenet201
@@ -157,13 +281,21 @@ densenet201 <- image_darknet_model(type = 'classify',
                                  weights = densenet201_weights, 
                                  labels = labels)
 
+## darknet19_448
+darknet19_448_weights <- "DL_library/darknet19_448.weights"
+
+darknet19_448 <- image_darknet_model(type = 'classify', 
+                                 model = "DL_library/darknet19_448.cfg",
+                                 weights = darknet19_448_weights, 
+                                 labels = labels)
+
 
 models_summary <- tibble(model = pretrained_models,
                          probability = 0,
                          label = "x")
 
 for(i in 1:length(pretrained_models)){
-  x <- image_darknet_classify(file = "fig/airplane.jpeg",
+  x <- image_darknet_classify(file = "fig/trilobite.jpg",
                               object = get(pretrained_models[i]))
   models_summary$probability[i] <- x$type$probability[1]
   models_summary$label[i] <- x$type$label[1]
@@ -171,6 +303,26 @@ for(i in 1:length(pretrained_models)){
 
 models_summary %>% 
   arrange(desc(probability))
-
 ```
+
+## 다양한 이미지 {#make-function-pretrained-model}
+
+`classify_image()` 사용자 정의 함수를 만들어서 이미지를 다양한 Pre-trained Image Classification 모형에 넣어 평가한다.
+
+```{r image-classification-function}
+classify_image <- function(image) {
+    for(i in 1:length(pretrained_models)){
+      x <- image_darknet_classify(file = image,
+                                  object = get(pretrained_models[i]))
+      models_summary$probability[i] <- x$type$probability[1]
+      models_summary$label[i] <- x$type$label[1]
+    }
+  
+    models_summary %>% 
+      arrange(desc(probability))
+}
+
+classify_image("fig/trilobite.jpg")
+```
+
 
