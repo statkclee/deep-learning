@@ -32,9 +32,19 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 knitr::opts_knit$set(global.par = TRUE) 
 ```
 
-# 객체 분류 {#object-classification}
+# 이미지 분류 [^image-classification] {#object-classification}
 
-[ImageNet Classification](https://pjreddie.com/darknet/imagenet/) 분류기는 [Large Scale Visual Recognition Challenge 2015 (ILSVRC2015)](http://image-net.org/challenges/LSVRC/2015/index)에 등재된 1,000개 객체(Image Object)를 정확히 분류하는 것을 목표로 한다. 정확도를 높이고자 그동안 많은 노력이 경주되어 왔다.
+[^image-classification]: [Arthur Ouaknine (Jan 16, 2018 ), "Review of Deep Learning Algorithms for Image Classification"](https://medium.com/zylapp/review-of-deep-learning-algorithms-for-image-classification-5fdbca4a05e2)
+
+[ImageNet Classification](https://pjreddie.com/darknet/imagenet/) 분류기는 [Large Scale Visual Recognition Challenge 2015 (ILSVRC2015)](http://image-net.org/challenges/LSVRC/2015/index)에 등재된 1,000개 객체(Image Object)를 정확히 분류하는 것을 목표로 한다. 정확도를 높이고자 그동안 많은 노력이 경주되어 왔다. Yann Lecun의 LeNet-5 (1998)에 영감을 받아 SIFT 모형이 달성한 ImageNet 26.2%를 뛰어넘는 2013년 AlexNet을 시작으로 연도별로 매년 혁신적인 딥러닝 알고리즘이 발표되었다.
+
+```{r distributed-deep-learning, eval = FALSE}
+webshot::webshot(url = "https://therinspark.com/extensions.html", selector = '#deep-learning > div:nth-child(20) > img', "fig/distributed-deep-learning.png")
+```
+
+![](fig/distributed-deep-learning.png)
+
+[ImageNet Classification](https://pjreddie.com/darknet/imagenet/) 웹사이트에서 이미지넷 다양한 알고리즘을 다운로드 받을 수 있다.
 
 - AlexNet: <http://pjreddie.com/media/files/alexnet.weights>
 - Darknet Reference Model: <http://pjreddie.com/media/files/darknet.weights>
@@ -42,6 +52,21 @@ knitr::opts_knit$set(global.par = TRUE)
 - Googlenet/extraction: <http://pjreddie.com/media/files/extraction.weights>
 - Darknet19: <http://pjreddie.com/media/files/extraction.weights>
 - Darknet19 448x448: <http://pjreddie.com/media/files/darknet19_448.weights>
+
+
+이미지 분류를 위한 아키텍처 다이어그램은 [NN SVG](http://alexlenail.me/NN-SVG/LeNet.html), [PlotNeuralNet](https://github.com/HarisIqbal88/PlotNeuralNet)을 통해서 딥러닝 신경망 모형 아키텍처를 시각화할 수 있다.
+
+```{r slickR-deep-learning-algorithm, eval = FALSE}
+library(slickR)
+
+"fig/deep_learning/LeNet-5.png"
+"fig/deep_learning/AlexNet.png"
+"fig/deep_learning/Inception.png"
+"fig/deep_learning/GoogLeNet.png"
+```
+
+
+AlexNet을 시작으로 증흥기를 이룬 딥러닝 신경망 모형 아키텍처의 성능은 다음과 같다.
 
 
 ```{r imagenet-performance}
