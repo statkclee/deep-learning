@@ -18,3 +18,5 @@ r-keras-cats-and-dogs_cache/
 logs/
 data/gzip/
 data/matlab/
+.Rhistory
+
