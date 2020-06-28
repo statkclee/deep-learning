@@ -34,6 +34,9 @@ title: xwMOOC 딥러닝과 $H_2 O$
 [^andrew-ng-spark-2016]: [AI-The New Electricity](https://www.youtube.com/watch?v=4eJhcxfYR4I)
 
 1. [딥러닝이 주목받는 이유](why-dl.html)
+    - [R 개발자가 알아야 되는 보안](r-security.html)
+    - **음성**: [오디오 데이터](speech-data-manip.html)
+    - [R 딥러닝 환경설정: `openmp` 맥](dl-mac-openmp.html)
 1. **텐서플로우(tensorflow)**
     - [텐서플로우(tensorflow) 설치](r-tensorflow.html)
     - [텐서플로우(tensorflow) 자료구조](tensorflow-data-structure.html)
@@ -44,18 +47,22 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - **전이학습(transfer learning)**
         - [비행기 vs 자동차 - 강아지 vs 고양이](r-keras-cats-and-dogs.html)
         - [비행기 vs 자동차 vs 배 - CNN](r-keras-cnn.html)
-    - **케라스(keras)**
+    - 케라스(keras)
         - [R 케라스(keras) - 보스톤 주택가격(Boston Housing)](r-keras-boston-housing.html)
         - [R 케라스(keras) - 붓꽃 데이터(iris)](r-keras-iris.html)
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
         - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html)
         - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html)
+    - [사람 얼굴 인식](r-face-recognition.html)
+    - [이미지 객체 분류 시스템 (Object Classification)](r-object-classification.html)
 1. [캡챠(captcha) 깨기](r-keras-captcha.html)    
     - [R 케라스(keras) - 필기숫자 인식 데이터(MNIST)](r-keras-mnist.html)
     - [필기숫자 인식 데이터(MNIST): 파이썬 스크립트](r-mnist-python.html)
     - [확장된 필기숫자 인식 데이터(EMNIST): 확장 손글씨](r-emnist-dataset.html)
-1. [R 개발자가 알아야 되는 보안](r-security.html)
-    - **음성**: [오디오 데이터](speech-data-manip.html)
+    - [이미지 주석/라벨(annotation) 달기](r-image-annotation.html)
+    - [캡챠 샤이니 뷰어(Captcha Shiny Viewer)](r-captcha-shiny-viewer.html)
+    - [캡챠 회전목마(carousel, merry-go-round): `slickR`](r-captcha-carousel.html)
+    - [YOLO: 캡챠 깨기](r-captcha-yolo.html)
 1. 클라우드 API 활용 딥러닝 앱개발
     - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
         - [텍스트와 이미지 API](ms-text-image.html)

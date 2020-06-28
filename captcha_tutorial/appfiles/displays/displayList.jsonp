@@ -1,0 +1,12 @@
+__loadDisplayList__2d4e44b8([
+  {
+    "group": "common",
+    "name": "captcha_tutorial",
+    "desc": "",
+    "n": 100,
+    "height": 500,
+    "width": 500,
+    "updated": "2020-06-22 16:40:34",
+    "keySig": "9c2ec68484eb843d984adbb41aee37d2"
+  }
+])
