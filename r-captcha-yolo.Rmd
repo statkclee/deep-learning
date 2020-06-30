@@ -1,6 +1,6 @@
 ---
 title: "딥러닝"
-subtitle: "`YOLO`: 캡챠 깨기"
+subtitle: "`YOLO`: 객체 탐지"
 author:
   - name: "[Tidyverse Korea](https://www.facebook.com/groups/tidyverse/)"
     url: https://www.facebook.com/groups/tidyverse/
@@ -32,47 +32,205 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 knitr::opts_knit$set(global.par = TRUE) 
 ```
 
-# `YOLO`
+# `YOLO` [^object-detection] [^r-yolo] [^r-yolo-three-lines] [^r-surf-advanced] {#yolo-object-detection}
 
+[^object-detection]: [JY Kang's Blog, "Darkflow를 활용하여 YOLO 모델로 이미지 디텍션 구현(윈도우 환경)"](https://junyoung-jamong.github.io/)
+
+[^r-yolo]: [Duncan Golicher (31/01/2020), "Object detection", RPubs](https://rpubs.com/dgolicher/yolo)
+
+[^r-yolo-three-lines]: [AbdulMajedRaja RS (Aug 22, 2018), "Object detection in just 3 lines of R code using Tiny YOLO"](https://rpubs.com/dgolicher/yolo)
+
+[^r-surf-advanced]: [@masaki_kubota (2017-08-24), "Rでコンピュータービジョン](https://qiita.com/masaki_kubota/items/e91402649e75d255d12f)
+
+객체 분류(object classification)을 위해서 먼저 해야 될 작업이 아마도 객체를 탐지하는 것이 아닐까 싶다.
+MNIST와 같은 데이터는 이미 손글씨를 탐지해서 인식 및 분류를 위한 사전준비가 완료된 상황이고, 대부분의 객체분류문제는 먼저 객체를 탐지하는 것부터 시작된다.
+
+신경망 분류모형은 기본적으로 지도학습(Supervised Learning)이라 라벨 작업이 먼저 사람에 의해 이뤄져야 한다. 이미지 라벨작업을 수월히 하는데 [`LabelImg`](https://github.com/tzutalin/labelImg) 등 도구가 있어 `YOLO` 모형 개발에 필요한 라벨 생성작업에 도움을 줄 듯 싶다.
+
+- [`LabelImg`](https://github.com/tzutalin/labelImg)
+
+## 탐지 대상 이미지 {#yolo-object-detection-image}
+
+이미지에서 객체가 위치한 곳을 제대로 탐지하는지 먼저 살펴보자.
+이를 위해서 대상 이미지를 `magick` 팩키지로 살펴보자.
+
+```{r airplane-image}
+library(tidyverse)
+library(magick)
+
+airplane <- image_read("fig/airplane.jpeg")
+
+airplane %>% 
+  image_resize(200)
+```
+
+## `YOLO` 팩키지 설치 {#yolo-object-detection-install}
+
+`image.darkent` 팩키지를 설치하여 이미지에서 `YOLO` 알고리즘으로 이미지 탐지를 위한 팩키지를 설치한다.
 
 ```{r yolo-install, eval = FALSE}
 devtools::install_github("bnosac/image",
                          subdir = "image.darknet",
                          build_vignettes = TRUE)
-
 ```
 
-```{r yolo-library, eval = FALSE}
+## `YOLO` 실행 {#yolo-object-detection-detect}
+
+[`YOLO` Real-Time Object Detection](https://pjreddie.com/darknet/yolo/)이 현재 가장 성능이 좋다고 하며, 파스칼 타이탄 X (Pascal Titan X) GPU 칩을 기준으로 초당 30 프레임(30 FPS) 속도로 [`COCO` 데이터셋](https://cocodataset.org/#home) 기준 mAP(mean Average Precision) 57.9%을 기록하고 있다.
+
+```{r yolo-library, eval = TRUE}
 library(image.darknet)
-
-
-# Define the detection model (YOLO)  ------------------------------------------
-## https://pjreddie.com/darknet/yolo/
-## (structure of the deep learning model + the learned weights + the labels)
-
-labels_VOC <- readLines(
-  system.file(package="image.darknet", "include", "darknet", "data", 
-              "voc.names")
-)
 
 labels_COCO <- readLines(
   system.file(package="image.darknet", "include", "darknet", "data", 
               "coco.names")
 )
 
-cfg <- "model_detection/yolov2-tiny-voc.cfg"
-weights <- "model_detection/yolov2.weights"
+yolo_cfg <- "DL_library//yolov2.cfg"
+yolo_weights <- "DL_library/yolov2.weights"
 
 yolo_COCO <- image_darknet_model(type = 'detect', 
-                                 model = cfg, 
-                                 weights = weights, 
+                                 model = yolo_cfg, 
+                                 weights = yolo_weights, 
                                  labels = labels_COCO)
 
-yolo_COCO$labels
+# yolo_COCO$labels
 
+image_darknet_detect(file = "fig/airplane.jpeg", 
+                     object = yolo_COCO,
+                     threshold = 0.5)
+```
 
-image_darknet_detect(file = f, 
-                     object = yolo_COCO)
+## 데이터프레임 변환 {#yolo-object-detection-dataframe}
 
+`predictions.png` 파일로 출력결과만 떨어질 뿐, 후속 작업을 위한 텍스트를 잡아낼 수 없기 때문에 `yolo` 알고리즘 실행 중 콘솔에 떨어지는 출력결과를 방향을 바꿔(redirect)시켜 파일에 텍스트로 떨어뜨린다.
+
+```{r extract-object-name}
+## lapply 적용을 위한 함수: 매개변수 다수 전달
+detect_object <- function(filename){
+
+  pred <- image_darknet_detect(file = filename, 
+                               object = yolo_COCO,
+                               threshold = 0.19)
+  }
+
+# detect_object("fig/airplane.jpeg")
+
+## 결과값을 가로채는 함수
+
+library(Rcpp)
+cppFunction('void redir() {FILE* F = freopen("capture.txt", "w+", stdout);}')
+redir()
+
+yolo_df <- lapply("fig/airplane.jpeg", detect_object)
+
+yolo_df <- tibble(text = read_lines("capture.txt"))
+
+system("rm capture.txt")
+
+yolo_df
+```
+
+# 다수 이미지 {#yolo-object-detection-multiple-image}
+
+먼저 다수 이미지를 가져온다. 이를 `yolo` 알고리즘을 태우고 텍스트 파일에 저장한다.
+
+```{r multiple-images, eval = FALSE}
+## 대상 이미지 지정
+filenames <- list.files(path = "fig/yolo/")
+path_filenames <- glue::glue("fig/yolo/{filenames}")
+
+## 다수 이미지 위치 정보를 텍스트로 저장
+redir()
+image_df <- lapply(path_filenames, detect_object)
+image_df <- tibble(text = read_lines("capture.txt"))
+
+system("rm capture.txt")
+
+# image_df %>% write_rds("data/image_df.rds")
+```
+
+텍스트로 추출한 데이터를 후속 처리가 가능한 데이터프레임으로 변환시킨다.
+
+```{r multiple-images-post-processing}
+image_dat <- read_rds("data/image_df.rds")
+
+image_df <- image_dat %>% 
+  filter(!str_detect(text, "^Boxes")) %>% 
+  mutate(file = str_extract(text, ".*\\.jpe?g")) %>% 
+  tidyr::fill(file, .direction = "down") %>% 
+  mutate(file = str_remove(file, "fig/yolo/"))
+
+image_df <- image_df %>% 
+  mutate(processing = str_extract(text, "\\d\\.\\d+ seconds")) %>% 
+  tidyr::fill(processing) %>% 
+  separate(text, into = c("object", "confidence"), sep=":") %>% 
+  filter(!str_detect(object, "fig/yolo/")) %>% 
+  mutate(confidence = str_trim(confidence)) %>% 
+  select(file, processing, object, confidence)
+
+image_df
+```
+
+## 다수 이미지 시각화 {#yolo-object-detection-multiple-images}
+
+다수 이미지를 `YOLO` 알고리즘으로 추출하여 작업한 결과를 이미지와 텍스트로 저장시켜 두고 이를 제대로 작업했는지 시각적으로 확인하는 과정을 거친다.
+
+```{r raw-image-yolo, eval = FALSE}
+## lapply 적용을 위한 함수: 매개변수 다수 전달
+detect_object <- function(filename){
+  
+  pred <- image_darknet_detect(file = filename, 
+                               object = yolo_COCO,
+                               threshold = 0.19)
+  
+  file_extension <- basename(filename)
+  only_filename <- tools::file_path_sans_ext(file_extension)
+  
+  mv_instruction <- glue::glue("mv predictions.png fig/yolo/{only_filename}_yolo.png")
+  # system("mv predictions.png fig/yolo/predictions.png")
+  system(mv_instruction)
+  }
+
+# detect_object("fig/airplane.jpeg")
+
+## 결과값을 가로채는 함수
+library(Rcpp)
+cppFunction('void redir() {FILE* F = freopen("capture.txt", "w+", stdout);}')
+redir()
+
+## 배치처리
+redir()
+image_df <- lapply(path_filenames, detect_object)
+image_df <- tibble(text = read_lines("capture.txt"))
+
+system("rm capture.txt")
+```
+
+이제 작업된 결과를 다음과 같은 방식으로 후속작업을 할 수 있다.
+
+1. 쌓은 이미지: `magick` 팩키지 `stack` 기능
+2. GIF 이미지: `magick` 팩키지 `GIF` 기능
+3. 회전목마 이미지(carousel): `slickR`
+4. R마크다운 `.tabset` 기능
+5. `trelliscopeJS` 기능
+
+`magic` 팩키지를 통해 다양한 작업을 배치처리 하고자 할 경우 먼저 이미지를 리스트로 만들고 이를 `image_join()` 함수를 사용해서 결합을 시키고 나서, GIF 로 만들어 최종 결과물을 만들어 낸다.
+
+```{r magick-stack}
+## 이미지 파일 목록
+yolo_path_filenames <- glue::glue("fig/yolo/{list.files('fig/yolo')}")
+
+## 이미지 파일 객체
+yolo_images <- map(yolo_path_filenames, magick::image_read)
+yolo_images <- map(yolo_images, magick::image_resize, geometry = 500 )
+
+## 이미지 파일 결합: list --> 데이터프레임
+yolo_images_data <- yolo_images %>% 
+  image_join()
+
+## GIF 생성: 데이터프레임 --> GIF
+yolo_images_data %>% 
+  image_animate(fps = 1)
 ```
 
