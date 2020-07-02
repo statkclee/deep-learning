@@ -63,6 +63,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [캡챠 샤이니 뷰어(Captcha Shiny Viewer)](r-captcha-shiny-viewer.html)
     - [캡챠 회전목마(carousel, merry-go-round): `slickR`](r-captcha-carousel.html)
     - [YOLO: 객체 탐지](r-captcha-yolo.html)
+    - [딥러닝 모형 개발 자동화](r-captcha-automation.html)    
 1. 클라우드 API 활용 딥러닝 앱개발
     - **[마이크로소프트 애저(Azure)](microsoft-azure.html)**
         - [텍스트와 이미지 API](ms-text-image.html)
