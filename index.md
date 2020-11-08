@@ -91,6 +91,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - [Structuring Machine Learning Projects](ng-product.html)
     - Convolutional Neural Networks
     - Sequence Models
+1. [`text-to-speech` - 문자 음성 변환 프로그램](r-tts.html)
 
 
 
