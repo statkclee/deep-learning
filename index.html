@@ -15,8 +15,8 @@
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
-    
+
+
     <!--
     <div id="google_translate_element"></div><script type="text/javascript">
     function googleTranslateElementInit() {
@@ -24,6 +24,7 @@
     }
     </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     -->
+            
   </head>
   <body class="lesson">
     <div class="container card">
@@ -36,7 +37,7 @@
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
                     <h1 class="title">xwMOOC 딥러닝과 <span class="math inline">\(H_2 O\)</span></h1>
-          <p>왜 지금 딥러닝이 각광받고 있는 이유가 뭘까? <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> 이 질문에 <a href="http://www.andrewng.org/">앤드류 응</a> 박사는 마치 로켓이 강력한 엔진과 더불어 어마어마한 연료를 갖추었기 때문이라고 설명한다. 강력한 엔진이 어떤 데이터도 학습할 수 있는 유연하고 파괴력있는 표현력이 강한 신경망이고, 어마어마한 연료가 빅데이터로 회자되는 풍부한 데이터다. 이를 계산할 수 있는 병렬컴퓨팅 기술이 합쳐져 인공지능 AI 혁명을 모두 지켜보고 있다.</p>
+          <p>왜 지금 딥러닝이 각광받고 있는 이유가 뭘까? <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 이 질문에 <a href="http://www.andrewng.org/">앤드류 응</a> 박사는 마치 로켓이 강력한 엔진과 더불어 어마어마한 연료를 갖추었기 때문이라고 설명한다. 강력한 엔진이 어떤 데이터도 학습할 수 있는 유연하고 파괴력있는 표현력이 강한 신경망이고, 어마어마한 연료가 빅데이터로 회자되는 풍부한 데이터다. 이를 계산할 수 있는 병렬컴퓨팅 기술이 합쳐져 인공지능 AI 혁명을 모두 지켜보고 있다.</p>
 <p><img src="fig/ear-of-dl.png" width="37%" /></p>
 <p>딥러닝을 뒷받침하고 있는 세가지 중요한 기술요소에는 <strong>빅데이터</strong>, <strong>깊은 신경망 모형</strong>, <strong>병렬 컴퓨팅</strong> 이 내포되어 있으며 이것중 하나도 빠지게 되면 오늘과 같은 변화와 혁신을 기대하기는 쉽지 않았을 것이다.</p>
 <p><img src="fig/three-pillars.png" width="57%" /></p>
@@ -44,15 +45,15 @@
 <p>전통 학습 모형은 작은 데이터에서 학습효과가 좋지만, 데이터가 많아져도 이를 반영한 성능은 나오지 않는다. 신경망 모형은 데이터 증가에 맞추어 표현력을 따라서 높이면 성능도 높일 수 있다. 하지만, 그에 따른 어마어마한 컴퓨팅 자원이 소요된다. 최근 클라우드와 더불어 고성능 컴퓨팅 HPC에 GPU를 도입해서 정말 상상도 못한 컴퓨팅 자원을 감당할만한 비용으로 이용가능한 세상이 되었다.</p>
 <p><img src="fig/dl-hpc-evolution.png" width="57%" /></p>
 <aside class="callout panel panel-info">
-<div class="panel-heading">
-<h3 id="ai-is-a-superpower"><span class="glyphicon glyphicon-pushpin"></span>AI is a Superpower</h3>
-</div>
+<section id="ai-is-a-superpower" class="panel-heading">
+<h3><span class="glyphicon glyphicon-pushpin"></span>AI is a Superpower</h3>
+</section>
 <div class="panel-body">
 <p>“AI is a superpower!!!”, 인공지능을 체득하면 슈퍼파워를 손에 쥘 것이다. <a href="https://twitter.com/andrewyng/status/728986380638916609">Andrew Ng</a></p>
 <p>금수저, 은수저 슈퍼파워를 받은 사람과 기계학습을 통달한 흑수저들간의 무한경쟁이 드뎌 시작되었다. 물론, 금수저를 입에 물고 기계학습을 통달한 사람이 가장 유리한 출발을 시작한 것도 사실이다.</p>
 </div>
 </aside>
-<h2 id="학습목차-jeff-dean-spark-2016-andrew-ng-spark-2016">학습목차 <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a></h2>
+<h2 id="학습목차-jeff-dean-spark-2016-andrew-ng-spark-2016">학습목차 <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></h2>
 <ol type="1">
 <li><a href="why-dl.html">딥러닝이 주목받는 이유</a>
 <ul>
@@ -140,13 +141,14 @@
 <li>Convolutional Neural Networks</li>
 <li>Sequence Models</li>
 </ul></li>
+<li><a href="r-tts.html"><code>text-to-speech</code> - 문자 음성 변환 프로그램</a></li>
 </ol>
-<section class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://www.youtube.com/watch?v=4eJhcxfYR4I">AI-The New Electricity</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p><a href="https://www.youtube.com/watch?v=XYwIDn00PAo">Large Scale Deep Learning with TensorFlow</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
-<li id="fn3"><p><a href="https://www.youtube.com/watch?v=4eJhcxfYR4I">AI-The New Electricity</a><a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="https://www.youtube.com/watch?v=4eJhcxfYR4I">AI-The New Electricity</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><a href="https://www.youtube.com/watch?v=XYwIDn00PAo">Large Scale Deep Learning with TensorFlow</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p><a href="https://www.youtube.com/watch?v=4eJhcxfYR4I">AI-The New Electricity</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
         </div>
@@ -168,10 +170,10 @@
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
+
       ga('create', 'UA-37305346-2', 'auto');
       ga('send', 'pageview');
-    
+
     </script>
   </body>
 </html>
