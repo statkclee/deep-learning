@@ -1,6 +1,6 @@
 ---
 title: "딥러닝"
-subtitle: "발표자료 동영상 제작"
+subtitle: "파워포인트 발표자료 유튜브 동영상 자동 제작"
 author:
   - name: "[Tidyverse Korea](https://www.facebook.com/groups/tidyverse/)"
     url: https://www.facebook.com/groups/tidyverse/
@@ -35,21 +35,101 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 knitr::opts_knit$set(global.par = TRUE) 
 ```
 
-# `ari` {#r-ari}
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6qpWDi30L7k" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-`webshot::install_phantomjs()` 을 `ari` 팩키지와 함께 설치해야 된다.
+# 파워포인트 원본파일 {#original-pptx}
 
-```{r youtube-video-making, eval = FALSE}
+파워포인트 동영상 제작에 사용된 원본 파일은 [다운로드](data/Xaringan_OCR.pptx) 받아 직접 실습에 사용할 수 있다.
+
+# `ari` 환경설정 {#r-ari}
+
+`webshot::install_phantomjs()` 을 `ari` 팩키지와 함께 설치해야 된다. 또한, `docxtractr` 팩키지는 [LibreOffice](https://www.libreoffice.org/)가 필요하다.
+`set_libreoffice_path()` 함수를 사용해서 `soffice.exe` 위치를 설정한다.
+
+```{r youtube-video-making, eval = TRUE}
 library(tidyverse)
 library(ari)
 
 readRenviron("~/.Renviron")
-
-ari_narrate(
-  ari_example("ari_intro_script.md"),
-  ari_example("ari_intro.html"),
-  voice = "Joey")
-
 ```
+
+특히 `usethis::edit_r_environ()` 명령어를 사용하여 `~/.Renviron` 파일에 AWS Polly 텍스트 음성 변환 API를 사용하도록 기본 설정을 한다.
+
+```{r aws-polly-key-setting, eval = FALSE}
+# AWS KEY
+AWS_ACCESS_KEY_ID="XXXXXXXXXXXXXXXXXXXXXXXXx"
+AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxx"
+AWS_DEFAULT_REGION="ap-northeast-2"
+```
+
+
+
+# PPT &rarr; 발표동영상 [^ari-ppt] {#ppt2ari}
+
+[^ari-ppt]: [Sean Kross, Jeffrey T. Leek, John Muschelli"Ari: The Automated R Instructor"](https://johnmuschelli.com/ari_paper/)
+
+`docxtractr` 팩키지를 사용해서 `convert_to_pdf()` 함수로 PDF 파일로 변환시킨다. 
+그리고 나서 각 슬라이드를 이미지로 활용할 수 있고 슬라이드 노트도 추출할 수 있다.
+
+먼저 `pptx_notes()` 함수로 슬라이드에 달린 텍스트 노트만 추출한다. 
+
+```{r ppt2avi-notes}
+ocr_pdf <- docxtractr::convert_to_pdf("data/Xaringan_OCR.pptx") # >= 0.6.2 
+notes <- ariExtra::pptx_notes("data/Xaringan_OCR.pptx")
+notes[1]
+```
+
+각 슬라이드를 PNG 파일로 변환시킨 후에 이를 `magick` 팩키지로 살펴본다.
+
+```{r extract-png-from-pptx, eval = TRUE}
+library(magick)
+
+pngs <-  pdftools::pdf_convert(ocr_pdf, dpi = 300)
+
+fs::dir_create("data/OCR")
+system("mv Xaring*.png data/OCR")
+
+fs::dir_ls("data/OCR")
+```
+
+앞서 변환시킨 결과를 슬라이드 이미지로 살펴본다.
+
+```{r OCR-magick-view}
+library(slickR)
+
+OCR_pdf_df <- tibble(page = glue::glue("data/OCR/{pngs}") )
+  
+slickR(OCR_pdf_df$page, height = 600)
+```
+
+
+# PPT &rarr; `ari`  {#ppt2ari-conversion}
+
+동영상 제작을 위해 파워포인트 파일을 변환하여 유튜브에 올려 공유해야되는데 이를 위해 
+[Making videos with ari: ari_stitch](https://cran.r-project.org/web/packages/ariExtra/vignettes/making_videos.html)을 참조하여 PPT 파일을 `ari` 형태로 변환시킨다. 
+
+```{r ppt2ari}
+library(ariExtra)
+# PPT 파일을 변환시킴
+OCR_doc <- ariExtra::pptx_to_ari("data/Xaringan_OCR.pptx")
+
+OCR_doc
+
+# fs::file_move("/private/var/folders/cg/0x9z12457xv1910wjyj19b1w0000gp/T/RtmpbtGF4M/", "data/ocr_ppt2md/")
+```
+
+# `ari` &rarr; `.mp4`  {#ppt2ari-conversion-mp4}
+
+마지막 단계로 앞서 변환시킨 `pptx_to_ari()` 산출물을 `ari_spin()` 함수로 `.mp4` 동영상을 한국어 유일한 목소리인 `Seoyeon`으로 제작한다.
+
+```{r ppt2ari2mp4}
+library(ari)
+pptx_result <- ari_spin(OCR_doc$images, OCR_doc$script, output = "data/OCR_pptx.mp4", voice = "Seoyeon",
+    divisible_height = TRUE, subtitles = TRUE)
+isTRUE(pptx_result)
+```
+
+작업결과 `.mp4`와 `.srt` 파일이 동시에 생성되는데 이를 유튜브에 올려 자막도 함께 재활용시키도록 등록한다.
+변환작업 결과는 [파워포인트 파일을 발표 동영상 자동생성 Powered by AWS.POLLY](https://www.youtube.com/watch?v=6qpWDi30L7k)에서 확인이 가능하다.
 
 
