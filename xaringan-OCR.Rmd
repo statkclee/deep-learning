@@ -48,7 +48,7 @@ opts_chunk$set(
 문서를 데이터로 이해하는 방식은 다소 생소할 수 있으나 데이터 과학의 기본이며 OCR 기술을 활용하여 
 데이터화하는 개념을 아주 높은 수준에서 일별하고자 합니다.
 
-
+---
 class: middle
 
 background-image: url(fig/설악산.jpeg)
@@ -97,6 +97,7 @@ class: middle
 
 .footnote[
 Kathy Haramundanis and Larry Rowland (Hewlett-Packard Company), "Experience paper: a content reuse documentation design experience", SIGDOC '07 Proceedings of the 25th annual ACM international conference on Design of communication Pages 229-233, El Paso, Texas, USA — October 22 - 24, 2007
+]
 ]
 
 ???

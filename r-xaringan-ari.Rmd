@@ -48,9 +48,12 @@ knitr::opts_knit$set(global.par = TRUE)
 [^RaukR-xaringan-demo]: [Roy Francis, "RaukR presentation demo", RaukR 2019 • Advanced R for Bioinformatics](https://github.com/NBISweden/raukrtemplate)
 
 
+`???` 뒤에 작성되는 발표자 노트는 `P` 키를 눌렀을 때 나타나게 된다. 이제 PPT 슬라이드를 `xaringan`에 맞춰 하나하나 차근히 변환시켜보자.
+
+```{r embed-xaringan-ocr}
+knitr::include_url('xaringan-OCR.html')
+```
 
 
-`???` 뒤에 작성되는 발표자 노트는 `P` 키를 눌렀을 때 나타나게 된다.
-
-
+# 
 
