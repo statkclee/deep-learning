@@ -14,7 +14,17 @@
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    -->
+            
   </head>
   <body class="lesson">
     <div class="container card">
@@ -29,9 +39,9 @@
                     <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
           <h2 class="subtitle">구글 클라우드 비젼</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>구글 클라우드 비젼 API를 이해한다.</li>
@@ -43,7 +53,7 @@
 <p><img src="fig/gcv-process.png" alt="구글 클라우드 비젼 API" width="60%"></p>
 <h3 id="구글-클라우드-비젼-api-인증-준비">1. 구글 클라우드 비젼 API 인증 준비</h3>
 <p>실시간 영상처리는 차치하고 정적 이미지를 인식하고 처리하는데 <a href="https://cloud.google.com/vision/">구글 클라우드 비젼 API</a>를 통해 일단 감을 잡는 것이 진지한 영상처리를 검토하기 전에 필요합니다.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>대부분 구글 클라우드 계정은 생성(없는 경우 하나 생성)되었으니 생략하고, <strong>Google Cloud Platform</strong> <code>Project Page</code>로 가서 새로운 이름을 갖는 프로젝트 페이지를 생성한다.
 <ul>
 <li>현재 시점 국내 클라우드 제공업체는 <a href="https://aws.amazon.com/ko/">아마존 AWS</a>, <a href="https://aws.amazon.com/ko/">마이크로소프트 Azure</a>, <a href="http://www.softlayer.com/ko">IBM Softlayer</a> 등 많은 업체가 다양한 서비스를 뿜어내고 있고, 구글의 <a href="https://cloud.google.com/">구글 Google Cloud Platform</a>도 동일한 클라우드 시장에서 각축을 벌이고 있다.</li>
@@ -77,7 +87,7 @@
 </ol>
 <h3 id="파이썬-응용프로그램-클라이언트-준비">2. 파이썬 응용프로그램 클라이언트 준비</h3>
 <p><code>.json</code> 인증서를 다운로드 받아 이미지 인식 및 처리를 할 컴퓨터에 환경설정을 사실 시작한 것이다. 이제 본격적으로 이를 시작해 나가보자.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>앞서 <strong>Google Cloud Platform</strong> <code>Project Page</code>로 가서 새로운 이름을 갖는 프로젝트 페이지를 생성했다.</li>
 <li>또한, 구글 비젼 API 사용자를 인증해주는 크리덴셜(Credentail) 인증서를 발급받았다.</li>
 <li>구글 비젼 API를 사용할 언어를 정하고 설치한다.
@@ -99,63 +109,63 @@
 <li>만약 오류가 나면, <code>sudo apt-get install python-dev</code> 명령어를 실행하고 Pillow를 설치한다.</li>
 </ul></li>
 </ol>
-<h3 id="헬로우-월드-파이썬-프로그램-실행-gcv-label">3. 헬로우 월드 파이썬 프로그램 실행 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<h3 id="헬로우-월드-파이썬-프로그램-실행-gcv-label">3. 헬로우 월드 파이썬 프로그램 실행 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h3>
 <h4 id="헬로우-월드-표식-생성-예제-실행">3.1. 헬로우 월드 표식 생성 예제 실행</h4>
 <p><code>argparse</code> 라이브러리로 이미지를 입력받아, 구글 비젼 API 인증서를 통해 파이썬 응용프로그램을 인증받아 불러온 이미지 정보를 <code>base64</code>으로 인코딩해 구글 비젼 API를 통해 전달한 후에 결과 값을 받아 이미지에 어떤 것이 들어있는지 출력하는 프로그램이다.</p>
 <p><img src="fig/gcv-label.png" alt="구글 비젼 API 표식" width="70%"></p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;</span>
-<span class="co">This script uses the Vision API&#39;s label detection capabilities to find a label</span>
-<span class="co">based on an image&#39;s content.</span>
-
-<span class="co">To run the example, install the necessary libraries by running:</span>
-
-<span class="co">    pip install -r requirements.txt</span>
-
-<span class="co">Run the script on an image to get a label, E.g.:</span>
-
-<span class="co">    ./label.py &lt;path-to-image&gt;</span>
-<span class="co">&quot;&quot;&quot;</span>
-
-<span class="im">import</span> argparse
-<span class="im">import</span> base64
-<span class="im">import</span> httplib2
-
-<span class="im">from</span> googleapiclient <span class="im">import</span> discovery
-<span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials
-
-DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span>
-
-
-<span class="kw">def</span> main(photo_file):
-    <span class="co">&quot;&quot;&quot;Run a label request on a single image&quot;&quot;&quot;</span>
-
-    credentials <span class="op">=</span> GoogleCredentials.get_application_default()
-    service <span class="op">=</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,
-                              discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)
-
-    <span class="cf">with</span> <span class="bu">open</span>(photo_file, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> image:
-        image_content <span class="op">=</span> base64.b64encode(image.read())
-        service_request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{
-            <span class="st">&#39;requests&#39;</span>: [{
-                <span class="st">&#39;image&#39;</span>: {
-                    <span class="st">&#39;content&#39;</span>: image_content.decode(<span class="st">&#39;UTF-8&#39;</span>)
-                },
-                <span class="st">&#39;features&#39;</span>: [{
-                    <span class="st">&#39;type&#39;</span>: <span class="st">&#39;LABEL_DETECTION&#39;</span>,
-                    <span class="st">&#39;maxResults&#39;</span>: <span class="dv">1</span>
-                }]
-            }]
-        })
-        response <span class="op">=</span> service_request.execute()
-        label <span class="op">=</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;labelAnnotations&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;description&#39;</span>]
-        <span class="bu">print</span>(<span class="st">&#39;Found label: </span><span class="sc">%s</span><span class="st"> for </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> (label, photo_file))
-        <span class="cf">return</span> <span class="dv">0</span>
-
-<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
-    parser <span class="op">=</span> argparse.ArgumentParser()
-    parser.add_argument(<span class="st">&#39;image_file&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;The image you</span><span class="ch">\&#39;</span><span class="st">d like to label.&#39;</span>)
-    args <span class="op">=</span> parser.parse_args()
-    main(args.image_file)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">This script uses the Vision API&#39;s label detection capabilities to find a label</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">based on an image&#39;s content.</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="co">To run the example, install the necessary libraries by running:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="co">    pip install -r requirements.txt</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">Run the script on an image to get a label, E.g.:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">    ./label.py &lt;path-to-image&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="im">import</span> argparse</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a><span class="im">import</span> base64</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="im">import</span> httplib2</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="im">from</span> googleapiclient <span class="im">import</span> discovery</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="kw">def</span> main(photo_file):</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>    <span class="co">&quot;&quot;&quot;Run a label request on a single image&quot;&quot;&quot;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>    credentials <span class="op">=</span> GoogleCredentials.get_application_default()</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>    service <span class="op">=</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>                              discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>    <span class="cf">with</span> <span class="bu">open</span>(photo_file, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> image:</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>        image_content <span class="op">=</span> base64.b64encode(image.read())</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>        service_request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>            <span class="st">&#39;requests&#39;</span>: [{</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>                <span class="st">&#39;image&#39;</span>: {</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>                    <span class="st">&#39;content&#39;</span>: image_content.decode(<span class="st">&#39;UTF-8&#39;</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>                },</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>                <span class="st">&#39;features&#39;</span>: [{</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>                    <span class="st">&#39;type&#39;</span>: <span class="st">&#39;LABEL_DETECTION&#39;</span>,</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>                    <span class="st">&#39;maxResults&#39;</span>: <span class="dv">1</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>                }]</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>            }]</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>        })</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>        response <span class="op">=</span> service_request.execute()</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>        label <span class="op">=</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;labelAnnotations&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;description&#39;</span>]</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&#39;Found label: </span><span class="sc">%s</span><span class="st"> for </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> (label, photo_file))</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>        <span class="cf">return</span> <span class="dv">0</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a>    parser <span class="op">=</span> argparse.ArgumentParser()</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a>    parser.add_argument(<span class="st">&#39;image_file&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;The image you</span><span class="ch">\&#39;</span><span class="st">d like to label.&#39;</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a>    main(args.image_file)</span></code></pre></div>
 <p><code>python label.py ../images/wagon.jpg</code> 의 경우 <code>wagon.jpg</code> 파일을 인자로 넘기면 <code>label.py</code> 파이썬 프로그래밍 이를 구글 비젼 API를 통해 전달하고 결과를 출력한다.</p>
 <pre class="output"><code>$ python label.py ../images/wagon.jpg
 Found label: horse and buggy for ../images/wagon.jpg
@@ -169,93 +179,93 @@ Found label: fossil for ../images/trilobite.jpg</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left">wagon.jpg</th>
-<th align="left">pororo.jpg</th>
-<th align="left">trilobite.jpg</th>
+<th>wagon.jpg</th>
+<th>pororo.jpg</th>
+<th>trilobite.jpg</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/wagon.jpg" width="20%"></td>
-<td align="left"><img src="fig/pororo.jpg" width="50%"></td>
-<td align="left"><img src="fig/trilobite.jpg" width="300%"></td>
+<td><img src="fig/wagon.jpg" width="20%"></td>
+<td><img src="fig/pororo.jpg" width="50%"></td>
+<td><img src="fig/trilobite.jpg" width="300%"></td>
 </tr>
 <tr class="even">
-<td align="left">horse and buggy</td>
-<td align="left">cartoon</td>
-<td align="left">fossil</td>
+<td>horse and buggy</td>
+<td>cartoon</td>
+<td>fossil</td>
 </tr>
 </tbody>
 </table>
-<h4 id="헬로우-월드-명소-인식-예제-실행-gcv-landmark">3.2. 헬로우 월드 명소 인식 예제 실행 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h4>
+<h4 id="헬로우-월드-명소-인식-예제-실행-gcv-landmark">3.2. 헬로우 월드 명소 인식 예제 실행 <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></h4>
 <p>주요 명소(landmark)를 인식하는 예제를 실행해보자.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;Identifies the landmark for the given image.&quot;&quot;&quot;</span>
-
-<span class="im">import</span> argparse
-
-<span class="im">from</span> googleapiclient <span class="im">import</span> discovery
-<span class="im">import</span> httplib2
-<span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials
-
-
-DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span>
-
-
-<span class="kw">def</span> get_vision_service():
-    credentials <span class="op">=</span> GoogleCredentials.get_application_default()
-    <span class="cf">return</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,
-                           discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)
-
-
-<span class="kw">def</span> identify_landmark(gcs_uri, max_results<span class="op">=</span><span class="dv">4</span>):
-    <span class="co">&quot;&quot;&quot;Uses the Vision API to identify the landmark in the given image.</span>
-
-<span class="co">    Args:</span>
-<span class="co">        gcs_uri: A uri of the form: gs://bucket/object</span>
-
-<span class="co">    Returns:</span>
-<span class="co">        An array of dicts with information about the landmarks in the picture.</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    batch_request <span class="op">=</span> [{
-        <span class="st">&#39;image&#39;</span>: {
-            <span class="st">&#39;source&#39;</span>: {
-                <span class="st">&#39;gcs_image_uri&#39;</span>: gcs_uri
-            }
-        },
-        <span class="st">&#39;features&#39;</span>: [{
-            <span class="st">&#39;type&#39;</span>: <span class="st">&#39;LANDMARK_DETECTION&#39;</span>,
-            <span class="co">&#39;maxResults&#39;</span>: max_results,
-            }]
-        }]
-
-    service <span class="op">=</span> get_vision_service()
-    request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{
-        <span class="st">&#39;requests&#39;</span>: batch_request,
-        })
-    response <span class="op">=</span> request.execute()
-
-    <span class="cf">return</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>].get(<span class="st">&#39;landmarkAnnotations&#39;</span>, <span class="va">None</span>)
-
-
-<span class="kw">def</span> main(gcs_uri):
-    <span class="cf">if</span> gcs_uri[:<span class="dv">5</span>] <span class="op">!=</span> <span class="st">&#39;gs://&#39;</span>:
-        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;Image uri must be of the form gs://bucket/object&#39;</span>)
-    annotations <span class="op">=</span> identify_landmark(gcs_uri)
-    <span class="cf">if</span> <span class="op">not</span> annotations:
-        <span class="bu">print</span>(<span class="st">&#39;No landmark identified&#39;</span>)
-    <span class="cf">else</span>:
-        <span class="bu">print</span>(<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>.join(a[<span class="st">&#39;description&#39;</span>] <span class="cf">for</span> a <span class="op">in</span> annotations))
-
-
-<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
-    parser <span class="op">=</span> argparse.ArgumentParser(
-        description<span class="op">=</span><span class="st">&#39;Identifies the landmark in the given image.&#39;</span>)
-    parser.add_argument(
-        <span class="st">&#39;gcs_uri&#39;</span>, <span class="bu">help</span><span class="op">=</span>(<span class="st">&#39;The Google Cloud Storage uri to the image to identify&#39;</span>
-                         <span class="co">&#39;, of the form: gs://bucket_name/object_name.jpg&#39;</span>))
-    args <span class="op">=</span> parser.parse_args()
-
-    main(args.gcs_uri)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">&quot;&quot;&quot;Identifies the landmark for the given image.&quot;&quot;&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="im">import</span> argparse</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="im">from</span> googleapiclient <span class="im">import</span> discovery</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="im">import</span> httplib2</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="kw">def</span> get_vision_service():</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    credentials <span class="op">=</span> GoogleCredentials.get_application_default()</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>    <span class="cf">return</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>                           discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="kw">def</span> identify_landmark(gcs_uri, max_results<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>    <span class="co">&quot;&quot;&quot;Uses the Vision API to identify the landmark in the given image.</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co">    Args:</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co">        gcs_uri: A uri of the form: gs://bucket/object</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="co">    Returns:</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="co">        An array of dicts with information about the landmarks in the picture.</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>    batch_request <span class="op">=</span> [{</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>        <span class="st">&#39;image&#39;</span>: {</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>            <span class="st">&#39;source&#39;</span>: {</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a>                <span class="st">&#39;gcs_image_uri&#39;</span>: gcs_uri</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>            }</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>        },</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>        <span class="st">&#39;features&#39;</span>: [{</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>            <span class="st">&#39;type&#39;</span>: <span class="st">&#39;LANDMARK_DETECTION&#39;</span>,</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>            <span class="st">&#39;maxResults&#39;</span>: max_results,</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>            }]</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a>        }]</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a>    service <span class="op">=</span> get_vision_service()</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a>    request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>        <span class="st">&#39;requests&#39;</span>: batch_request,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a>        })</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a>    response <span class="op">=</span> request.execute()</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a>    <span class="cf">return</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>].get(<span class="st">&#39;landmarkAnnotations&#39;</span>, <span class="va">None</span>)</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true"></a><span class="kw">def</span> main(gcs_uri):</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true"></a>    <span class="cf">if</span> gcs_uri[:<span class="dv">5</span>] <span class="op">!=</span> <span class="st">&#39;gs://&#39;</span>:</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true"></a>        <span class="cf">raise</span> <span class="pp">Exception</span>(<span class="st">&#39;Image uri must be of the form gs://bucket/object&#39;</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true"></a>    annotations <span class="op">=</span> identify_landmark(gcs_uri)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true"></a>    <span class="cf">if</span> <span class="kw">not</span> annotations:</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&#39;No landmark identified&#39;</span>)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true"></a>    <span class="cf">else</span>:</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>.join(a[<span class="st">&#39;description&#39;</span>] <span class="cf">for</span> a <span class="kw">in</span> annotations))</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true"></a>    parser <span class="op">=</span> argparse.ArgumentParser(</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true"></a>        description<span class="op">=</span><span class="st">&#39;Identifies the landmark in the given image.&#39;</span>)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true"></a>    parser.add_argument(</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true"></a>        <span class="st">&#39;gcs_uri&#39;</span>, <span class="bu">help</span><span class="op">=</span>(<span class="st">&#39;The Google Cloud Storage uri to the image to identify&#39;</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true"></a>                         <span class="st">&#39;, of the form: gs://bucket_name/object_name.jpg&#39;</span>))</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true"></a></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true"></a>    main(args.gcs_uri)</span></code></pre></div>
 <p>주의할 점은 인식할 이미지를 구글 클라우드 버킷에 넣어야 된다는 점이다. <code>korea-khm.jpg</code> 이미지 파일은 구글 클라우드 버킷에 미리 <code>Upload</code> 했다.</p>
 <p><code>Google Cloud Platform</code> → <code>STORAGE</code> → <code>Storage</code> → 생성한 <code>trilobite</code> 버킷 클릭 → <strong>UPLOAD FILES</strong></p>
 <p>광화문 사진을 근처 경복궁으로 인식했다.</p>
@@ -263,113 +273,113 @@ DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span
 Gyeongbokgung
 Gyeongbokgung</code></pre>
 <p><img src="fig/korea-khm.jpg" width="30%"></p>
-<h4 id="헬로우-월드-얼굴-인식-예제-실행-gcv-face-detection">3.3. 헬로우 월드 얼굴 인식 예제 실행 <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h4>
+<h4 id="헬로우-월드-얼굴-인식-예제-실행-gcv-face-detection">3.3. 헬로우 월드 얼굴 인식 예제 실행 <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></h4>
 <p>사진에서 얼굴을 인식하고 나서 인식된 얼굴에 녹색 사각형을 얼굴위에 그리는 파이썬 프로그램이다.</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">&quot;&quot;&quot;Draws squares around faces in the given image.&quot;&quot;&quot;</span>
-
-<span class="im">import</span> argparse
-<span class="im">import</span> base64
-
-<span class="im">from</span> PIL <span class="im">import</span> Image
-<span class="im">from</span> PIL <span class="im">import</span> ImageDraw
-
-<span class="im">from</span> googleapiclient <span class="im">import</span> discovery
-<span class="im">import</span> httplib2
-<span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials
-
-
-<span class="co"># [START get_vision_service]</span>
-DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span>
-
-
-<span class="kw">def</span> get_vision_service():
-    credentials <span class="op">=</span> GoogleCredentials.get_application_default()
-    <span class="cf">return</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,
-                           discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)
-<span class="co"># [END get_vision_service]</span>
-
-
-<span class="co"># [START detect_face]</span>
-<span class="kw">def</span> detect_face(face_file, max_results<span class="op">=</span><span class="dv">4</span>):
-    <span class="co">&quot;&quot;&quot;Uses the Vision API to detect faces in the given file.</span>
-
-<span class="co">    Args:</span>
-<span class="co">        face_file: A file-like object containing an image with faces.</span>
-
-<span class="co">    Returns:</span>
-<span class="co">        An array of dicts with information about the faces in the picture.</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    image_content <span class="op">=</span> face_file.read()
-    batch_request <span class="op">=</span> [{
-        <span class="st">&#39;image&#39;</span>: {
-            <span class="st">&#39;content&#39;</span>: base64.b64encode(image_content).decode(<span class="st">&#39;UTF-8&#39;</span>)
-            },
-        <span class="st">&#39;features&#39;</span>: [{
-            <span class="st">&#39;type&#39;</span>: <span class="st">&#39;FACE_DETECTION&#39;</span>,
-            <span class="co">&#39;maxResults&#39;</span>: max_results,
-            }]
-        }]
-
-    service <span class="op">=</span> get_vision_service()
-    request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{
-        <span class="st">&#39;requests&#39;</span>: batch_request,
-        })
-    response <span class="op">=</span> request.execute()
-
-    <span class="cf">return</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;faceAnnotations&#39;</span>]
-<span class="co"># [END detect_face]</span>
-
-
-<span class="co"># [START highlight_faces]</span>
-<span class="kw">def</span> highlight_faces(image, faces, output_filename):
-    <span class="co">&quot;&quot;&quot;Draws a polygon around the faces, then saves to output_filename.</span>
-
-<span class="co">    Args:</span>
-<span class="co">      image: a file containing the image with the faces.</span>
-<span class="co">      faces: a list of faces found in the file. This should be in the format</span>
-<span class="co">          returned by the Vision API.</span>
-<span class="co">      output_filename: the name of the image file to be created, where the faces</span>
-<span class="co">          have polygons drawn around them.</span>
-<span class="co">    &quot;&quot;&quot;</span>
-    im <span class="op">=</span> Image.<span class="bu">open</span>(image)
-    draw <span class="op">=</span> ImageDraw.Draw(im)
-
-    <span class="cf">for</span> face <span class="op">in</span> faces:
-        box <span class="op">=</span> [(v.get(<span class="st">&#39;x&#39;</span>, <span class="fl">0.0</span>), v.get(<span class="st">&#39;y&#39;</span>, <span class="fl">0.0</span>)) <span class="cf">for</span> v <span class="op">in</span> face[<span class="st">&#39;fdBoundingPoly&#39;</span>][<span class="st">&#39;vertices&#39;</span>]]
-        draw.line(box <span class="op">+</span> [box[<span class="dv">0</span>]], width<span class="op">=</span><span class="dv">5</span>, fill<span class="op">=</span><span class="st">&#39;#00ff00&#39;</span>)
-
-    <span class="kw">del</span> draw
-    im.save(output_filename)
-<span class="co"># [END highlight_faces]</span>
-
-
-<span class="co"># [START main]</span>
-<span class="kw">def</span> main(input_filename, output_filename, max_results):
-    <span class="cf">with</span> <span class="bu">open</span>(input_filename, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> image:
-        faces <span class="op">=</span> detect_face(image, max_results)
-        <span class="bu">print</span>(<span class="st">&#39;Found </span><span class="sc">%s</span><span class="st"> face</span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> (<span class="bu">len</span>(faces), <span class="st">&#39;&#39;</span> <span class="cf">if</span> <span class="bu">len</span>(faces) <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">&#39;s&#39;</span>))
-
-        <span class="bu">print</span>(<span class="st">&#39;Writing to file </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> output_filename)
-        <span class="co"># Reset the file pointer, so we can read the file again</span>
-        image.seek(<span class="dv">0</span>)
-        highlight_faces(image, faces, output_filename)
-<span class="co"># [END main]</span>
-
-
-<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:
-    parser <span class="op">=</span> argparse.ArgumentParser(
-        description<span class="op">=</span><span class="st">&#39;Detects faces in the given image.&#39;</span>)
-    parser.add_argument(
-        <span class="st">&#39;input_image&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the image you</span><span class="ch">\&#39;</span><span class="st">d like to detect faces in.&#39;</span>)
-    parser.add_argument(
-        <span class="st">&#39;--out&#39;</span>, dest<span class="op">=</span><span class="st">&#39;output&#39;</span>, default<span class="op">=</span><span class="st">&#39;out.jpg&#39;</span>,
-        <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the name of the output file.&#39;</span>)
-    parser.add_argument(
-        <span class="st">&#39;--max-results&#39;</span>, dest<span class="op">=</span><span class="st">&#39;max_results&#39;</span>, default<span class="op">=</span><span class="dv">4</span>,
-        <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the max results of face detection.&#39;</span>)
-    args <span class="op">=</span> parser.parse_args()
-
-    main(args.input_image, args.output, args.max_results)</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">&quot;&quot;&quot;Draws squares around faces in the given image.&quot;&quot;&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="im">import</span> argparse</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="im">import</span> base64</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="im">from</span> PIL <span class="im">import</span> Image</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="im">from</span> PIL <span class="im">import</span> ImageDraw</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="im">from</span> googleapiclient <span class="im">import</span> discovery</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="im">import</span> httplib2</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a><span class="im">from</span> oauth2client.client <span class="im">import</span> GoogleCredentials</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a><span class="co"># [START get_vision_service]</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>DISCOVERY_URL<span class="op">=</span><span class="st">&#39;https://</span><span class="sc">{api}</span><span class="st">.googleapis.com/$discovery/rest?version=</span><span class="sc">{apiVersion}</span><span class="st">&#39;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="kw">def</span> get_vision_service():</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true"></a>    credentials <span class="op">=</span> GoogleCredentials.get_application_default()</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true"></a>    <span class="cf">return</span> discovery.build(<span class="st">&#39;vision&#39;</span>, <span class="st">&#39;v1&#39;</span>, credentials<span class="op">=</span>credentials,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true"></a>                           discoveryServiceUrl<span class="op">=</span>DISCOVERY_URL)</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true"></a><span class="co"># [</span><span class="re">END</span><span class="co"> get_vision_service]</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true"></a><span class="co"># [START detect_face]</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true"></a><span class="kw">def</span> detect_face(face_file, max_results<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true"></a>    <span class="co">&quot;&quot;&quot;Uses the Vision API to detect faces in the given file.</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true"></a><span class="co">    Args:</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true"></a><span class="co">        face_file: A file-like object containing an image with faces.</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true"></a><span class="co">    Returns:</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true"></a><span class="co">        An array of dicts with information about the faces in the picture.</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true"></a>    image_content <span class="op">=</span> face_file.read()</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true"></a>    batch_request <span class="op">=</span> [{</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true"></a>        <span class="st">&#39;image&#39;</span>: {</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true"></a>            <span class="st">&#39;content&#39;</span>: base64.b64encode(image_content).decode(<span class="st">&#39;UTF-8&#39;</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true"></a>            },</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true"></a>        <span class="st">&#39;features&#39;</span>: [{</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true"></a>            <span class="st">&#39;type&#39;</span>: <span class="st">&#39;FACE_DETECTION&#39;</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true"></a>            <span class="st">&#39;maxResults&#39;</span>: max_results,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true"></a>            }]</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true"></a>        }]</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true"></a>    service <span class="op">=</span> get_vision_service()</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true"></a>    request <span class="op">=</span> service.images().annotate(body<span class="op">=</span>{</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true"></a>        <span class="st">&#39;requests&#39;</span>: batch_request,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true"></a>        })</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true"></a>    response <span class="op">=</span> request.execute()</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true"></a>    <span class="cf">return</span> response[<span class="st">&#39;responses&#39;</span>][<span class="dv">0</span>][<span class="st">&#39;faceAnnotations&#39;</span>]</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true"></a><span class="co"># [</span><span class="re">END</span><span class="co"> detect_face]</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true"></a></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true"></a><span class="co"># [START highlight_faces]</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true"></a><span class="kw">def</span> highlight_faces(image, faces, output_filename):</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true"></a>    <span class="co">&quot;&quot;&quot;Draws a polygon around the faces, then saves to output_filename.</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true"></a><span class="co">    Args:</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true"></a><span class="co">      image: a file containing the image with the faces.</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true"></a><span class="co">      faces: a list of faces found in the file. This should be in the format</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true"></a><span class="co">          returned by the Vision API.</span></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true"></a><span class="co">      output_filename: the name of the image file to be created, where the faces</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true"></a><span class="co">          have polygons drawn around them.</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true"></a>    im <span class="op">=</span> Image.<span class="bu">open</span>(image)</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true"></a>    draw <span class="op">=</span> ImageDraw.Draw(im)</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true"></a></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true"></a>    <span class="cf">for</span> face <span class="kw">in</span> faces:</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true"></a>        box <span class="op">=</span> [(v.get(<span class="st">&#39;x&#39;</span>, <span class="fl">0.0</span>), v.get(<span class="st">&#39;y&#39;</span>, <span class="fl">0.0</span>)) <span class="cf">for</span> v <span class="kw">in</span> face[<span class="st">&#39;fdBoundingPoly&#39;</span>][<span class="st">&#39;vertices&#39;</span>]]</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true"></a>        draw.line(box <span class="op">+</span> [box[<span class="dv">0</span>]], width<span class="op">=</span><span class="dv">5</span>, fill<span class="op">=</span><span class="st">&#39;#00ff00&#39;</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true"></a></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true"></a>    <span class="kw">del</span> draw</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true"></a>    im.save(output_filename)</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true"></a><span class="co"># [</span><span class="re">END</span><span class="co"> highlight_faces]</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true"></a></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true"></a></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true"></a><span class="co"># [START main]</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true"></a><span class="kw">def</span> main(input_filename, output_filename, max_results):</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true"></a>    <span class="cf">with</span> <span class="bu">open</span>(input_filename, <span class="st">&#39;rb&#39;</span>) <span class="im">as</span> image:</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true"></a>        faces <span class="op">=</span> detect_face(image, max_results)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&#39;Found </span><span class="sc">%s</span><span class="st"> face</span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> (<span class="bu">len</span>(faces), <span class="st">&#39;&#39;</span> <span class="cf">if</span> <span class="bu">len</span>(faces) <span class="op">==</span> <span class="dv">1</span> <span class="cf">else</span> <span class="st">&#39;s&#39;</span>))</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true"></a>        <span class="bu">print</span>(<span class="st">&#39;Writing to file </span><span class="sc">%s</span><span class="st">&#39;</span> <span class="op">%</span> output_filename)</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true"></a>        <span class="co"># Reset the file pointer, so we can read the file again</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true"></a>        image.seek(<span class="dv">0</span>)</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true"></a>        highlight_faces(image, faces, output_filename)</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true"></a><span class="co"># [</span><span class="re">END</span><span class="co"> main]</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true"></a></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true"></a></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true"></a>    parser <span class="op">=</span> argparse.ArgumentParser(</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true"></a>        description<span class="op">=</span><span class="st">&#39;Detects faces in the given image.&#39;</span>)</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true"></a>    parser.add_argument(</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true"></a>        <span class="st">&#39;input_image&#39;</span>, <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the image you</span><span class="ch">\&#39;</span><span class="st">d like to detect faces in.&#39;</span>)</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true"></a>    parser.add_argument(</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true"></a>        <span class="st">&#39;--out&#39;</span>, dest<span class="op">=</span><span class="st">&#39;output&#39;</span>, default<span class="op">=</span><span class="st">&#39;out.jpg&#39;</span>,</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the name of the output file.&#39;</span>)</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true"></a>    parser.add_argument(</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true"></a>        <span class="st">&#39;--max-results&#39;</span>, dest<span class="op">=</span><span class="st">&#39;max_results&#39;</span>, default<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">&#39;the max results of face detection.&#39;</span>)</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true"></a></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true"></a>    main(args.input_image, args.output, args.max_results)</span></code></pre></div>
 <p>사진에서 4개 얼굴만 인식하고 녹색 사각형을 인식된 얼굴에 올려 <code>out.jpg</code> 파일로 저장한다.</p>
 <pre class="shell"><code>$ python faces.py ../images/people.jpg
 Found 4 faces
@@ -377,25 +387,25 @@ Writing to file out.jpg</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left">people.jpg</th>
-<th align="left">out.jpg</th>
+<th>people.jpg</th>
+<th>out.jpg</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/people.jpg" width="87%"></td>
-<td align="left"><img src="fig/people-out.jpg" width="87%"></td>
+<td><img src="fig/people.jpg" width="87%"></td>
+<td><img src="fig/people-out.jpg" width="87%"></td>
 </tr>
 </tbody>
 </table>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="https://cloud.google.com/vision/docs/label-tutorial">Label Detection Tutorial</a><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="https://cloud.google.com/vision/docs/landmark-tutorial">Landmark Detection Tutorial</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="https://cloud.google.com/vision/docs/face-tutorial">Face Detection Tutorial</a><a href="#fnref3">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="https://cloud.google.com/vision/docs/label-tutorial">Label Detection Tutorial</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><a href="https://cloud.google.com/vision/docs/landmark-tutorial">Landmark Detection Tutorial</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p><a href="https://cloud.google.com/vision/docs/face-tutorial">Face Detection Tutorial</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
         </div>
       </div>
       </article>
