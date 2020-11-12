@@ -93,6 +93,7 @@ title: xwMOOC 딥러닝과 $H_2 O$
     - Sequence Models
 1. [`text-to-speech` - 문자 음성 변환 프로그램](r-tts.html)
     - [파워포인트 발표자료 유튜브 동영상 자동 제작](r-ari.html)
+    - [`xaringan` 발표자료 유튜브 동영상 자동 제작](r-xaringan-ari.html)
 
 
 
