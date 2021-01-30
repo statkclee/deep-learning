@@ -172,7 +172,7 @@ stt_script
 ```
 
 
-# 오디오 &rarr; 텍스트 {#stt-comparison}
+# 담화문과 STT 비교 {#stt-comparison}
 
 마지막으로 대국민 담화문 원문과 구글 STT 결과 작업결과를 비교해보자.
 
