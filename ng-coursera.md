@@ -1,5 +1,16 @@
-# xwMOOC 딥러닝
-`r Sys.Date()`  
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: Andrew Ng 딥러닝 코세라 강의
+date: "2021-01-30"
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 

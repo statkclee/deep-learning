@@ -1,4 +1,15 @@
-# xwMOOC 딥러닝
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: R 케라스(keras) - 이미지넷(Imagenet)
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -55,7 +66,7 @@ plot(0:1, 0:1, type="n", ann=FALSE, axes=FALSE)
 rasterImage(img, 0,0,1,1)
 ~~~
 
-<img src="fig/imagenet-transfer-learning-setup-1.png" style="display: block; margin: auto;" />
+<img src="fig/imagenet-transfer-learning-setup-1.png" title="plot of chunk imagenet-transfer-learning-setup" alt="plot of chunk imagenet-transfer-learning-setup" style="display: block; margin: auto;" />
 
 ~~~{.r}
 dim(img)
@@ -81,39 +92,294 @@ dim(img)
 # 2. 사전 훈련된 신경망 모형 -------------------------------------
 ## 2.1. 이미지 데이터 준비 ---------------------------------------
 img2keras <- image_load("data/elephant.jpg", target_size = c(224, 224))
+~~~
+
+
+
+~~~{.error}
+Error: Installation of TensorFlow not found.
+
+Python environments searched for 'tensorflow' package:
+ C:\Users\statkclee\miniconda3\python.exe
+
+You can install TensorFlow using the install_tensorflow() function.
+
+~~~
+
+
+
+~~~{.r}
 img2array <- image_to_array(img2keras)
+~~~
 
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
 dim(img2array) <- c(1, dim(img2array))
-img2array <- imagenet_preprocess_input(img2array)
+~~~
 
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'img2array' not found
+
+~~~
+
+
+
+~~~{.r}
+img2array <- imagenet_preprocess_input(img2array)
+~~~
+
+
+
+~~~{.error}
+Error in imagenet_preprocess_input(img2array): object 'img2array' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 2.2. 사전 훈련된 모형 적합 ------------------------------------
 model_vgg19 <- application_vgg19(weights="imagenet")
+~~~
+
+
+
+~~~{.error}
+Error: The h5py Python package is required to use pre-built Keras models
+
+~~~
+
+
+
+~~~{.r}
 model_vgg16 <- application_vgg16(weights="imagenet")
+~~~
+
+
+
+~~~{.error}
+Error: The h5py Python package is required to use pre-built Keras models
+
+~~~
+
+
+
+~~~{.r}
 model_resnet50 <- application_resnet50(weights="imagenet")
+~~~
 
+
+
+~~~{.error}
+Error: The h5py Python package is required to use pre-built Keras models
+
+~~~
+
+
+
+~~~{.r}
 pred_vgg19 <- model_vgg19 %>% predict(img2array)
+~~~
+
+
+
+~~~{.error}
+Error in predict(., img2array): object 'model_vgg19' not found
+
+~~~
+
+
+
+~~~{.r}
 pred_vgg16 <- model_vgg16 %>% predict(img2array)
+~~~
+
+
+
+~~~{.error}
+Error in predict(., img2array): object 'model_vgg16' not found
+
+~~~
+
+
+
+~~~{.r}
 pred_resnet50 <- model_resnet50 %>% predict(img2array)
+~~~
 
 
+
+~~~{.error}
+Error in predict(., img2array): object 'model_resnet50' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 2.3. 모형 평가 ------------------------------------------------
 vgg19_df <- imagenet_decode_predictions(pred_vgg19, top = 10)[[1]]
-vgg16_df <- imagenet_decode_predictions(pred_vgg16, top = 10)[[1]]
-resnet50_df <- imagenet_decode_predictions(pred_resnet50, top = 10)[[1]]
+~~~
 
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
+vgg16_df <- imagenet_decode_predictions(pred_vgg16, top = 10)[[1]]
+~~~
+
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
+resnet50_df <- imagenet_decode_predictions(pred_resnet50, top = 10)[[1]]
+~~~
+
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
 vgg19_df <- vgg19_df %>% mutate(pre_model = "vgg19") %>% 
     select(pre_model_vgg19 = pre_model, class_vgg19 = class_description, score_vgg19=score)
+~~~
 
+
+
+~~~{.error}
+Error in mutate(., pre_model = "vgg19"): object 'vgg19_df' not found
+
+~~~
+
+
+
+~~~{.r}
 vgg16_df <- vgg16_df %>% mutate(pre_model = "vgg16") %>% 
     select(pre_model_vgg16 = pre_model, class_vgg16=class_description, score_vgg16=score)
+~~~
 
+
+
+~~~{.error}
+Error in mutate(., pre_model = "vgg16"): object 'vgg16_df' not found
+
+~~~
+
+
+
+~~~{.r}
 resnet50_df <- resnet50_df %>% mutate(pre_model = "resnet50") %>% 
     select(pre_model_resnet50=pre_model, class_resnet50 = class_description, score_resnet50=score)
+~~~
 
+
+
+~~~{.error}
+Error in mutate(., pre_model = "resnet50"): object 'resnet50_df' not found
+
+~~~
+
+
+
+~~~{.r}
 pretrain_df <- bind_cols(vgg19_df, vgg16_df, resnet50_df)
+~~~
 
+
+
+~~~{.error}
+Error in list2(...): object 'vgg19_df' not found
+
+~~~
+
+
+
+~~~{.r}
 DT::datatable(pretrain_df)
 ~~~
 
-<!--html_preserve--><div id="htmlwidget-d23692d02519411cf303" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d23692d02519411cf303">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["vgg19","vgg19","vgg19","vgg19","vgg19","vgg19","vgg19","vgg19","vgg19","vgg19"],["Indian_elephant","tusker","African_elephant","Arabian_camel","triceratops","warthog","lion","Komodo_dragon","water_buffalo","hippopotamus"],[0.389254182577133,0.364613264799118,0.246002480387688,0.0001198433819809,5.98906126469956e-006,1.96317864720186e-006,1.0881332173085e-006,3.95982823420127e-007,2.13460111808672e-007,1.56458170863516e-007],["vgg16","vgg16","vgg16","vgg16","vgg16","vgg16","vgg16","vgg16","vgg16","vgg16"],["tusker","African_elephant","Indian_elephant","warthog","triceratops","Arabian_camel","Komodo_dragon","lion","ram","bighorn"],[0.6380974650383,0.191901743412018,0.169553399085999,0.000138765579322353,9.23363986657932e-005,8.67744529386982e-005,2.63651072600624e-005,2.02037081180606e-005,1.58142738655442e-005,9.81449466053164e-006],["resnet50","resnet50","resnet50","resnet50","resnet50","resnet50","resnet50","resnet50","resnet50","resnet50"],["West_Highland_white_terrier","toilet_tissue","sea_urchin","zebra","sorrel","guinea_pig","beaver","marmot","fox_squirrel","porcupine"],[1,0,0,0,0,0,0,0,0,0]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>pre_model_vgg19<\/th>\n      <th>class_vgg19<\/th>\n      <th>score_vgg19<\/th>\n      <th>pre_model_vgg16<\/th>\n      <th>class_vgg16<\/th>\n      <th>score_vgg16<\/th>\n      <th>pre_model_resnet50<\/th>\n      <th>class_resnet50<\/th>\n      <th>score_resnet50<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"crosstalkOptions":{"key":null,"group":null},"columnDefs":[{"className":"dt-right","targets":[3,6,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row"}},"evals":[],"jsHooks":[]}</script><!--/html_preserve-->
+
+
+~~~{.error}
+Error in crosstalk::is.SharedData(data): object 'pretrain_df' not found
+
+~~~

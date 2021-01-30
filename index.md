@@ -82,7 +82,6 @@ title: xwMOOC 딥러닝과 $H_2 O$
         - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
         - [R 구글 url 축약-googleAuthR](r-short-url.html)
         - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
-        - [구글 음성 API](speech-api.html)
     - **IBM**
         - [IBM 왓슨](r-watson.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)
@@ -94,6 +93,6 @@ title: xwMOOC 딥러닝과 $H_2 O$
 1. [`text-to-speech` - 문자 음성 변환 프로그램](r-tts.html)
     - [파워포인트 발표자료 유튜브 동영상 자동 제작](r-ari.html)
     - [`xaringan` 발표자료 유튜브 동영상 자동 제작](r-xaringan-ari.html)
-
-
+1. [`speech-to-text` - 음성을 텍스트로 변환](r-stt.html)
+    - [구글 음성 API](speech-api.html)
 

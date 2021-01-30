@@ -483,6 +483,13 @@ ggplot(emo_long_df, aes(speech_frame, value, group = key, col = key)) +
   scale_x_discrete(breaks = c('10-25_1', '11-04_1', '11-29_1'))
 ~~~
 
+
+
+~~~{.output}
+`geom_smooth()` using formula 'y ~ x'
+
+~~~
+
 <img src="fig/emo-api-ggplot-1.png" title="plot of chunk emo-api-ggplot" alt="plot of chunk emo-api-ggplot" style="display: block; margin: auto;" />
 
 ### 5.4. 시간별 감정 변화 
@@ -545,6 +552,13 @@ ggplot(emo_long_df, aes(times, value, group = key, col = key)) +
   labs(colour = "Emotion") +
   xlab("") +
   ylab("")
+~~~
+
+
+
+~~~{.output}
+`geom_smooth()` using formula 'y ~ x'
+
 ~~~
 
 <img src="fig/emo-time-ggplot-1.png" title="plot of chunk emo-time-ggplot" alt="plot of chunk emo-time-ggplot" style="display: block; margin: auto;" />

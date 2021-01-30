@@ -14,7 +14,17 @@
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    -->
+            
   </head>
   <body class="lesson">
     <div class="container card">
@@ -29,9 +39,9 @@
                     <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
           <h2 class="subtitle">R 구글 클라우드 비젼 API - RoogleVision</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>구글 클라우드 비젼 API 기능을 이해한다.</li>
@@ -45,7 +55,7 @@
 </section>
 <h3 id="rooglevision-설치-및-구글-비젼-api-연동">1. <code>RoogleVision</code> 설치 및 구글 비젼 API 연동</h3>
 <p><code>RoogleVision</code>를 통해 이미지를 인식하는 방법은 다음과 같다.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><code>RoogleVision</code> 팩키지를 <code>install_github</code>을 통해 설치한다.</li>
 <li>구글 클라우드 플랫폼에 인증과정을 거친다.
 <ul>
@@ -64,54 +74,54 @@
 <li><code>IMAGE_PROPERTIES</code>: 이미지를 지배하는 색상같은 이미지에 대한 특징정보</li>
 </ul></li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##=========================================================================================
-## 1. 환경설정
-##=========================================================================================
-<span class="co"># 팩키지 설치 </span>
-if(<span class="st">&quot;googleAuthR&quot;</span> %in%<span class="st"> </span><span class="kw">installed.packages</span>() ==<span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;googleAuthR&quot;</span>)
-<span class="kw">library</span>(googleAuthR)
-<span class="kw">library</span>(devtools)
-<span class="co"># install_github(&quot;flovv/RoogleVision&quot;)</span>
-<span class="kw">library</span>(RoogleVision)
-
-<span class="co"># GA 계정 인증</span>
-<span class="kw">setwd</span>(<span class="st">&quot;~/Dropbox/01_data_science/03_kds/08-google-vision&quot;</span>)
-
-<span class="kw">source</span>(<span class="st">&quot;gcp_conf.R&quot;</span>)
-
-<span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_id&quot;</span> =<span class="st"> </span>client.id)
-<span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_secret&quot;</span> =<span class="st"> </span>client.secret)
-
-<span class="kw">options</span>(<span class="st">&quot;googleAuthR.scopes.selected&quot;</span> =<span class="st"> </span>
-<span class="st">          </span><span class="kw">c</span>(<span class="st">&quot;https://www.googleapis.com/auth/cloud-platform&quot;</span>))
-
-googleAuthR::<span class="kw">gar_auth</span>()
-
-##=========================================================================================
-## 2. 구글 비젼 API 실행
-##=========================================================================================
-
-bear.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;bear.jpg&quot;</span>)
-brand.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="dt">imagePath=</span><span class="st">&quot;brandlogos.png&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LOGO_DETECTION&quot;</span>, <span class="dt">numResults=</span><span class="dv">5</span>)
-landmark.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;https://media-cdn.tripadvisor.com/media/photo-s/02/6b/c2/19/filename-48842881-jpg.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LANDMARK_DETECTION&quot;</span>)
-label.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://static.flickr.com/1129/1394639648_1e10df0ddd.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LABEL_DETECTION&quot;</span>)
-text.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://www.justsomebroad.com/wp-content/uploads/2013/01/handwriting.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;TEXT_DETECTION&quot;</span>)
-hantext.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://static.campaign.naver.com/0/hangeul/2013/img/img_renew_docs/img_h_docs.png&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;TEXT_DETECTION&quot;</span>)
-face.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://www.news.ucsb.edu/sites/www.news.ucsb.edu/files/styles/article_horizontal/public/images/2014/angry%20face.jpg?itok=xdzforot&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;FACE_DETECTION&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">##=========================================================================================</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">## 1. 환경설정</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">##=========================================================================================</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># 팩키지 설치 </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="cf">if</span>(<span class="st">&quot;googleAuthR&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">installed.packages</span>() <span class="op">==</span><span class="st"> </span><span class="ot">FALSE</span>) <span class="kw">install.packages</span>(<span class="st">&quot;googleAuthR&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">library</span>(googleAuthR)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">library</span>(devtools)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="co"># install_github(&quot;flovv/RoogleVision&quot;)</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="kw">library</span>(RoogleVision)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co"># GA 계정 인증</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a><span class="kw">setwd</span>(<span class="st">&quot;~/Dropbox/01_data_science/03_kds/08-google-vision&quot;</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a><span class="kw">source</span>(<span class="st">&quot;gcp_conf.R&quot;</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_id&quot;</span> =<span class="st"> </span>client.id)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="kw">options</span>(<span class="st">&quot;googleAuthR.client_secret&quot;</span> =<span class="st"> </span>client.secret)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a><span class="kw">options</span>(<span class="st">&quot;googleAuthR.scopes.selected&quot;</span> =<span class="st"> </span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="st">          </span><span class="kw">c</span>(<span class="st">&quot;https://www.googleapis.com/auth/cloud-platform&quot;</span>))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>googleAuthR<span class="op">::</span><span class="kw">gar_auth</span>()</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a><span class="co">##=========================================================================================</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a><span class="co">## 2. 구글 비젼 API 실행</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a><span class="co">##=========================================================================================</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>bear.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;bear.jpg&quot;</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>brand.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="dt">imagePath=</span><span class="st">&quot;brandlogos.png&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LOGO_DETECTION&quot;</span>, <span class="dt">numResults=</span><span class="dv">5</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>landmark.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;https://media-cdn.tripadvisor.com/media/photo-s/02/6b/c2/19/filename-48842881-jpg.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LANDMARK_DETECTION&quot;</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>label.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://static.flickr.com/1129/1394639648_1e10df0ddd.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;LABEL_DETECTION&quot;</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>text.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://www.justsomebroad.com/wp-content/uploads/2013/01/handwriting.jpg&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;TEXT_DETECTION&quot;</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>hantext.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://static.campaign.naver.com/0/hangeul/2013/img/img_renew_docs/img_h_docs.png&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;TEXT_DETECTION&quot;</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>face.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse</span>(<span class="st">&quot;http://www.news.ucsb.edu/sites/www.news.ucsb.edu/files/styles/article_horizontal/public/images/2014/angry%20face.jpg?itok=xdzforot&quot;</span>, <span class="dt">feature=</span><span class="st">&quot;FACE_DETECTION&quot;</span>)</span></code></pre></div>
 <h3 id="구글-비젼-api-서비스">2. 구글 비젼 API 서비스</h3>
 <h4 id="표지-검출label_detection">2.1. 표지 검출(LABEL_DETECTION)</h4>
 <p>이미지에 어떤 물체가 있는지 인식하고 이를 표식으로 검출한다.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/bear.jpg" width="30%"></td>
-<td align="left">기본설정 LABEL_DETECTION</td>
+<td><img src="fig/bear.jpg" width="30%"></td>
+<td>기본설정 LABEL_DETECTION</td>
 </tr>
 </tbody>
 </table>
@@ -127,14 +137,14 @@ face.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse<
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/brandlogos.png" width="30%"></td>
-<td align="left">LOGO_DETECTION</td>
+<td><img src="fig/brandlogos.png" width="30%"></td>
+<td>LOGO_DETECTION</td>
 </tr>
 </tbody>
 </table>
@@ -150,14 +160,14 @@ face.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse<
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/landmark-ex.jpg" width="30%"></td>
-<td align="left">LANDMARK_DETECTION</td>
+<td><img src="fig/landmark-ex.jpg" width="30%"></td>
+<td>LANDMARK_DETECTION</td>
 </tr>
 </tbody>
 </table>
@@ -170,14 +180,14 @@ face.res &lt;-<span class="st"> </span><span class="kw">getGoogleVisionResponse<
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/handwriting-ex.jpg" width="30%"></td>
-<td align="left">TEXT_DETECTION</td>
+<td><img src="fig/handwriting-ex.jpg" width="30%"></td>
+<td>TEXT_DETECTION</td>
 </tr>
 </tbody>
 </table>
@@ -191,14 +201,14 @@ description
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/handwriting-ko-ex.png" width="30%"></td>
-<td align="left">TEXT_DETECTION</td>
+<td><img src="fig/handwriting-ko-ex.png" width="30%"></td>
+<td>TEXT_DETECTION</td>
 </tr>
 </tbody>
 </table>
@@ -213,14 +223,14 @@ description
 <table>
 <thead>
 <tr class="header">
-<th align="left">이미지</th>
-<th align="left">구글 비젼 API</th>
+<th>이미지</th>
+<th>구글 비젼 API</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/angry-face.jpg" width="30%"></td>
-<td align="left">FACE_DETECTION</td>
+<td><img src="fig/angry-face.jpg" width="30%"></td>
+<td>FACE_DETECTION</td>
 </tr>
 </tbody>
 </table>
