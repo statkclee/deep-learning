@@ -1,5 +1,16 @@
-# xwMOOC 딥러닝
-`r Sys.Date()`  
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: Structuring Machine Learning Projects - 기계학습 전략 
+date: "2021-01-30"
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -165,7 +176,7 @@ ggplot(df, aes(x, y)) +
         axis.ticks.y=element_blank())
 ~~~
 
-<img src="fig/human-level-performance-1.png" style="display: block; margin: auto;" />
+<img src="fig/human-level-performance-1.png" title="plot of chunk human-level-performance" alt="plot of chunk human-level-performance" style="display: block; margin: auto;" />
 
 지도학습 기계학습 알고리즘 성능이 기대에 못미치는 경우 다음 세가지 조치를 취할 수 있다.
 

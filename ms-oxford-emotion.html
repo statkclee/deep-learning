@@ -14,7 +14,17 @@
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <![endif]-->
+    
+    
+    <!--
+    <div id="google_translate_element"></div><script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'ko', includedLanguages: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    }
+    </script><script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    -->
+            
   </head>
   <body class="lesson">
     <div class="container card">
@@ -29,9 +39,9 @@
                     <a href="index.html"><h1 class="title">xwMOOC 딥러닝</h1></a>
           <h2 class="subtitle">옥스포드 - 감정 API</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>마이크로소프트 옥스포드 API를 이해한다.</li>
@@ -39,10 +49,10 @@
 </ul>
 </div>
 </section>
-<h3 id="얼굴에-나타난-감정을-분석face-motion-with-r">1. 얼굴에 나타난 감정을 분석<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<h3 id="얼굴에-나타난-감정을-분석face-motion-with-r">1. 얼굴에 나타난 감정을 분석<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h3>
 <p>얼굴에 나타난 감정을 분석하는데 최근에 공개된 마이크로소프트 옥스포드 프로젝트 API를 R에서 활용한다.</p>
 <p><code>httr</code> 팩키지 덕분에 사용법은 무척이나 간결한다.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>마이크로소프트 <a href="https://www.microsoft.com/cognitive-services/">Congnitive Services</a>에 무료로 가입한다.</li>
 <li>마이크로소프트에서 제공하는 서비스마다 인증키를 잘 관리한다.
 <ul>
@@ -58,131 +68,131 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">손학규</th>
-<th align="left">반기문</th>
-<th align="left">문재인</th>
-<th align="left">안철수</th>
+<th>손학규</th>
+<th>반기문</th>
+<th>문재인</th>
+<th>안철수</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><img src="fig/candidate-son.jpg" width="100%"></td>
-<td align="left"><img src="fig/candidate-ban.jpg" width="100%"></td>
-<td align="left"><img src="fig/candidate-moon.jpg" width="70%"></td>
-<td align="left"><img src="fig/candidate-ahn.jpg" width="60%"></td>
+<td><img src="fig/candidate-son.jpg" width="100%"></td>
+<td><img src="fig/candidate-ban.jpg" width="100%"></td>
+<td><img src="fig/candidate-moon.jpg" width="70%"></td>
+<td><img src="fig/candidate-ahn.jpg" width="60%"></td>
 </tr>
 </tbody>
 </table>
 <h3 id="이미지에-나타난-감정-분석-r-코드">3. 이미지에 나타난 감정 분석 R 코드</h3>
 <p>이미지에 나타난 감정을 분석 R 코드하는 코드를 다음 순서로 작성한다.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li>작업 디렉토리와 더불어 라이브러리를 불러온다.</li>
 <li>마이크로소프트 <code>Emotion - Preview</code> 감정분석 API 서비스 접속 환경설정을 한다.</li>
 <li><code>emotion_fn</code> 함수를 만들어 이미지가 담긴 사진 URL을 넣으면 마이크로소프트 감정분석 API에 접속하여 감정분석결과를 받아오게 한다.</li>
 <li>사진에 나온 이미지 분석결과를 대선후별로 정리하여 시각화하여 분석을 마무리한다.</li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">##==========================================================================================
-## 00. 환경설정  
-##==========================================================================================
-<span class="kw">library</span>(<span class="st">&quot;httr&quot;</span>)
-<span class="kw">library</span>(<span class="st">&quot;XML&quot;</span>)
-<span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)
-<span class="kw">setwd</span>(<span class="st">&quot;~/10-microsoft-oxford&quot;</span>)
-
-##==========================================================================================
-## 01. 마이크로소프트 API 설정  
-##==========================================================================================
-
-<span class="co"># 적용할 마이크로소프트 API 지정</span>
-URL.emoface =<span class="st"> &#39;https://api.projectoxford.ai/emotion/v1.0/recognize&#39;</span>
-
-<span class="co"># 접속 인증키 설정</span>
-<span class="co"># emotionKEY = &#39;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX&#39;</span>
-<span class="kw">source</span>(<span class="st">&quot;private-keys.R&quot;</span>) 
-
-##==========================================================================================
-## 02. 감정분석할 이미지 지정 및 호출
-##==========================================================================================
-
-emotion_fn &lt;-<span class="st"> </span>function(img.url){
-    mybody =<span class="st"> </span><span class="kw">list</span>(<span class="dt">url =</span> img.url)
-    
-    <span class="co"># 마이크로소프트에 API 호출 및 데이터 요청</span>
-    faceEMO  &lt;-<span class="st">  </span><span class="kw">POST</span>(
-      <span class="dt">url =</span> URL.emoface,
-      <span class="kw">content_type</span>(<span class="st">&#39;application/json&#39;</span>), <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>emotionKEY)),
-      <span class="dt">body =</span> mybody,
-      <span class="dt">encode =</span> <span class="st">&#39;json&#39;</span>
-    )
-    
-    <span class="co"># 결과값 출력, Status=200 이면 모든 것이 OK!!!</span>
-    <span class="kw">return</span>(faceEMO)
-}
-
-<span class="co"># 이미지 지정</span>
-son.url &lt;-<span class="st"> &#39;http://www.jungang.co/news/photo/201509/1051_603_841.jpg&#39;</span>
-ban.url &lt;-<span class="st"> &#39;http://img.etoday.co.kr/pto_db/2012/04/20120424082942_194639_500_333.jpg&#39;</span>
-moon.url &lt;-<span class="st"> &#39;http://www.hyundaenews.com/imgdata/hyundaenews_com/201601/2016011932479902.jpg&#39;</span>
-ahn.url &lt;-<span class="st"> &#39;https://t1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/5ns/image/TtrYI3uNOJCsI-UmswcmJgRm5QQ.jpg&#39;</span>
-
-son &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(son.url)
-ban &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ban.url)
-moon &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(moon.url)
-ahn &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ahn.url)
-
-##==========================================================================================
-## 03. 감정분석결과 추가분석
-##==========================================================================================
-<span class="co"># 얼굴 분석결과</span>
-Son &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(son)[[<span class="dv">1</span>]]
-Ban &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(ban)[[<span class="dv">1</span>]]
-Moon &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(moon)[[<span class="dv">1</span>]]
-Ahn &lt;-<span class="st">  </span>httr::<span class="kw">content</span>(ahn)[[<span class="dv">1</span>]]
-
-
-<span class="co"># 분석을 위해 결과값을 데이터프레임으로 변환</span>
-Son.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Son$scores))
-Ban.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ban$scores))
-Moon.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Moon$scores))
-Ahn.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ahn$scores))
-
-<span class="co"># Make some transformation</span>
-Son.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Son.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
-Ban.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ban.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
-Moon.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Moon.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
-Ahn.o$V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ahn.o$V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)
-
-Son.o$V1 &lt;-<span class="kw">as.numeric</span>(Son.o$V1)
-Son.o$V1 &lt;-<span class="kw">as.numeric</span>(Son.o$V1)
-<span class="kw">colnames</span>(Son.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Son&quot;</span>
-
-Ban.o$V1 &lt;-<span class="kw">as.numeric</span>(Ban.o$V1)
-Ban.o$V1 &lt;-<span class="kw">as.numeric</span>(Ban.o$V1)
-<span class="kw">colnames</span>(Ban.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ban&quot;</span>
-
-Moon.o$V1 &lt;-<span class="kw">as.numeric</span>(Moon.o$V1)
-Moon.o$V1 &lt;-<span class="kw">as.numeric</span>(Moon.o$V1)
-<span class="kw">colnames</span>(Moon.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Moon&quot;</span>
-
-Ahn.o$V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o$V1)
-Ahn.o$V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o$V1)
-<span class="kw">colnames</span>(Ahn.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ahn&quot;</span>
-
-
-<span class="co"># 행명칭으로부터 감정 변수 생성</span>
-Son.o$Emotion&lt;-<span class="st"> </span><span class="kw">rownames</span>(Son.o)
-
-<span class="co"># 후보데이터 취합</span>
-candidate.df &lt;-<span class="st"> </span><span class="kw">cbind</span>(Ban.o, Moon.o, Ahn.o, Son.o)
-
-<span class="kw">library</span>(reshape2)
-
-candidate.df.m &lt;-<span class="st"> </span><span class="kw">melt</span>(candidate.df, <span class="dt">id.vars=</span><span class="st">&#39;Emotion&#39;</span>)
-
-candidate.df
-
-<span class="kw">ggplot</span>(candidate.df.m, <span class="kw">aes</span>(Emotion, value)) +<span class="st">   </span>
-<span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> variable), <span class="dt">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">## 00. 환경설정  </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">library</span>(<span class="st">&quot;httr&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">library</span>(<span class="st">&quot;XML&quot;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">setwd</span>(<span class="st">&quot;~/10-microsoft-oxford&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a><span class="co">## 01. 마이크로소프트 API 설정  </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a><span class="co"># 적용할 마이크로소프트 API 지정</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>URL.emoface =<span class="st"> &#39;https://api.projectoxford.ai/emotion/v1.0/recognize&#39;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a><span class="co"># 접속 인증키 설정</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="co"># emotionKEY = &#39;XXXXXXXXXXXXXXXXXXXXXXXXXXXXX&#39;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="kw">source</span>(<span class="st">&quot;private-keys.R&quot;</span>) </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a><span class="co">## 02. 감정분석할 이미지 지정 및 호출</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>emotion_fn &lt;-<span class="st"> </span><span class="cf">function</span>(img.url){</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>    mybody =<span class="st"> </span><span class="kw">list</span>(<span class="dt">url =</span> img.url)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>    </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>    <span class="co"># 마이크로소프트에 API 호출 및 데이터 요청</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>    faceEMO  &lt;-<span class="st">  </span><span class="kw">POST</span>(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a>      <span class="dt">url =</span> URL.emoface,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>      <span class="kw">content_type</span>(<span class="st">&#39;application/json&#39;</span>), <span class="kw">add_headers</span>(<span class="dt">.headers =</span> <span class="kw">c</span>(<span class="st">&#39;Ocp-Apim-Subscription-Key&#39;</span> =<span class="st"> </span>emotionKEY)),</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>      <span class="dt">body =</span> mybody,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>      <span class="dt">encode =</span> <span class="st">&#39;json&#39;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>    )</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a>    </span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    <span class="co"># 결과값 출력, Status=200 이면 모든 것이 OK!!!</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a>    <span class="kw">return</span>(faceEMO)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>}</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a><span class="co"># 이미지 지정</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>son.url &lt;-<span class="st"> &#39;http://www.jungang.co/news/photo/201509/1051_603_841.jpg&#39;</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>ban.url &lt;-<span class="st"> &#39;http://img.etoday.co.kr/pto_db/2012/04/20120424082942_194639_500_333.jpg&#39;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a>moon.url &lt;-<span class="st"> &#39;http://www.hyundaenews.com/imgdata/hyundaenews_com/201601/2016011932479902.jpg&#39;</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>ahn.url &lt;-<span class="st"> &#39;https://t1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/5ns/image/TtrYI3uNOJCsI-UmswcmJgRm5QQ.jpg&#39;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>son &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(son.url)</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>ban &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ban.url)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>moon &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(moon.url)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a>ahn &lt;-<span class="st"> </span><span class="kw">emotion_fn</span>(ahn.url)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true"></a><span class="co">## 03. 감정분석결과 추가분석</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true"></a><span class="co">##==========================================================================================</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true"></a><span class="co"># 얼굴 분석결과</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true"></a>Son &lt;-<span class="st">  </span>httr<span class="op">::</span><span class="kw">content</span>(son)[[<span class="dv">1</span>]]</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true"></a>Ban &lt;-<span class="st">  </span>httr<span class="op">::</span><span class="kw">content</span>(ban)[[<span class="dv">1</span>]]</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true"></a>Moon &lt;-<span class="st">  </span>httr<span class="op">::</span><span class="kw">content</span>(moon)[[<span class="dv">1</span>]]</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true"></a>Ahn &lt;-<span class="st">  </span>httr<span class="op">::</span><span class="kw">content</span>(ahn)[[<span class="dv">1</span>]]</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true"></a><span class="co"># 분석을 위해 결과값을 데이터프레임으로 변환</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true"></a>Son.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Son<span class="op">$</span>scores))</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true"></a>Ban.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ban<span class="op">$</span>scores))</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true"></a>Moon.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Moon<span class="op">$</span>scores))</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true"></a>Ahn.o &lt;-<span class="kw">as.data.frame</span>(<span class="kw">as.matrix</span>(Ahn<span class="op">$</span>scores))</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true"></a></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true"></a><span class="co"># Make some transformation</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true"></a>Son.o<span class="op">$</span>V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Son.o<span class="op">$</span>V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true"></a>Ban.o<span class="op">$</span>V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ban.o<span class="op">$</span>V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true"></a>Moon.o<span class="op">$</span>V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Moon.o<span class="op">$</span>V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true"></a>Ahn.o<span class="op">$</span>V1 &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">strsplit</span>(<span class="kw">as.character</span>(Ahn.o<span class="op">$</span>V1), <span class="st">&quot;e&quot;</span>), <span class="st">&quot;[&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true"></a></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true"></a>Son.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Son.o<span class="op">$</span>V1)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true"></a>Son.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Son.o<span class="op">$</span>V1)</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true"></a><span class="kw">colnames</span>(Son.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Son&quot;</span></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true"></a></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true"></a>Ban.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Ban.o<span class="op">$</span>V1)</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true"></a>Ban.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Ban.o<span class="op">$</span>V1)</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true"></a><span class="kw">colnames</span>(Ban.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ban&quot;</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true"></a></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true"></a>Moon.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Moon.o<span class="op">$</span>V1)</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true"></a>Moon.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Moon.o<span class="op">$</span>V1)</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true"></a><span class="kw">colnames</span>(Moon.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Moon&quot;</span></span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true"></a>Ahn.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o<span class="op">$</span>V1)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true"></a>Ahn.o<span class="op">$</span>V1 &lt;-<span class="kw">as.numeric</span>(Ahn.o<span class="op">$</span>V1)</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true"></a><span class="kw">colnames</span>(Ahn.o)[<span class="dv">1</span>] &lt;-<span class="st"> &quot;Ahn&quot;</span></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true"></a><span class="co"># 행명칭으로부터 감정 변수 생성</span></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true"></a>Son.o<span class="op">$</span>Emotion&lt;-<span class="st"> </span><span class="kw">rownames</span>(Son.o)</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true"></a></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true"></a><span class="co"># 후보데이터 취합</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true"></a>candidate.df &lt;-<span class="st"> </span><span class="kw">cbind</span>(Ban.o, Moon.o, Ahn.o, Son.o)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true"></a></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true"></a><span class="kw">library</span>(reshape2)</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true"></a>candidate.df.m &lt;-<span class="st"> </span><span class="kw">melt</span>(candidate.df, <span class="dt">id.vars=</span><span class="st">&#39;Emotion&#39;</span>)</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true"></a>candidate.df</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true"></a><span class="kw">ggplot</span>(candidate.df.m, <span class="kw">aes</span>(Emotion, value)) <span class="op">+</span><span class="st">   </span></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_bar</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> variable), <span class="dt">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="dt">stat=</span><span class="st">&quot;identity&quot;</span>)</span></code></pre></div>
 <pre class="output"><code>&gt; candidate.df
                 Son          Ban      Moon          Ahn   Emotion
 anger     7.3542325 1.9190960000 1.1539198 0.0003854623     anger
@@ -194,12 +204,12 @@ neutral   1.4403704 0.0002112589 1.7898545 0.0547735900   neutral
 sadness   1.9024080 1.8409718900 1.8538832 0.0005460684   sadness
 surprise  1.0656165 6.0466163600 1.5935927 1.1286004300  surprise</code></pre>
 <p><img src="fig/candidate-emotion.png" width="100%"></p>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://thinktostart.com/analyze-face-emotions-r/">Analyze Face Emotions with R</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="http://thinktostart.com/analyze-face-emotions-r/">Analyze Face Emotions with R</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
         </div>
       </div>
       </article>

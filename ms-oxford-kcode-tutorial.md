@@ -93,7 +93,18 @@ rasterImage(lena,0,0,1,1)
 ## 1. Lena 이미지
 
 library(httr)
+~~~
 
+
+
+~~~{.error}
+Warning: package 'httr' was built under R version 4.0.2
+
+~~~
+
+
+
+~~~{.r}
 par(mar=c(0,0,0,0))
 plot.new()
 
@@ -111,23 +122,74 @@ face_api_url = "https://api.projectoxford.ai/face/v1.0/detect?returnFaceLandmark
 
 # faceKEY <- '53xxxxxxxxxxxxxxxxxxxxxxxxxx'
 source("03_code/private-keys.R") 
+~~~
 
+
+
+~~~{.error}
+Warning in file(filename, "r", encoding = encoding): cannot open file '03_code/
+private-keys.R': No such file or directory
+
+~~~
+
+
+
+~~~{.error}
+Error in file(filename, "r", encoding = encoding): cannot open the connection
+
+~~~
+
+
+
+~~~{.r}
 result <- POST(url = face_api_url,
                body = img,
                add_headers(.headers = c('Content-Type' = 'application/octet-stream',
                                         'Ocp-Apim-Subscription-Key' = faceKEY))
 )
+~~~
 
+
+
+~~~{.error}
+Error in request(headers = c(..., .headers)): object 'faceKEY' not found
+
+~~~
+
+
+
+~~~{.r}
 face_df <- as.data.frame(content(result))
+~~~
 
 
+
+~~~{.error}
+Error in is.response(x): object 'result' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 3. 얼굴 위치 사각형 표시
 
 rect <- data.frame(x1 = face_df$faceRectangle.left,
                    x2 = face_df$faceRectangle.left + face_df$faceRectangle.width,
                    y1 = dim(lena)[1] - face_df$faceRectangle.top,
                    y2 = dim(lena)[1] - face_df$faceRectangle.top - face_df$faceRectangle.height)
+~~~
 
+
+
+~~~{.error}
+Error in data.frame(x1 = face_df$faceRectangle.left, x2 = face_df$faceRectangle.left + : object 'face_df' not found
+
+~~~
+
+
+
+~~~{.r}
 df <- data.frame(0:dim(lena)[2], 0:dim(lena)[1])
 
 
@@ -139,6 +201,13 @@ ggplot(df) +
   annotation_custom(g, xmin=0, xmax=dim(lena)[2], ymin=0, ymax=dim(lena)[1]) +
   geom_rect(data=rect, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="blue", alpha=0.0) +
   coord_fixed()
+~~~
+
+
+
+~~~{.error}
+Error in f(...): 'list' object cannot be coerced to type 'double'
+
 ~~~
 
 <img src="fig/dl-image-location-2.png" title="plot of chunk dl-image-location" alt="plot of chunk dl-image-location" style="display: block; margin: auto;" />
@@ -160,7 +229,26 @@ URL.emoface <- 'https://api.projectoxford.ai/emotion/v1.0/recognize'
 # 접속 인증키 설정
 # emotionKEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 source("03_code/private-keys.R") 
+~~~
 
+
+
+~~~{.error}
+Warning in file(filename, "r", encoding = encoding): cannot open file '03_code/
+private-keys.R': No such file or directory
+
+~~~
+
+
+
+~~~{.error}
+Error in file(filename, "r", encoding = encoding): cannot open the connection
+
+~~~
+
+
+
+~~~{.r}
 ## 02. 감정분석할 이미지 지정 및 호출 ==========================================================================================
 
 img <- httr::upload_file("02_data/suji.jpg")
@@ -171,24 +259,111 @@ suji_face <- POST(url = emotion_api_url,
             add_headers(.headers = c('Content-Type' = 'application/octet-stream',
                         'Ocp-Apim-Subscription-Key' = emotionKEY))
 )
+~~~
 
+
+
+~~~{.error}
+Error in request(headers = c(..., .headers)): object 'emotionKEY' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 03. 감정분석결과 추가분석 (Suji Face) ==========================================================================================
 # 얼굴 분석결과
 suji_face_lst <- httr::content(suji_face)[[1]]
+~~~
+
+
+
+~~~{.error}
+Error in is.response(x): object 'suji_face' not found
+
+~~~
+
+
+
+~~~{.r}
 suji_face_df <- as.data.frame(suji_face_lst[2]) %>% t %>% as.data.frame
+~~~
 
+
+
+~~~{.error}
+Error in as.data.frame(suji_face_lst[2]): object 'suji_face_lst' not found
+
+~~~
+
+
+
+~~~{.r}
 suji_face_df$V1 <- lapply(strsplit(as.character(suji_face_df$V1), "e"), "[", 1)
+~~~
+
+
+
+~~~{.error}
+Error in strsplit(as.character(suji_face_df$V1), "e"): object 'suji_face_df' not found
+
+~~~
+
+
+
+~~~{.r}
 suji_face_df$V1 <- as.numeric(suji_face_df$V1)
+~~~
+
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'suji_face_df' not found
+
+~~~
+
+
+
+~~~{.r}
 colnames(suji_face_df)[1] <- "Level"
+~~~
 
+
+
+~~~{.error}
+Error in colnames(suji_face_df)[1] <- "Level": object 'suji_face_df' not found
+
+~~~
+
+
+
+~~~{.r}
 suji_face_df$Emotion <- sub("scores.", "", rownames(suji_face_df))
+~~~
 
+
+
+~~~{.error}
+Error in rownames(suji_face_df): object 'suji_face_df' not found
+
+~~~
+
+
+
+~~~{.r}
 # 시각화
 ggplot(suji_face_df, aes(x=Emotion, y=Level)) +   
   geom_bar(stat="identity")
 ~~~
 
-<img src="fig/dl-image-emotion-1.png" title="plot of chunk dl-image-emotion" alt="plot of chunk dl-image-emotion" style="display: block; margin: auto;" />
+
+
+~~~{.error}
+Error in ggplot(suji_face_df, aes(x = Emotion, y = Level)): object 'suji_face_df' not found
+
+~~~
+
+
 
 ~~~{.r}
 suji_face_df
@@ -196,16 +371,8 @@ suji_face_df
 
 
 
-~~~{.output}
-                     Level   Emotion
-scores.anger     1.0956078     anger
-scores.contempt  1.4617596  contempt
-scores.disgust   1.8161433   disgust
-scores.fear      4.8990230      fear
-scores.happiness 0.9999176 happiness
-scores.neutral   7.6674960   neutral
-scores.sadness   1.2341061   sadness
-scores.surprise  4.2812660  surprise
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'suji_face_df' not found
 
 ~~~
 
@@ -223,6 +390,18 @@ library(ggplot2)
 library(png)
 library(grid)
 library(jsonlite)
+~~~
+
+
+
+~~~{.error}
+Warning: package 'jsonlite' was built under R version 4.0.3
+
+~~~
+
+
+
+~~~{.r}
 library(dplyr)
 
 # 1. 데이터 불러오기 ----------------------------------------------
@@ -235,7 +414,26 @@ face_api_url <- "https://api.projectoxford.ai/face/v1.0/detect?returnFaceAttribu
 
 # faceKEY <- '53xxxxxxxxxxxxxxxxxx'
 source("03_code/private-keys.R")
+~~~
 
+
+
+~~~{.error}
+Warning in file(filename, "r", encoding = encoding): cannot open file '03_code/
+private-keys.R': No such file or directory
+
+~~~
+
+
+
+~~~{.error}
+Error in file(filename, "r", encoding = encoding): cannot open the connection
+
+~~~
+
+
+
+~~~{.r}
 img_bucket <- list()
 
 for(lst in seq_along(img_list)){
@@ -250,26 +448,65 @@ for(lst in seq_along(img_list)){
   
   img_bucket[[lst]] <- as.data.frame(content(result))[,c("faceAttributes.gender", "faceAttributes.age")]
 }
+~~~
 
+
+
+~~~{.error}
+Error in request(headers = c(..., .headers)): object 'faceKEY' not found
+
+~~~
+
+
+
+~~~{.r}
 # 3. 데이터 정리-------------------------------------
 
 img_buckets <- do.call(rbind, img_bucket)
 
 img_buckets <- data.frame(idate=img_list, img_buckets)
+~~~
+
+
+
+~~~{.error}
+Error in data.frame(idate = img_list, img_buckets): arguments imply differing number of rows: 5, 0
+
+~~~
+
+
+
+~~~{.r}
 img_buckets <- img_buckets %>% 
   rename(gender = faceAttributes.gender, age=faceAttributes.age)
+~~~
 
+
+
+~~~{.error}
+Warning: `rename_()` is deprecated as of dplyr 0.7.0.
+Please use `rename()` instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_warnings()` to see where this warning was generated.
+
+~~~
+
+
+
+~~~{.error}
+Error in UseMethod("rename_"): no applicable method for 'rename_' applied to an object of class "NULL"
+
+~~~
+
+
+
+~~~{.r}
 img_buckets
 ~~~
 
 
 
 ~~~{.output}
-           idate gender  age
-1 angry-face.jpg female  6.2
-2         hq.png   male 45.9
-3       lena.png female 27.7
-4     suji-2.png female 23.8
-5       suji.jpg female 22.3
+NULL
 
 ~~~

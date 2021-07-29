@@ -1,4 +1,15 @@
-# xwMOOC 딥러닝
+---
+layout: page
+title: xwMOOC 딥러닝
+subtitle: R 케라스(keras) - 보스톤 주택가격(Boston Housing)
+output:
+  html_document: 
+    toc: yes
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -45,17 +56,99 @@
 
 # 1. 데이터 가져오기 ------------------------
 boston <- dataset_boston_housing()
+~~~
 
+
+
+~~~{.error}
+Error: Installation of TensorFlow not found.
+
+Python environments searched for 'tensorflow' package:
+ C:\Users\statkclee\miniconda3\python.exe
+
+You can install TensorFlow using the install_tensorflow() function.
+
+~~~
+
+
+
+~~~{.r}
 # 2. 전처리 및 훈련/학습 데이터 분할 ----------------------------------
 ## 훈련데이터
 train_x <- scale(boston$train$x, center = TRUE, scale = TRUE)
-train_x[,4] <- boston$train$x[,4]
-train_y <- boston$train$y
+~~~
 
+
+
+~~~{.error}
+Error in scale(boston$train$x, center = TRUE, scale = TRUE): object 'boston' not found
+
+~~~
+
+
+
+~~~{.r}
+train_x[,4] <- boston$train$x[,4]
+~~~
+
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'boston' not found
+
+~~~
+
+
+
+~~~{.r}
+train_y <- boston$train$y
+~~~
+
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'boston' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 검증데이터
 test_x <- scale(boston$test$x, center = TRUE, scale = TRUE)
+~~~
+
+
+
+~~~{.error}
+Error in scale(boston$test$x, center = TRUE, scale = TRUE): object 'boston' not found
+
+~~~
+
+
+
+~~~{.r}
 test_x[,4] <- boston$test$x[,4]
+~~~
+
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'boston' not found
+
+~~~
+
+
+
+~~~{.r}
 test_y <- boston$test$y
+~~~
+
+
+
+~~~{.error}
+Error in eval(expr, envir, enclos): object 'boston' not found
+
 ~~~
 
 ### 2.2. 보스턴 주택가격 예측 모형
@@ -69,35 +162,68 @@ test_y <- boston$test$y
 # 3. 딥러닝 모형 ----------------------------------
 ## 3.1. 모형 초기화
 model <- keras_model_sequential()
+~~~
 
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
 ## 3.2. 모형 아키텍쳐 구성
 model %>% 
     layer_dense(units=36, kernel_initializer='normal', activation='relu', input_shape=c(13))  %>%
     layer_dense(units=6, kernel_initializer='normal', activation='relu')  %>%
     layer_dense(units=1, activation = "relu", kernel_initializer='normal') 
+~~~
 
+
+
+~~~{.error}
+Error: Python module tensorflow.keras was not found.
+
+Detected Python configuration:
+
+python:         C:/Users/statkclee/miniconda3/python.exe
+libpython:      C:/Users/statkclee/miniconda3/python38.dll
+pythonhome:     C:/Users/statkclee/miniconda3
+version:        3.8.5 (default, Sep  3 2020, 21:29:08) [MSC v.1916 64 bit (AMD64)]
+Architecture:   64bit
+numpy:          C:/Users/statkclee/miniconda3/Lib/site-packages/numpy
+numpy_version:  1.19.5
+tensorflow:     [NOT FOUND]
+
+NOTE: Python version was forced by RETICULATE_PYTHON
+
+~~~
+
+
+
+~~~{.r}
 summary(model)
 ~~~
 
 
 
-~~~{.output}
-Model
-___________________________________________________________________________
-Layer (type)                     Output Shape                  Param #     
-===========================================================================
-dense_1 (Dense)                  (None, 36)                    504         
-___________________________________________________________________________
-dense_2 (Dense)                  (None, 6)                     222         
-___________________________________________________________________________
-dense_3 (Dense)                  (None, 1)                     7           
-===========================================================================
-Total params: 733
-Trainable params: 733
-Non-trainable params: 0
-___________________________________________________________________________
-
- 
+~~~{.error}
+Error in summary(model): object 'model' not found
 
 ~~~
 
@@ -107,26 +233,41 @@ ___________________________________________________________________________
 model %>%
     compile(loss ="mse",
             optimizer = "adam")
+~~~
 
+
+
+~~~{.error}
+Error in compile(., loss = "mse", optimizer = "adam"): object 'model' not found
+
+~~~
+
+
+
+~~~{.r}
 ## 3.3. 학습
 history <- model %>% fit(train_x, train_y, epochs = 20, batch_size = 10,
                          callbacks = callback_tensorboard(log_dir = "logs/run_b"),
                          validation_split = 0.2) 
+~~~
+
+
+
+~~~{.error}
+Error in fit(., train_x, train_y, epochs = 20, batch_size = 10, callbacks = callback_tensorboard(log_dir = "logs/run_b"), : object 'model' not found
+
+~~~
+
+
+
+~~~{.r}
 history$metrics
 ~~~
 
 
 
-~~~{.output}
-$val_loss
- [1] 472.01922 383.94909 276.99221 188.34494 148.03433 125.00140 107.16720
- [8]  93.12612  81.90249  72.96477  66.60478  62.52658  59.13130  56.43135
-[15]  53.64271  50.60874  48.97117  47.37940  45.24506  43.75909
-
-$loss
- [1] 449.92567 396.36524 331.66133 231.91577 153.86702 117.60213  95.89921
- [8]  78.13874  64.63229  55.53465  50.91266  47.29405  44.54993  42.09855
-[15]  40.09888  38.12401  36.23847  34.75228  33.39728  31.99447
+~~~{.error}
+Error in history$metrics: object of type 'closure' is not subsettable
 
 ~~~
 
@@ -143,25 +284,79 @@ $loss
 plot(x = 1:length(history$metrics$val_loss), y = sqrt(history$metrics$loss),
      pch=19, col='red',type='b',
      ylab="훈련데이터 오차", xlab="세대별(Epoch)", family="NanumGothic")
+~~~
+
+
+
+~~~{.error}
+Error in history$metrics: object of type 'closure' is not subsettable
+
+~~~
+
+
+
+~~~{.r}
 lines(sqrt(history$metrics$val_loss), col="green")
+~~~
+
+
+
+~~~{.error}
+Error in history$metrics: object of type 'closure' is not subsettable
+
+~~~
+
+
+
+~~~{.r}
 title("보스턴 주택가격 평균제곱오차(MSE)", family="NanumGothic")
+~~~
+
+
+
+~~~{.error}
+Error in title("보스턴 주택가격 평균제곱오차(MSE)", family = "NanumGothic"): plot.new has not been called yet
+
+~~~
+
+
+
+~~~{.r}
 legend("topright", c("훈련","검증"), col=c("red", "green"), lty=c(1,1))
 ~~~
 
-<img src="fig/boston-housing-deep-learning-evaluation-1.png" style="display: block; margin: auto;" />
+
+
+~~~{.error}
+Error in strwidth(legend, units = "user", cex = cex, font = text.font): plot.new has not been called yet
+
+~~~
+
+
 
 ~~~{.r}
 # 검증데이터 평가점수
 score <- model %>% 
     evaluate(test_x, test_y, batch_size=32)
+~~~
 
+
+
+~~~{.error}
+Error in evaluate(., test_x, test_y, batch_size = 32): object 'model' not found
+
+~~~
+
+
+
+~~~{.r}
 cat("제곱근평균제곱오차(RMSE): ", sqrt(score[[1]]), "\n")
 ~~~
 
 
 
-~~~{.output}
-제곱근평균제곱오차(RMSE):  6.816028 
+~~~{.error}
+Error in cat("제곱근평균제곱오차(RMSE): ", sqrt(score[[1]]), "\n"): object 'score' not found
 
 ~~~
 
