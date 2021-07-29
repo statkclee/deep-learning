@@ -12,7 +12,7 @@ output:
     include:
       after_body: footer.html
       before_body: header.html
-    theme: journal
+    theme: default
     toc: yes
     toc_depth: 2
     toc_float: true
@@ -132,7 +132,7 @@ julia_bbox_img
 ```
 
 
-# 얼굴 추출 함수 {#extract-face-from-image}
+## 얼굴 추출 함수 {#extract-face-from-image}
 
 앞선 알고리즘을 바탕으로 사진을 입력값으로 넣었을 때 얼굴을 추출하여 이미지로 저장하는 함수를 작성해보자.
 원본 이미지 경로를 받아 이미지에서 얼굴 좌표를 얻어내고 이미지 영역 표시를 거쳐 얼굴 영역만 짤라낸다.
@@ -185,7 +185,7 @@ julia_face_img
 ```
 
 
-# 발표자 얼굴 추출 {#extract-face-from-image-automation}
+## 발표자 얼굴 추출 {#extract-face-from-image-automation}
 
 발표자 사진 모두에서 발표자를 추출하여 얼굴만 담긴 프로필 사진을 저장시킨다.
 
@@ -199,7 +199,7 @@ walk(speakers_list, safely_extract_face)
 ```
 
 
-# 추출 결과확인 {#extract-face-from-image-automation-check}
+## 추출 결과확인 {#extract-face-from-image-automation-check}
 
 추출한 발표자 얼굴을 확인한다.
 
@@ -211,5 +211,45 @@ speakers_face_img <- map(speakers_face_img, image_resize, "100")
 
 image_join(speakers_face_img) %>% 
   image_append()
+```
+
+
+# 졸업 얼굴 추출 {#recognized-faces-circle}
+
+`ocv_facemask()` 함수를 사용해서 바로 마스크를 사용해서 발표자 얼굴을 추출해보자.
+
+```{r extract-face-circle}
+
+julia_img <- image_read("fig/rconf_speakers/julia_silge.jpg")
+
+# 1. 얼굴인식 좌표 추출 --------------
+figure_face_info <- ocv_read('fig/rconf_speakers/julia_silge.jpg') %>% 
+  ocv_facemask() 
+
+# 2. 마스크 저장 --------------
+# fs::dir_create("fig/rconf_circle")
+
+figure_face_info %>% 
+  ocv_write(path = "fig/rconf_circle/julia_silge_mask.png")
+
+julia_silge_mask <- 
+  image_read("fig/rconf_circle/julia_silge_mask.png") %>% 
+  image_transparent(color = "white")
+
+# 3. 마스크 이미지에 적용 --------------
+
+julia_silge_circle <- 
+  image_composite(julia_img, julia_silge_mask, operator='atop') %>% 
+  image_fill(
+    color = "white", 
+    refcolor = "black", 
+    fuzz = 3,
+    point = "+1+1" # start at top left 1 pixel in
+  ) %>% 
+  image_trim
+
+julia_silge_circle %>% 
+  image_resize("200%")
+
 ```
 
