@@ -97,7 +97,10 @@ julia_tbl
 ## 얼굴인식 영역 {#helloworld-faces-bbox}
 
 인식한 얼굴의 영역을 원이 아니라 영역상자(bouding box)를 통해 원본 이미지 위에 표현해보자.
-인식한 얼굴의 좌표를 바탕으로 얼굴이 위치한 곳에 녹색 영역상자를 그려보자.
+인식한 얼굴의 좌표를 바탕으로 얼굴이 위치한 곳에 녹색 영역상자를 그려보자. 먼저 원으로 된 좌표를 정사각형으로 변화시키는데 필요한 로직을 정리하면 다음과 같다. `rect()` 함수의 인자값에 맞춰야 하기 때문에 다음 수식을 사용한다.
+
+![](fig/rconf-circle-rect.png)
+
 
 ```{r face-recognition-bbox}
 
@@ -126,5 +129,87 @@ julia_bbox_img <-
   image_read("fig/rconf_speakers_processed/julia_rect.png")
 
 julia_bbox_img
+```
+
+
+# 얼굴 추출 함수 {#extract-face-from-image}
+
+앞선 알고리즘을 바탕으로 사진을 입력값으로 넣었을 때 얼굴을 추출하여 이미지로 저장하는 함수를 작성해보자.
+원본 이미지 경로를 받아 이미지에서 얼굴 좌표를 얻어내고 이미지 영역 표시를 거쳐 얼굴 영역만 짤라낸다.
+그리고 추출된 이미지를 적절한 확장자를 붙여 로컬 파일에 저장시킨다.
+
+```{r make-face-detection-function}
+
+extract_face <- function(raw_image) {
+  # 1. 얼굴인식 좌표 추출 --------------
+  figure_face_info <- ocv_read(raw_image) %>% 
+    ocv_facemask()
+  
+  ## 데이터프레임 자료구조 변환
+  face_tbl <- attr(figure_face_info, "faces") %>% 
+  as_tibble()
+  
+  # 2. 이미지 영역 표시 -------------
+  figure_img <- image_read(raw_image)
+
+  ## 영역 표시 -------------------------
+  figure_draw <- image_draw(figure_img)
+  
+  rect(xleft   = face_tbl$x - face_tbl$radius, 
+       xright  = face_tbl$x + face_tbl$radius,
+       ybottom = face_tbl$y - face_tbl$radius,
+       ytop    = face_tbl$y + face_tbl$radius, border = "green", lwd = 5)
+  
+  dev.off()
+
+  # 3. 이미지 잘라내기 -------------
+  figure_crop <- figure_draw %>% 
+    image_crop(geometry_area(x_off = face_tbl$x - face_tbl$radius * 1.5, 
+                             y_off = face_tbl$y - face_tbl$radius * 1.5,
+                             width = face_tbl$radius  * 2 * 1.5, 
+                             height = face_tbl$radius * 2 * 1.5))
+  
+  # 4. 이미지 저장하기 -------------
+  processed_filename <- fs::path_file(raw_image) %>% fs::path_ext_remove(.)
+  
+  figure_crop %>% 
+    image_write(path =  glue::glue("fig/rconf_processed/{processed_filename}_face.png"))
+  
+  # return(figure_crop)
+}
+
+extract_face('fig/rconf_speakers/julia_silge.jpg')
+
+julia_face_img <- image_read(path = "fig/rconf_processed/julia_silge_face.png")
+julia_face_img
+```
+
+
+# 발표자 얼굴 추출 {#extract-face-from-image-automation}
+
+발표자 사진 모두에서 발표자를 추출하여 얼굴만 담긴 프로필 사진을 저장시킨다.
+
+```{r make-face-detection-function-automation, eval=FALSE}
+
+speakers_list <- fs::dir_ls("fig/rconf_speakers/")
+
+safely_extract_face <- safely(extract_face, otherwise = NA_real_)
+
+walk(speakers_list, safely_extract_face)
+```
+
+
+# 추출 결과확인 {#extract-face-from-image-automation-check}
+
+추출한 발표자 얼굴을 확인한다.
+
+```{r make-face-detection-function-check}
+speakers_face_list <- fs::dir_ls("fig/rconf_processed/")
+
+speakers_face_img <- map(speakers_face_list, image_read)
+speakers_face_img <- map(speakers_face_img, image_resize, "100")
+
+image_join(speakers_face_img) %>% 
+  image_append()
 ```
 
