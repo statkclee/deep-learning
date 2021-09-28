@@ -253,3 +253,37 @@ julia_silge_circle %>%
 
 ```
 
+
+# 한국 R 컨퍼런스 발표자 {#rconf-speakers}
+
+[한국 R 컨퍼런스](https://use-r.kr/) 발표자가 확정되어 졸업앨범 사진 형태로 각 발표자가 보내준 
+프로필 사진에서 얼굴을 인식하여 우선 직사각형 형태로 특정하고 졸업앨범 형태로 발표자 사진 이미지를 
+추출한 결과를 확인해보자.
+
+```{r check-rconf-speakers}
+library(magick)
+library(slickR)
+
+rconf_mask_filename <- fs::dir_ls("fig/rconf_speakers_mask/")
+
+speaker_name <- fs::path_file(rconf_mask_filename) %>% 
+  str_remove("_face_mask\\.(png|gif)") %>% 
+  str_replace("_", " ") %>% 
+  str_to_title()
+
+rconf_mask_tbl <- tibble(file_path    = rconf_mask_filename,
+                         speaker_name = speaker_name)
+
+opts <- settings(
+  dots = TRUE,
+  initialSlide = 0,
+  slidesToShow = 3, 
+  slidesToScroll = 3, 
+  focusOnSelect = TRUE)
+
+slickR(obj = rconf_mask_tbl$file_path)  %synch%
+( slickR(rconf_mask_tbl$speaker_name, slideType = 'p') + settings(arrows = FALSE) ) +
+  opts
+
+```
+

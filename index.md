@@ -53,7 +53,7 @@ title: 데이터 과학과 딥러닝
         - [R 케라스(keras) - 이미지넷(Imagenet)](r-keras-imagenet.html)
         - [R 케라스(keras) - 패션 MNIST](r-keras-fashion-mnist.html)
         - [R 케라스(keras) - 패션 MNIST (캐글 데이터)](r-keras-fashion-mnist-kaggle.html)
-    - [사람 얼굴 인식](r-face-recognition.html)
+    - [사람 얼굴 인식](r-face-recognition.html) vs. [사람 얼굴 인식(2021)](r-face-recognition-20210928.html)
         - [한국 R 컨퍼런스 - 발표자](r-face-conference.html)
     - [이미지 객체 분류 시스템 (Object Classification)](r-object-classification.html)
 1. [캡챠(captcha)란?](r-captcha.html)
