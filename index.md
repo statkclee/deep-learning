@@ -96,4 +96,5 @@ title: 데이터 과학과 딥러닝
     - [`xaringan` 발표자료 유튜브 동영상 자동 제작](r-xaringan-ari.html)
 1. [`speech-to-text` - 음성을 텍스트로 변환](r-stt.html)
     - [구글 음성 API](speech-api.html)
+    - [한국 R 컨퍼런스 - Julia Silge Keynote 번역](rconf-keynote.html)
 
