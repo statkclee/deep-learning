@@ -50,7 +50,12 @@ embed_audio("data/julia_silge/15_silge.mp3")
 
 # 오디오 &rarr; 텍스트 (STT) {#audio-extraction-stt}
 
-[Cloud Speech-to-Text API](https://cloud.google.com/speech-to-text/)를 사용해서 오디오에서 텍스트를 추출한다. 하지만 1분이 넘어가는 경우 제약이 있기 때문에 Google Cloud Storage에 앞서 추출한 `.flac` 파일을 GCS 버킷에 넣어 사용해야만 한다. 추출한 오디오 `.flac` 파일을 클라우데 
+[Cloud Speech-to-Text API](https://cloud.google.com/speech-to-text/)를 사용해서 오디오에서 텍스트를 추출한다. 하지만 1분이 넘어가는 경우 제약이 있기 때문에 Google Cloud Storage에 앞서 추출한 `.flac` 파일을 GCS 버킷에 넣어 사용해야만 한다. 추출한 오디오 `.flac` 파일을 GCS 버킷에 담는 자세한 과정은 [Google Cloud Storage - googleCloudStorageR](https://statkclee.github.io/deep-learning/r-google-storage.html)을 참조한다.
+
+구글 STT API를 활용하게 되면 오디오 파일을 입력으로 받아 추출한 텍스트와 시점정보를 함께 반환한다.
+`객체명$transcript`에 오디오에서 추출된 텍스트, `객체명$timings`에 추출된 텍스트 시점정보가 함께 저장되어 있다.
+
+약 45분 오디오를 구글 STT에서 처리하는데 2,820 초가 소요되었다. 
 
 ```{r tts-hello, error=TRUE, eval = FALSE}
 library(googleLanguageR)
@@ -62,7 +67,6 @@ kt_config <- list(encoding = "FLAC",
                   ))
 
 julia_gcs <- "gs://julia_silge/15_silge.flac"
-
 
 julia_tts <-  gl_speech(julia_gcs, languageCode = "en-US", sampleRateHertz = 44100L, asynch = TRUE, 
                         customConfig = kt_config)
@@ -85,21 +89,39 @@ julia_stt_timing_list %>%
 
 ## STT 기계추출 &rarr; 텍스트 {#stt-raw-text}
 
-```{r julia-silge-translation, eval = FALSE}
+추출한 텍스트와 전문은 다음과 같다. [다운로드: STT 원본 TEXT](data/julia_silge/julia_stt_raw_text.txt)
+
+```{r julia-silge-translation, eval = TRUE}
+library(reactable)
+
 julia_stt_tbl <-  
   read_rds("data/julia_silge/julia_stt_tbl.rds") 
 
 julia_stt_raw_text <- julia_stt_tbl %>% 
   summarise(stt_raw_text = paste(transcript, collapse = "\n"))
 
+# julia_stt_raw_text %>% 
+#   write_lines("data/julia_silge/julia_stt_raw_text.txt")
+
 julia_stt_raw_text %>% 
-  write_lines("data/julia_silge/julia_stt_raw_text.txt")
+    reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  bordered = TRUE,
+  highlight = TRUE)
 ```
+
 
 ## STT 기계추출 &rarr; 시간 {#stt-raw-text-timing}
 
-```{r julia-silge-translation-time, eval = FALSE}
-library(reactable)
+다음으로 중요한 것은 시점정보다. 이를 위해서 총 45분 강연이라 5분 단위로 짤라 9개로 쪼개 추후 자연어 처리가 가능하도록 조치한다.
+
+```{r julia-silge-translation-time, eval = TRUE}
 
 julia_stt_timing_list <- 
   read_rds("data/julia_silge/julia_stt_timing_list.rds")
