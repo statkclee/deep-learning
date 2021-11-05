@@ -83,6 +83,7 @@ title: 데이터 과학과 딥러닝
         - [구글 클라우드 비젼 - 파이썬](gc-vision.html)            
         - [R 구글 url 축약-googleAuthR](r-short-url.html)
         - [R 구글 애널리틱스(GA)-RGA](r-ga.html)
+        - [Google Cloud Storage - `googleCloudStorageR`](r-google-storage.html)        
     - **IBM**
         - [IBM 왓슨](r-watson.html)
 1. [Andrew Ng 딥러닝 코세라 강의](ng-coursera.html)

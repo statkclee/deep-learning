@@ -2,17 +2,15 @@
 title: "딥러닝"
 subtitle: "한국 R 컨퍼런스 - Julia Silge Keynote번역"
 author:
-  - name: "[Tidyverse Korea](https://www.facebook.com/groups/tidyverse/)"
-    url: https://www.facebook.com/groups/tidyverse/
-    affiliation: Tidyverse Korea
-    affiliation_url: https://www.facebook.com/groups/tidyverse/
+- name: "이광춘"
+  affiliation: "[Tidyverse Korea](https://www.facebook.com/groups/tidyverse/)"
 date: "`r Sys.Date()`"
 output:
   html_document: 
     include:
       after_body: footer.html
       before_body: header.html
-    theme: journal
+    theme: default
     toc: yes
     toc_depth: 2
     toc_float: true
@@ -35,19 +33,26 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
 knitr::opts_knit$set(global.par = TRUE) 
 ```
 
+![](fig/rconf_keynote_translation.jpg)
+
+# 동영상 &rarr; 오디오 추출 {#audio-extraction}
+
+동영상에서 오디오를 추출해서 Speech to Text (STT)가 가능한 `.flac` 형태로 저장한다.
+유튜브 동영상에서 오디오를 추출하는 사례를 [speech-to-text - 음성을 텍스트로 변환](https://statkclee.github.io/deep-learning/r-stt.html)에서 자세한 사항 참조한다.
 
 ```{r julia-silge}
 library(embedr)
+library(tidyverse)
 
-embed_audio("data/15_silge.mp3")
-
+embed_audio("data/julia_silge/15_silge.mp3")
 
 ```
 
+# 오디오 &rarr; 텍스트 (STT) {#audio-extraction-stt}
 
-Cloud Speech-to-Text API
+[Cloud Speech-to-Text API](https://cloud.google.com/speech-to-text/)를 사용해서 오디오에서 텍스트를 추출한다. 하지만 1분이 넘어가는 경우 제약이 있기 때문에 Google Cloud Storage에 앞서 추출한 `.flac` 파일을 GCS 버킷에 넣어 사용해야만 한다. 추출한 오디오 `.flac` 파일을 클라우데 
 
-```{r tts-hello, error=TRUE}
+```{r tts-hello, error=TRUE, eval = FALSE}
 library(googleLanguageR)
 
 kt_config <- list(encoding = "FLAC",
@@ -56,11 +61,79 @@ kt_config <- list(encoding = "FLAC",
                     enableSpeakerDiarization = TRUE
                   ))
 
-test_gcs <- "gs://mark-edmondson-public-files/googleLanguageR/a-dream-mono.wav"
+julia_gcs <- "gs://julia_silge/15_silge.flac"
 
 
-julia_tts <-  gl_speech("https://storage.googleapis.com/rconf-keynote/15_silge.flac", languageCode = "en-US", customConfig = kt_config)
+julia_tts <-  gl_speech(julia_gcs, languageCode = "en-US", sampleRateHertz = 44100L, asynch = TRUE, 
+                        customConfig = kt_config)
 
+julia_tts_res <- gl_speech_op(julia_tts)
+# 2021-11-05 15:49:59 -- Asynchronous transcription finished.
+# 2021-11-05 15:49:59 -- Speech transcription finished. Total billed time: 2820s
+
+julia_stt_tbl <- julia_tts_res$transcript %>% 
+  as_tibble()
+
+julia_stt_tbl %>% 
+  write_rds("data/julia_silge/julia_stt_tbl.rds")
+
+julia_stt_timing_list <- julia_tts_res$timings 
+
+julia_stt_timing_list %>% 
+  write_rds("data/julia_silge/julia_stt_timing_list.rds")
+```
+
+## STT 기계추출 &rarr; 텍스트 {#stt-raw-text}
+
+```{r julia-silge-translation, eval = FALSE}
+julia_stt_tbl <-  
+  read_rds("data/julia_silge/julia_stt_tbl.rds") 
+
+julia_stt_raw_text <- julia_stt_tbl %>% 
+  summarise(stt_raw_text = paste(transcript, collapse = "\n"))
+
+julia_stt_raw_text %>% 
+  write_lines("data/julia_silge/julia_stt_raw_text.txt")
+```
+
+## STT 기계추출 &rarr; 시간 {#stt-raw-text-timing}
+
+```{r julia-silge-translation-time, eval = FALSE}
+library(reactable)
+
+julia_stt_timing_list <- 
+  read_rds("data/julia_silge/julia_stt_timing_list.rds")
+
+julia_stt_timing_tbl <- map_df(julia_stt_timing_list, rbind) %>% 
+  as_tibble() %>% 
+  select(-speakerTag)
+
+
+julia_stt_timing_five_tbl <- julia_stt_timing_tbl %>% 
+  mutate(startTime = parse_number(startTime),
+         endTime   = parse_number(endTime)) %>% 
+  # 45 분 / 9 구간 = 5 분/구간
+  mutate(nine_interval = cut( startTime, 
+                              breaks = unique(quantile(startTime, probs = seq.int(0, 1, by = 1 / 9))), 
+                                              include.lowest=TRUE)) %>% 
+  group_by(nine_interval) %>% 
+  summarise(five_min_text = paste(word, collapse = " "))
+
+julia_stt_timing_five_tbl %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    nine_interval = colDef(minWidth = 20),
+    five_min_text = colDef(minWidth = 140)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)
 ```
 
 
