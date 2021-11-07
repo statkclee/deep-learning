@@ -289,11 +289,65 @@ keynote_kor_srt <- translation_obj %>%
   bind_cols(keynote_gl_tbl %>% select(-translation)) %>% 
   select(n, start, end, subtitle = translatedText)
 
-# 기대했던 결과가 아님!!! 
-keynote_kor_srt %>% 
-  srt::write_srt("data/julia_silge/15_silge_kor_google.srt")
-
-
+# 기대했던 결과가 아님!!! (버그가 있음)
+# keynote_kor_srt %>% 
+#   srt::write_srt("data/julia_silge/15_silge_kor_google.srt", wrap = TRUE, width = 50)
 
 ```
+
+`srt::write_srt()` 함수에 버그가 있어 [`subtools`](https://github.com/fkeck/subtools)  
+
+```{r srt-export-with-subtools, eval = FALSE}
+# devtools::install_github("fkeck/subtools")
+library(subtools)
+
+eng_subtools <- subtools::read_subtitles("data/julia_silge/15_silge_english.srt")
+
+kor_subtools <- eng_subtools %>% 
+  bind_cols(translation_obj %>% select(translatedText)) %>% 
+  select(ID, Timecode_in, Timecode_out, Text_content = translatedText)
+
+# class(eng_subtools)
+# class(kor_subtools)
+
+kor_subtools %>% 
+  subtools::write_subtitles(file = "data/julia_silge/15_silge_kor.srt", 
+                            format = "srt", encoding = "UTF-8")
+```
+
+앞서 작업한 구글 영한 기계 번역 결과가 제대로 되었는지 다음을 통해 확인할 수 있다.
+
+```{r korean-srt-output-overview}
+kor_subtools <- 
+  subtools::read_subtitles(file = "data/julia_silge/15_silge_kor.srt", 
+                            format = "srt", encoding = "UTF-8")
+
+kor_subtools %>% 
+  janitor::clean_names() %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    id = colDef(minWidth = 10),
+    timecode_in = colDef(minWidth = 25),
+    timecode_out = colDef(minWidth = 25),
+    text_content = colDef(minWidth = 100)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)
+```
+
+![](fig/julia-google-translation-with-human.jpg)
+
+# 깔끔한 작업흐름 {#google-translation}
+
+구글 실시간 번역 결과를 의미있는 형태로 바꾸기 위해서는 이를 문장단위로 나눠져야 구글 번역기의
+성능이 향상되어 나름 적은 노력으로 `.srt` 한글 번역 자막을 만들어 바로 활용할 수 있다. 
+
+
 
