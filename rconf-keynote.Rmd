@@ -349,5 +349,332 @@ kor_subtools %>%
 구글 실시간 번역 결과를 의미있는 형태로 바꾸기 위해서는 이를 문장단위로 나눠져야 구글 번역기의
 성능이 향상되어 나름 적은 노력으로 `.srt` 한글 번역 자막을 만들어 바로 활용할 수 있다. 
 
+```{r read-sentence-level-translation}
+julia_sentence_srt <- 
+  subtools::read_subtitles(file = "data/julia_silge/15_silge_eng_for_translation.srt", 
+                            format = "srt", encoding = "UTF-8") %>% 
+    janitor::clean_names()
 
+julia_sentence_srt %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    id = colDef(minWidth = 10),
+    timecode_in = colDef(minWidth = 25),
+    timecode_out = colDef(minWidth = 25),
+    text_content = colDef(minWidth = 100)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)
+
+```
+
+구글 번역기에 문장단위로 쪼개 전송하여 영문을 한국어로 번역한다.
+
+```{r translate-again-google, eval = FALSE}
+julia_sentence_gl_translation_srt <- julia_sentence_srt %>% 
+  mutate(translation = googleLanguageR::gl_translate(text_content, target = "ko", source = "en", model = "nmt"))
+
+# i 2021-11-08 01:21:45 > Request Status Code:  400
+# 2021-11-08 01:21:45 -- API returned: Too many text segments
+# 2021-11-08 01:21:45 -- Attempting to split into several API calls
+# 2021-11-08 01:21:45 -- Translating text: 81 characters - 
+# 2021-11-08 01:21:45 -- Translating text: 99 characters - 
+# 2021-11-08 01:21:45 -- Translating text: 132 characters - 
+# 2021-11-08 01:21:46 -- Translating text: 271 characters - 
+# 2021-11-08 01:21:46 -- Translating text: 201 characters - 
+# 2021-11-08 01:21:46 -- Translating text: 99 characters - 
+# 2021-11-08 01:21:46 -- Translating text: 108 characters - 
+# 2021-11-08 01:21:46 -- Translating text: 71 characters - 
+# 2021-11-08 01:21:47 -- Translating text: 118 characters - 
+# 2021-11-08 01:21:47 -- Translating text: 32 characters - 
+# 2021-11-08 01:21:47 -- Translating text: 118 characters - 
+# 2021-11-08 01:21:47 -- Translating text: 262 characters - 
+# 2021-11-08 01:21:47 -- Translating text: 116 characters - 
+# 2021-11-08 01:21:48 -- Translating text: 109 characters - 
+# 2021-11-08 01:21:48 -- Translating text: 108 characters - 
+# 2021-11-08 01:21:48 -- Translating text: 103 characters - 
+# 2021-11-08 01:21:48 -- Translating text: 220 characters - 
+# 2021-11-08 01:21:48 -- Translating text: 146 characters - 
+# 2021-11-08 01:21:49 -- Translating text: 184 characters - 
+# 2021-11-08 01:21:49 -- Translating text: 62 characters - 
+# 2021-11-08 01:21:49 -- Translating text: 94 characters - 
+# 2021-11-08 01:21:49 -- Translating text: 27 characters - 
+# 2021-11-08 01:21:50 -- Translating text: 162 characters - 
+# 2021-11-08 01:21:50 -- Translating text: 328 characters - 
+# 2021-11-08 01:21:50 -- Translating text: 147 characters - 
+# 2021-11-08 01:21:50 -- Translating text: 163 characters - 
+# 2021-11-08 01:21:50 -- Translating text: 206 characters - 
+# 2021-11-08 01:21:51 -- Translating text: 199 characters - 
+# 2021-11-08 01:21:51 -- Translating text: 187 characters - 
+# 2021-11-08 01:21:51 -- Translating text: 123 characters - 
+# 2021-11-08 01:21:51 -- Translating text: 62 characters - 
+# 2021-11-08 01:21:51 -- Translating text: 163 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 150 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 79 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 81 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 103 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 46 characters - 
+# 2021-11-08 01:21:52 -- Translating text: 91 characters - 
+# 2021-11-08 01:21:53 -- Translating text: 335 characters - 
+# 2021-11-08 01:21:53 -- Translating text: 168 characters - 
+# 2021-11-08 01:21:53 -- Translating text: 392 characters - 
+# 2021-11-08 01:21:53 -- Translating text: 111 characters - 
+# 2021-11-08 01:21:53 -- Translating text: 377 characters - 
+# 2021-11-08 01:21:54 -- Translating text: 111 characters - 
+# 2021-11-08 01:21:54 -- Translating text: 136 characters - 
+# 2021-11-08 01:21:54 -- Translating text: 164 characters - 
+# 2021-11-08 01:21:54 -- Translating text: 402 characters - 
+# 2021-11-08 01:21:54 -- Translating text: 72 characters - 
+# 2021-11-08 01:21:55 -- Translating text: 107 characters - 
+# 2021-11-08 01:21:55 -- Translating text: 164 characters - 
+# 2021-11-08 01:21:55 -- Translating text: 148 characters - 
+# 2021-11-08 01:21:55 -- Translating text: 233 characters - 
+# 2021-11-08 01:21:55 -- Translating text: 121 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 34 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 200 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 25 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 125 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 117 characters - 
+# 2021-11-08 01:21:56 -- Translating text: 102 characters - 
+# 2021-11-08 01:21:57 -- Translating text: 140 characters - 
+# 2021-11-08 01:21:57 -- Translating text: 103 characters - 
+# 2021-11-08 01:21:57 -- Translating text: 219 characters - 
+# 2021-11-08 01:21:57 -- Translating text: 171 characters - 
+# 2021-11-08 01:21:57 -- Translating text: 284 characters - 
+# 2021-11-08 01:21:58 -- Translating text: 154 characters - 
+# 2021-11-08 01:21:58 -- Translating text: 205 characters - 
+# 2021-11-08 01:21:58 -- Translating text: 325 characters - 
+# 2021-11-08 01:21:58 -- Translating text: 67 characters - 
+# 2021-11-08 01:21:58 -- Translating text: 569 characters - 
+# 2021-11-08 01:21:59 -- Translating text: 170 characters - 
+# 2021-11-08 01:21:59 -- Translating text: 77 characters - 
+# 2021-11-08 01:21:59 -- Translating text: 174 characters - 
+# 2021-11-08 01:21:59 -- Translating text: 190 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 40 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 104 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 153 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 201 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 42 characters - 
+# 2021-11-08 01:22:00 -- Translating text: 180 characters - 
+# 2021-11-08 01:22:01 -- Translating text: 122 characters - 
+# 2021-11-08 01:22:01 -- Translating text: 193 characters - 
+# 2021-11-08 01:22:01 -- Translating text: 159 characters - 
+# 2021-11-08 01:22:01 -- Translating text: 72 characters - 
+# 2021-11-08 01:22:01 -- Translating text: 153 characters - 
+# 2021-11-08 01:22:02 -- Translating text: 181 characters - 
+# 2021-11-08 01:22:02 -- Translating text: 208 characters - 
+# 2021-11-08 01:22:02 -- Translating text: 103 characters - 
+# 2021-11-08 01:22:02 -- Translating text: 113 characters - 
+# 2021-11-08 01:22:02 -- Translating text: 185 characters - 
+# 2021-11-08 01:22:03 -- Translating text: 160 characters - 
+# 2021-11-08 01:22:03 -- Translating text: 220 characters - 
+# 2021-11-08 01:22:03 -- Translating text: 77 characters - 
+# 2021-11-08 01:22:03 -- Translating text: 99 characters - 
+# 2021-11-08 01:22:03 -- Translating text: 122 characters - 
+# 2021-11-08 01:22:04 -- Translating text: 106 characters - 
+# 2021-11-08 01:22:04 -- Translating text: 127 characters - 
+# 2021-11-08 01:22:04 -- Translating text: 117 characters - 
+# 2021-11-08 01:22:04 -- Translating text: 90 characters - 
+# 2021-11-08 01:22:04 -- Translating text: 124 characters - 
+# 2021-11-08 01:22:05 -- Translating text: 192 characters - 
+# 2021-11-08 01:22:05 -- Translating text: 81 characters - 
+# 2021-11-08 01:22:05 -- Translating text: 76 characters - 
+# 2021-11-08 01:22:05 -- Translating text: 153 characters - 
+# 2021-11-08 01:22:05 -- Translating text: 78 characters - 
+# 2021-11-08 01:22:06 -- Translating text: 119 characters - 
+# 2021-11-08 01:22:06 -- Translating text: 112 characters - 
+# 2021-11-08 01:22:06 -- Translating text: 130 characters - 
+# 2021-11-08 01:22:06 -- Translating text: 103 characters - 
+# 2021-11-08 01:22:06 -- Translating text: 129 characters - 
+# 2021-11-08 01:22:07 -- Translating text: 120 characters - 
+# 2021-11-08 01:22:07 -- Translating text: 68 characters - 
+# 2021-11-08 01:22:07 -- Translating text: 135 characters - 
+# 2021-11-08 01:22:07 -- Translating text: 91 characters - 
+# 2021-11-08 01:22:07 -- Translating text: 62 characters - 
+# 2021-11-08 01:22:08 -- Translating text: 118 characters - 
+# 2021-11-08 01:22:08 -- Translating text: 110 characters - 
+# 2021-11-08 01:22:08 -- Translating text: 148 characters - 
+# 2021-11-08 01:22:08 -- Translating text: 166 characters - 
+# 2021-11-08 01:22:08 -- Translating text: 77 characters - 
+# 2021-11-08 01:22:09 -- Translating text: 116 characters - 
+# 2021-11-08 01:22:09 -- Translating text: 67 characters - 
+# 2021-11-08 01:22:09 -- Translating text: 179 characters - 
+# 2021-11-08 01:22:09 -- Translating text: 107 characters - 
+# 2021-11-08 01:22:09 -- Translating text: 164 characters - 
+# 2021-11-08 01:22:10 -- Translating text: 114 characters - 
+# 2021-11-08 01:22:10 -- Translating text: 68 characters - 
+# 2021-11-08 01:22:10 -- Translating text: 109 characters - 
+# 2021-11-08 01:22:10 -- Translating text: 111 characters - 
+# 2021-11-08 01:22:10 -- Translating text: 157 characters - 
+# 2021-11-08 01:22:11 -- Translating text: 27 characters - 
+# 2021-11-08 01:22:11 -- Translating text: 102 characters - 
+# 2021-11-08 01:22:11 -- Translating text: 72 characters - 
+# 2021-11-08 01:22:11 -- Translating text: 130 characters - 
+# 2021-11-08 01:22:11 -- Translating text: 174 characters - 
+# 2021-11-08 01:22:12 -- Translating text: 149 characters - 
+# 2021-11-08 01:22:12 -- Translating text: 72 characters - 
+# 2021-11-08 01:22:12 -- Translating text: 120 characters - 
+# 2021-11-08 01:22:12 -- Translating text: 191 characters - 
+# 2021-11-08 01:22:12 -- Translating text: 104 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 173 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 59 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 48 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 62 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 207 characters - 
+# 2021-11-08 01:22:13 -- Translating text: 115 characters - 
+# 2021-11-08 01:22:14 -- Translating text: 125 characters - 
+# 2021-11-08 01:22:14 -- Translating text: 89 characters - 
+# 2021-11-08 01:22:14 -- Translating text: 79 characters - 
+# 2021-11-08 01:22:14 -- Translating text: 106 characters - 
+# 2021-11-08 01:22:14 -- Translating text: 125 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 38 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 53 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 57 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 154 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 46 characters - 
+# 2021-11-08 01:22:15 -- Translating text: 115 characters - 
+# 2021-11-08 01:22:16 -- Translating text: 166 characters - 
+# 2021-11-08 01:22:16 -- Translating text: 52 characters - 
+# 2021-11-08 01:22:16 -- Translating text: 176 characters - 
+# 2021-11-08 01:22:16 -- Translating text: 130 characters - 
+# 2021-11-08 01:22:16 -- Translating text: 114 characters - 
+# 2021-11-08 01:22:17 -- Translating text: 82 characters - 
+# 2021-11-08 01:22:17 -- Translating text: 165 characters - 
+# 2021-11-08 01:22:17 -- Translating text: 171 characters - 
+# 2021-11-08 01:22:17 -- Translating text: 218 characters - 
+# 2021-11-08 01:22:17 -- Translating text: 66 characters - 
+# 2021-11-08 01:22:18 -- Translating text: 84 characters - 
+# 2021-11-08 01:22:18 -- Translating text: 138 characters - 
+# 2021-11-08 01:22:18 -- Translating text: 65 characters - 
+# 2021-11-08 01:22:18 -- Translating text: 201 characters - 
+# 2021-11-08 01:22:18 -- Translating text: 118 characters - 
+# 2021-11-08 01:22:19 -- Translating text: 176 characters - 
+# 2021-11-08 01:22:19 -- Translating text: 130 characters - 
+# 2021-11-08 01:22:19 -- Translating text: 241 characters - 
+# 2021-11-08 01:22:19 -- Translating text: 78 characters - 
+# 2021-11-08 01:22:19 -- Translating text: 85 characters - 
+# 2021-11-08 01:22:20 -- Translating text: 214 characters - 
+# 2021-11-08 01:22:20 -- Translating text: 204 characters - 
+# 2021-11-08 01:22:20 -- Translating text: 183 characters - 
+# 2021-11-08 01:22:20 -- Translating text: 188 characters - 
+# 2021-11-08 01:22:20 -- Translating text: 140 characters - 
+# 2021-11-08 01:22:21 -- Translating text: 270 characters - 
+# 2021-11-08 01:22:21 -- Translating text: 239 characters - 
+# 2021-11-08 01:22:21 -- Translating text: 142 characters - 
+# 2021-11-08 01:22:21 -- Translating text: 146 characters - 
+# 2021-11-08 01:22:21 -- Translating text: 87 characters - 
+# 2021-11-08 01:22:22 -- Translating text: 124 characters - 
+# 2021-11-08 01:22:22 -- Translating text: 139 characters - 
+# 2021-11-08 01:22:22 -- Translating text: 218 characters - 
+# 2021-11-08 01:22:22 -- Translating text: 122 characters - 
+# 2021-11-08 01:22:22 -- Translating text: 94 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 80 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 166 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 46 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 91 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 21 characters - 
+# 2021-11-08 01:22:23 -- Translating text: 132 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 137 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 120 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 183 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 189 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 46 characters - 
+# 2021-11-08 01:22:24 -- Translating text: 98 characters - 
+# 2021-11-08 01:22:25 -- Translating text: 185 characters - 
+# 2021-11-08 01:22:25 -- Translating text: 233 characters - 
+# 2021-11-08 01:22:25 -- Translating text: 159 characters - 
+# 2021-11-08 01:22:25 -- Translating text: 46 characters - 
+# 2021-11-08 01:22:25 -- Translating text: 66 characters - 
+# 2021-11-08 01:22:26 -- Translating text: 92 characters - 
+# 2021-11-08 01:22:26 -- Translating text: 291 characters - 
+# 2021-11-08 01:22:26 -- Translating text: 149 characters - 
+# 2021-11-08 01:22:26 -- Translating text: 59 characters - 
+# 2021-11-08 01:22:26 -- Translating text: 38 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 98 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 160 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 37 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 82 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 250 characters - 
+# 2021-11-08 01:22:27 -- Translating text: 152 characters - 
+# 2021-11-08 01:22:28 -- Translating text: 167 characters - 
+# 2021-11-08 01:22:28 -- Translating text: 147 characters - 
+# 2021-11-08 01:22:28 -- Translating text: 70 characters - 
+# 2021-11-08 01:22:28 -- Translating text: 136 characters - 
+# 2021-11-08 01:22:28 -- Translating text: 100 characters - 
+# 2021-11-08 01:22:29 -- Translating text: 60 characters - 
+# 2021-11-08 01:22:29 -- Translating text: 206 characters - 
+# 2021-11-08 01:22:29 -- Translating text: 101 characters - 
+# 2021-11-08 01:22:29 -- Translating text: 105 characters - 
+# 2021-11-08 01:22:29 -- Translating text: 110 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 106 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 125 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 159 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 60 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 252 characters - 
+# 2021-11-08 01:22:30 -- Translating text: 161 characters - 
+# 2021-11-08 01:22:31 -- Translating text: 163 characters - 
+# 2021-11-08 01:22:31 -- Translating text: 89 characters - 
+# 2021-11-08 01:22:31 -- Translating text: 117 characters - 
+# 2021-11-08 01:22:31 -- Translating text: 153 characters - 
+# 2021-11-08 01:22:31 -- Translating text: 75 characters - 
+# 2021-11-08 01:22:32 -- Translating text: 50 characters - 
+# 2021-11-08 01:22:32 -- Translating text: 102 characters - 
+
+julia_sentence_gl_translation_srt %>% 
+  write_rds("data/julia_silge/julia_sentence_gl_translation_srt.rds")
+
+```
+
+
+```{r read-julia-transtion}
+julia_sentence_gl_translation_srt  <-  
+  read_rds("data/julia_silge/julia_sentence_gl_translation_srt.rds")
+
+julia_translation_listcolumn <- julia_sentence_gl_translation_srt %>% 
+  pull(translation)
+
+julia_sentence_srt %>% 
+  bind_cols(julia_translation_listcolumn) %>% 
+  select(-text) %>% 
+  janitor::clean_names() %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    id = colDef(minWidth = 10),
+    timecode_in = colDef(minWidth = 25),
+    timecode_out = colDef(minWidth = 25),
+    text_content = colDef(minWidth = 100),
+    translated_text = colDef(minWidth = 100)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)  
+
+```
+
+구글 유튜브에서 활용이 가능하도록 `.srt` 파일로 영한 구글 기계번역을 문장단위로 수행하여 번역이 자연스럽도록 수행한 뒤에 내보내기 작업을 수행하여 저장한다.
+
+```{r make-export-for-youtube-srt, eval = FALSE}
+julia_sentence_srt %>% 
+  bind_cols(julia_translation_listcolumn) %>% 
+  select(-text) %>% 
+  janitor::clean_names() %>% 
+  select(id, timecode_in, timecode_out, text_content = translated_text) %>% 
+  set_names("ID", "Timecode_in", "Timecode_out", "Text_content") %>% 
+  subtools::write_subtitles(file = "data/julia_silge/15_silge_kor_sentence.srt", 
+                            format = "srt", encoding = "UTF-8")
+  
+```
 
