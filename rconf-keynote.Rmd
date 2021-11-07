@@ -189,3 +189,111 @@ srt_eng_text[1:10]
 ```
 
 
+# 영문 `.srt` 파일 번역 {#srt-file-translation}
+
+## 전체 통번역 {#full-text-translation}
+
+먼저 텍스트를 하나로 묶어 이를 전체 문자 벡터로 만든 후에 이를 구글 번역기에 넣어 한글로 번역한다.
+
+```{r srt-file-translation-full, eval = FALSE}
+library(googleLanguageR)
+
+eng_plain_text <- keynote %>% 
+  summarise(eng_text = paste(subtitle, collapse = " ")) %>% 
+  pull()
+
+kor_translated_text <- googleLanguageR::gl_translate(eng_plain_text, target = "ko", source = "en", model = "nmt")
+# 2021-11-07 10:53:00 -- Translating text: 33505 characters - 
+
+kor_translated_text %>% 
+  write_rds("data/julia_silge/full_ko_translation.rds")
+```
+
+영어 원문과 구글 번역기를 돌려 나온 결과물을 나란히 놓고 비교해보자.
+
+```{r show-full-translation-side}
+kor_translated_text <- 
+  read_rds("data/julia_silge/full_ko_translation.rds")
+
+kor_translated_text %>% 
+  select(text, translatedText) %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  # columns = list(
+  #   translatedText = colDef(minWidth = 100),
+  #   text = colDef(minWidth = 100)
+  # ),
+  bordered = TRUE,
+  highlight = TRUE)
+```
+
+## `.srt` 자막 번역 {#srt-translation}
+
+통번역이 아니라 `.srt` 파일에 나온 자막 시작시간과 종료시간을 고려하여 번역작업을 수행해보자.
+
+```{r srt-file-translation, eval = FALSE}
+keynote_gl_tbl <- keynote %>% 
+  mutate(translation = googleLanguageR::gl_translate(subtitle, target = "ko", source = "en", model = "nmt"))
+
+keynote_gl_tbl %>% 
+  write_rds("data/julia_silge/keynote_gl_tbl.rds")
+```
+
+`.srt` 파일로 번역한 것을 영어 원문과 비교해 보면 다음과 같다.
+
+```{r srt-file-translation-review}
+keynote_gl_tbl <-  
+  read_rds("data/julia_silge/keynote_gl_tbl.rds")
+
+translation_obj <- keynote_gl_tbl %>% 
+  pull(translation)
+
+translation_obj %>% 
+  select(translatedText) %>% 
+  bind_cols(keynote_gl_tbl %>% select(-translation)) %>% 
+  select(n, start, end, subtitle, translatedText) %>% 
+  mutate(start = scales::comma(start),
+         end = scales::comma(end)) %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    n = colDef(minWidth = 10),
+    start = colDef(minWidth = 25),
+    end = colDef(minWidth = 25),
+    subtitle = colDef(minWidth = 100),
+    translatedText = colDef(minWidth = 100)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)
+```
+
+## `.srt` 번역자막 내보내기 {#translation-export}
+
+마지막으로 이렇게 기계 번역을 완료한 `.srt` 파일을 내보내서 기계번역을 입혀보도록 하자.
+
+```{r srt-export}
+keynote_kor_srt <- translation_obj %>% 
+  select(translatedText) %>% 
+  bind_cols(keynote_gl_tbl %>% select(-translation)) %>% 
+  select(n, start, end, subtitle = translatedText)
+
+# 기대했던 결과가 아님!!! 
+keynote_kor_srt %>% 
+  srt::write_srt("data/julia_silge/15_silge_kor_google.srt")
+
+
+
+```
+
