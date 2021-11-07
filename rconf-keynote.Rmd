@@ -17,7 +17,7 @@ output:
     highlight: tango
     code_folding: show
     number_section: true
-    self_contained: true
+    self_contained: false
 bibliography: bibliography.bib
 csl: biomed-central.csl
 urlcolor: blue
@@ -26,7 +26,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-``` {r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
                       comment="", digits = 3, tidy = FALSE, prompt = FALSE, fig.align = 'center')
 
@@ -35,10 +35,9 @@ knitr::opts_knit$set(global.par = TRUE)
 
 ![](fig/rconf_keynote_translation.jpg)
 
-# 동영상 &rarr; 오디오 추출 {#audio-extraction}
+# 동영상 → 오디오 추출 {#audio-extraction}
 
-동영상에서 오디오를 추출해서 Speech to Text (STT)가 가능한 `.flac` 형태로 저장한다.
-유튜브 동영상에서 오디오를 추출하는 사례를 [speech-to-text - 음성을 텍스트로 변환](https://statkclee.github.io/deep-learning/r-stt.html)에서 자세한 사항 참조한다.
+동영상에서 오디오를 추출해서 Speech to Text (STT)가 가능한 `.flac` 형태로 저장한다. 유튜브 동영상에서 오디오를 추출하는 사례를 [speech-to-text - 음성을 텍스트로 변환](https://statkclee.github.io/deep-learning/r-stt.html)에서 자세한 사항 참조한다.
 
 ```{r julia-silge}
 library(embedr)
@@ -48,14 +47,13 @@ embed_audio("data/julia_silge/15_silge.mp3")
 
 ```
 
-# 오디오 &rarr; 텍스트 (STT) {#audio-extraction-stt}
+# 오디오 → 텍스트 (STT) {#audio-extraction-stt}
 
 [Cloud Speech-to-Text API](https://cloud.google.com/speech-to-text/)를 사용해서 오디오에서 텍스트를 추출한다. 하지만 1분이 넘어가는 경우 제약이 있기 때문에 Google Cloud Storage에 앞서 추출한 `.flac` 파일을 GCS 버킷에 넣어 사용해야만 한다. 추출한 오디오 `.flac` 파일을 GCS 버킷에 담는 자세한 과정은 [Google Cloud Storage - googleCloudStorageR](https://statkclee.github.io/deep-learning/r-google-storage.html)을 참조한다.
 
-구글 STT API를 활용하게 되면 오디오 파일을 입력으로 받아 추출한 텍스트와 시점정보를 함께 반환한다.
-`객체명$transcript`에 오디오에서 추출된 텍스트, `객체명$timings`에 추출된 텍스트 시점정보가 함께 저장되어 있다.
+구글 STT API를 활용하게 되면 오디오 파일을 입력으로 받아 추출한 텍스트와 시점정보를 함께 반환한다. `객체명$transcript`에 오디오에서 추출된 텍스트, `객체명$timings`에 추출된 텍스트 시점정보가 함께 저장되어 있다.
 
-약 45분 오디오를 구글 STT에서 처리하는데 2,820 초가 소요되었다. 
+약 45분 오디오를 구글 STT에서 처리하는데 2,820 초가 소요되었다.
 
 ```{r tts-hello, error=TRUE, eval = FALSE}
 library(googleLanguageR)
@@ -87,7 +85,7 @@ julia_stt_timing_list %>%
   write_rds("data/julia_silge/julia_stt_timing_list.rds")
 ```
 
-## STT 기계추출 &rarr; 텍스트 {#stt-raw-text}
+## STT 기계추출 → 텍스트 {#stt-raw-text}
 
 추출한 텍스트와 전문은 다음과 같다. [다운로드: STT 원본 TEXT](data/julia_silge/julia_stt_raw_text.txt)
 
@@ -103,7 +101,8 @@ julia_stt_raw_text <- julia_stt_tbl %>%
 # julia_stt_raw_text %>% 
 #   write_lines("data/julia_silge/julia_stt_raw_text.txt")
 
-julia_stt_raw_text %>% 
+str_sub(julia_stt_raw_text, 1, 1000) %>% 
+  as_tibble() %>% 
     reactable::reactable(
     defaultColDef = colDef(
       header = function(value) gsub(".", " ", value, fixed = TRUE),
@@ -116,8 +115,7 @@ julia_stt_raw_text %>%
   highlight = TRUE)
 ```
 
-
-## STT 기계추출 &rarr; 시간 {#stt-raw-text-timing}
+## STT 기계추출 → 시간 {#stt-raw-text-timing}
 
 다음으로 중요한 것은 시점정보다. 이를 위해서 총 45분 강연이라 5분 단위로 짤라 9개로 쪼개 추후 자연어 처리가 가능하도록 조치한다.
 
@@ -142,6 +140,7 @@ julia_stt_timing_five_tbl <- julia_stt_timing_tbl %>%
   summarise(five_min_text = paste(word, collapse = " "))
 
 julia_stt_timing_five_tbl %>% 
+  slice(1) %>% 
   reactable::reactable(
     defaultColDef = colDef(
       header = function(value) gsub(".", " ", value, fixed = TRUE),
@@ -156,6 +155,37 @@ julia_stt_timing_five_tbl %>%
   ),
   bordered = TRUE,
   highlight = TRUE)
+```
+
+# `.srt` 파일 {#srt-file}
+
+구글 STT의 경우 상세한 시점정보가 제공되나 단어 STT 시간과 거의 1분 단위로 기계적으로 쪼개진 정보만 제공되고 있다. [데이터 가져오기 - 유튜브, 영화자막](https://statkclee.github.io/ingest-data/ingest-srt.html)을 참고하여 자막정보를 만들어보자.
+
+자막 `.srt` 파일을 제작하는 다른 방식은 유튜브 자막 자동생성 기능을 활용하는 것이다. 일단 동영상을 업로드하고 공개로 설정을 해주면 기계가 자동으로 STT 를 수행하여 자막을 추출할 수 있게 도움을 준다.
+
+![](fig/youtube-auto-cc.jpg){width="394"}
+
+# `.srt` 파일 교정 {#srt-file-proof-reading}
+
+[Subtitle Edit](https://github.com/SubtitleEdit/subtitleedit/releases) 최신 버전을 설치하여 구글 STT 기능으로 추출된 텍스트를 교정한다. 
+구글 STT는 아무래도 R 데이터 과학 전문용어에는 한계가 있기 때문에 `RStudio`, `dplyr`와 같은 용어오 `stopwords`, `n-gram`와 같은 NLP 전문용어 그리고 `um` 의성어 등도 있는 그대로 텍스트로 떨구기 때문에 이런 용어를 교정할 필요가 있다. [교정한 영문 SRT 파일](data/julia_silge/15_silge_english.srt)
+
+![](fig/youtube-subtitleedit.jpg)
+
+```{r ingest-srt-file}
+library(srt)
+
+srt_eng_raw <- read_lines("data/julia_silge/15_silge_english.srt")
+
+srt_eng_text <- srt_eng_raw[srt_eng_raw != ""]
+
+srt_eng_text[1:10]
+```
+
+`read_srt()` 함수를 사용하여 전체 내용을 살펴보면 다음과 같다.
+
+```{r second-srt-feature}
+(keynote <- read_srt(path = "data/julia_silge/15_silge_english.srt", collapse = " "))
 ```
 
 
