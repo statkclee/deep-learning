@@ -678,3 +678,18 @@ julia_sentence_srt %>%
   
 ```
 
+## 엑셀파일 내보내기 {#export-srt-excel}
+
+R 써포터즈가 작업하기 편하도록 엑셀파일로 변환시킨다.
+
+```{r export-excel-srt, eval = FALSE}
+julia_sentence_srt %>% 
+  bind_cols(julia_translation_listcolumn) %>% 
+  select(-text) %>% 
+  writexl::write_xlsx(path = "data/julia_silge/keynote_translation.xlsx")
+```
+
+![](fig/julia-human-translation.jpg)
+
+
+
