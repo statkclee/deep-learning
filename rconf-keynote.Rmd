@@ -167,8 +167,7 @@ julia_stt_timing_five_tbl %>%
 
 # `.srt` 파일 교정 {#srt-file-proof-reading}
 
-[Subtitle Edit](https://github.com/SubtitleEdit/subtitleedit/releases) 최신 버전을 설치하여 구글 STT 기능으로 추출된 텍스트를 교정한다. 
-구글 STT는 아무래도 R 데이터 과학 전문용어에는 한계가 있기 때문에 `RStudio`, `dplyr`와 같은 용어오 `stopwords`, `n-gram`와 같은 NLP 전문용어 그리고 `um` 의성어 등도 있는 그대로 텍스트로 떨구기 때문에 이런 용어를 교정할 필요가 있다. [교정한 영문 SRT 파일](data/julia_silge/15_silge_english.srt)
+[Subtitle Edit](https://github.com/SubtitleEdit/subtitleedit/releases) 최신 버전을 설치하여 구글 STT 기능으로 추출된 텍스트를 교정한다. 구글 STT는 아무래도 R 데이터 과학 전문용어에는 한계가 있기 때문에 `RStudio`, `dplyr`와 같은 용어오 `stopwords`, `n-gram`와 같은 NLP 전문용어 그리고 `um` 의성어 등도 있는 그대로 텍스트로 떨구기 때문에 이런 용어를 교정할 필요가 있다. [교정한 영문 SRT 파일](data/julia_silge/15_silge_english.srt)
 
 ![](fig/youtube-subtitleedit.jpg)
 
@@ -187,7 +186,6 @@ srt_eng_text[1:10]
 ```{r second-srt-feature}
 (keynote <- read_srt(path = "data/julia_silge/15_silge_english.srt", collapse = " "))
 ```
-
 
 # 영문 `.srt` 파일 번역 {#srt-file-translation}
 
@@ -295,7 +293,7 @@ keynote_kor_srt <- translation_obj %>%
 
 ```
 
-`srt::write_srt()` 함수에 버그가 있어 [`subtools`](https://github.com/fkeck/subtools)  
+`srt::write_srt()` 함수에 버그가 있어 [`subtools`](https://github.com/fkeck/subtools)
 
 ```{r srt-export-with-subtools, eval = FALSE}
 # devtools::install_github("fkeck/subtools")
@@ -346,8 +344,7 @@ kor_subtools %>%
 
 # 깔끔한 작업흐름 {#google-translation}
 
-구글 실시간 번역 결과를 의미있는 형태로 바꾸기 위해서는 이를 문장단위로 나눠져야 구글 번역기의
-성능이 향상되어 나름 적은 노력으로 `.srt` 한글 번역 자막을 만들어 바로 활용할 수 있다. 
+구글 실시간 번역 결과를 의미있는 형태로 바꾸기 위해서는 이를 문장단위로 나눠져야 구글 번역기의 성능이 향상되어 나름 적은 노력으로 `.srt` 한글 번역 자막을 만들어 바로 활용할 수 있다.
 
 ```{r read-sentence-level-translation}
 julia_sentence_srt <- 
@@ -632,7 +629,6 @@ julia_sentence_gl_translation_srt %>%
 
 ```
 
-
 ```{r read-julia-transtion}
 julia_sentence_gl_translation_srt  <-  
   read_rds("data/julia_silge/julia_sentence_gl_translation_srt.rds")
@@ -691,5 +687,72 @@ julia_sentence_srt %>%
 
 ![](fig/julia-human-translation.jpg)
 
+# 전문가 번역 반영 최종 `.srt` {#google-translation-final}
 
+구글 번역기는 특히, 전문 용어 (자연어처리, 기계학습, 데이터과학, R/Tidyverse) 처리가 미진하고 경우에 따라서는 오역이 상당수 존재하여 이를 전문가가 직접 보정할 필요가 있다. 전문가 번역에는 한국 R 사용자회 이광춘, 이영록, 이승현 님이 참여해주셨습니다. 
+
+![](fig/julia-srt-completed.jpg)
+
+번역이 완료되었기 때문에 최종 한글 번역 완료 자막을 넣어 확정하자.
+
+```{r julia-sliege-completed}
+library(tidyverse)
+library(srt)
+library(subtools)
+library(readxl)
+
+julia_sentence_gl_translation_srt  <-  
+  read_rds("data/julia_silge/julia_sentence_gl_translation_srt.rds")
+
+julia_translated  <-  
+  read_excel("data/julia_silge/keynote_translation_human.xlsx") %>% 
+  janitor::clean_names(ascii = FALSE) %>% 
+  select(id, `사람_번역`)
+
+julia_base_srt <- julia_sentence_gl_translation_srt %>% select(id, timecode_in, timecode_out)
+
+julia_ko_srt <- julia_base_srt %>% 
+   inner_join(julia_translated, by = "id")
+
+julia_ko_srt %>% 
+  select(ID = id, Timecode_in = timecode_in, Timecode_out = timecode_out, Text_content = `사람_번역`) %>% 
+  subtools::write_subtitles(file = "data/julia_silge/15_silge_kor_human.srt", 
+                            format = "srt", encoding = "UTF-8")
+```
+
+마지막 번역 결과를 살펴보자.
+
+```{r final-review}
+library(reactable)
+
+julia_tbl <- julia_sentence_gl_translation_srt %>% 
+  inner_join(julia_translated, by = "id")
+
+google_translation_tbl <- julia_tbl %>% 
+  pull(translation)
+
+julia_tbl %>% 
+  select(id, timecode_in, timecode_out, text_content, 사람_번역) %>% 
+  bind_cols(google_translation_tbl %>% select(translatedText)) %>% 
+  rename(구글_기계번역 = translatedText) %>% 
+  reactable::reactable(
+    defaultColDef = colDef(
+      header = function(value) gsub(".", " ", value, fixed = TRUE),
+      cell = function(value) format(value, nsmall = 1),
+      align = "center",
+      minWidth = 70,
+      headerStyle = list(background = "#f7f7f8")
+  ),
+  columns = list(
+    id = colDef(minWidth = 10),
+    timecode_in = colDef(minWidth = 25),
+    timecode_out = colDef(minWidth = 25),
+    text_content = colDef(minWidth = 100),
+    사람_번역 = colDef(minWidth = 100),
+    구글_기계번역 = colDef(minWidth = 100)
+  ),
+  bordered = TRUE,
+  highlight = TRUE)  
+
+```
 
